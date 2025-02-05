@@ -1,12 +1,9 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
-
-export default async function Dashboard() {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    return <p>Access Denied. Please log in.</p>;
-  }
-
-  return <h1>Welcome, {session.user.email}!</h1>;
+export default function Home() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h1 className="text-3xl font-bold">Welcome to Ephantronics</h1>
+      <p>Start shopping today!</p>
+      <a href="/auth/signin" className="mt-4 text-blue-500">Sign In</a>
+    </div>
+  );
 }
