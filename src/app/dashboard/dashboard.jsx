@@ -5,8 +5,13 @@ export default async function Dashboard() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return <p>Access Denied. Please log in.</p>;
+    return <p>You need to sign in to access this page.</p>;
   }
 
-  return <h1>Welcome, {session.user.email}!</h1>;
+  return (
+    <div>
+      <h1>Welcome to your Dashboard, {session.user.email}!</h1>
+      <p>This is a protected route.</p>
+    </div>
+  );
 }

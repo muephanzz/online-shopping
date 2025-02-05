@@ -1,17 +1,59 @@
 datasource db {
-  provider = "mongodb"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model User {
+  id        String   @id @default(uuid())  
+  name      String?  
+  email     String   @unique  
+  password  String  
+  phone     String?  @unique  
+  createdAt DateTime @default(now())  
+
+  accounts    Account[]
+  sessions    Session[]
 }
 
-model User {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String?
-  email    String  @unique
-  password String
-  phone    String? @unique
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  
+  type              String  
+  provider          String  
+  providerAccountId String  @unique
+  access_token      String?  
+  refresh_token     String?  
+  expires_at        Int?  
+  token_type        String?  
+  scope             String?  
+  id_token          String?  
+  session_state     String?  
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+model Product {
+  id        String  @id @default(uuid())
+  name      String
+  price     Float
+  stock     Int
+  imageUrl  String
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id        String  @id @default(uuid())
+  userId    String
+  total     Float
   createdAt DateTime @default(now())
 }
