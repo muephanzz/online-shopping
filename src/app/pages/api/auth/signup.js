@@ -1,6 +1,6 @@
 // pages/api/auth/signup.js
-import { prisma } from '../../../lib/prisma'; 
-import { supabase } from '../../../lib/supabaseClient'; 
+import { prisma } from '../../../../../lib/prisma'; 
+import { supabase } from '../../../../../lib/supabaseClient'; 
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
