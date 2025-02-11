@@ -1,10 +1,12 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { supabase } from '../../utils/supabaseClient';
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { createClient } from '@supabase/supabase-js';
+import { Card, CardContent } from '../../components/ui/card';
+import { Button } from "../../components/ui/button";
 import { Star } from 'lucide-react';
 import Image from 'next/image';
+
+const supabase = createClient('https://znjrafazpveysjguzxri.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuanJhZmF6cHZleXNqZ3V6eHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzkxMzg1OTAsImV4cCI6MjA1NDcxNDU5MH0.jdJDl_QoXDF-0_2FxQSt4qml-kj2jQtMmYsL4Vbk7Ks');
 
 export default function ProductPage() {
   const router = useRouter();
@@ -39,7 +41,6 @@ export default function ProductPage() {
   return (
     <div className="max-w-5xl mx-auto p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Product Images */}
         <div>
           <Image 
             src={product.images[0]} 
@@ -62,7 +63,6 @@ export default function ProductPage() {
           </div>
         </div>
 
-        {/* Product Details */}
         <div>
           <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
           <p className="text-xl text-green-600 font-semibold mb-4">${product.price}</p>
@@ -71,7 +71,6 @@ export default function ProductPage() {
         </div>
       </div>
 
-      {/* Reviews Section */}
       <div className="mt-10">
         <h2 className="text-2xl font-semibold mb-4">Customer Reviews</h2>
         {product.reviews && product.reviews.length > 0 ? (
