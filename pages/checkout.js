@@ -1,13 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
 
 export default function Checkout() {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(0);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Retrieve cart items from localStorage
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    // Calculate total price
+    const totalPrice = storedCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    
+    // Set the total as the default amount
+    setAmount(totalPrice);
+  }, []);
 
   const handlePayment = async () => {
     setMessage('');
@@ -26,6 +37,7 @@ export default function Checkout() {
   return (
     <div className="max-w-md mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Checkout</h1>
+
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Phone Number</label>
         <Input
@@ -35,15 +47,17 @@ export default function Checkout() {
           placeholder="Enter your M-Pesa phone number"
         />
       </div>
+
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700">Amount</label>
         <Input
           type="number"
           value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          placeholder="Enter amount"
+          readOnly // Prevents manual changes
+          className="bg-gray-200 cursor-not-allowed"
         />
       </div>
+
       <Button onClick={handlePayment}>Pay with M-Pesa</Button>
 
       {message && <p className="mt-4 text-green-600">{message}</p>}
