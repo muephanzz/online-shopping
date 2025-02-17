@@ -78,7 +78,7 @@ export default function Cart() {
           </div>
         </div>
       ) : (
-        <p className="text-center text-gray-500">Your cart is empty.</p>
+        <p className="text-center text-gray-500">Your cart is empty. Start adding Item to it!</p>
       )}
     </div>
   );

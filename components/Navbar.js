@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import { ShoppingCart, UserCircle, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { FaDownload, FaBars, FaTimes } from "react-icons/fa";
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabaseClient';
 import { Button } from "../components/ui/button";
@@ -51,14 +50,12 @@ export default function Navbar() {
         
         {/* Logo */}
         <Link href="/">
-          <h1 className="text-2xl font-bold text-blue-600">MyStore</h1>
+          <h1 className="text-2xl font-bold text-blue-600">Ephantronics</h1>
         </Link>
 
         {/* Centered Navigation Links + Search Bar */}
         <div className="flex-1 mx-10 flex items-center space-x-6">
-          <Link href="/" className="text-gray-700 hover:text-blue-600">
-            <FaUser className="inline mr-2" />Home
-          </Link>
+          <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
           <Link href="/categories" className="text-gray-700 hover:text-blue-600">Categories</Link>
           <Link href="/contact" className="text-gray-700 hover:text-blue-600">Contact</Link>
 
