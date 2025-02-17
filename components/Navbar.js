@@ -53,24 +53,17 @@ export default function Navbar() {
           <h1 className="text-2xl font-bold text-blue-600">Ephantronics</h1>
         </Link>
 
-        {/* Centered Navigation Links + Search Bar */}
-        <div className="flex-1 mx-10 flex items-center space-x-6">
-          <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
-          <Link href="/categories" className="text-gray-700 hover:text-blue-600">Categories</Link>
-          <Link href="/contact" className="text-gray-700 hover:text-blue-600">Contact</Link>
-
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="relative w-full max-w-sm">
-            <input
-              type="text"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <Search className="absolute left-3 top-2.5 text-gray-500" size={20} />
-          </form>
-        </div>
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} className="relative w-full max-w-sm">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <Search className="absolute left-3 top-2.5 text-gray-500" size={20} />
+        </form>
 
         {/* User & Cart Section */}
         <div className="flex items-center space-x-6">
@@ -135,6 +128,12 @@ export default function Navbar() {
           )}
         </div>
       </div>
+      {/* Centered Navigation Links + Search Bar */}
+      <nav className="flex-1 mt-5 flex items-left space-x-6">
+        <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
+        <Link href="/categories" className="text-gray-700 hover:text-blue-600">Categories</Link>
+        <Link href="/contact" className="text-gray-700 hover:text-blue-600">Contact</Link>
+      </nav>
     </nav>
   );
 }
