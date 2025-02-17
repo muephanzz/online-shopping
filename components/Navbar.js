@@ -1,17 +1,24 @@
+'useclient';
+
 import Link from 'next/link';
-import { ShoppingCart, UserCircle, Search } from 'lucide-react';
+import { ShoppingCart, UserCircle, Search, Menu, Contact } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabaseClient';
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input"; // Make sure this exists or use a basic input.
+import { Input } from "../components/ui/input"; 
+import { Home, User, Laptop, Smartphone } from 'lucide-react';
 
 export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+
+  const toggleMenu = () => setMenuOpen(!menuOpen);
+  const closeMenu = () => setMenuOpen(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -45,16 +52,19 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-md p-4">
+    <nav 
+      style={{position:"fixed", width:"100%"}} 
+      className="bg-white shadow-md p-4 z-40">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         
         {/* Logo */}
         <Link href="/">
-          <h1 className="text-2xl font-bold text-blue-600">Ephantronics</h1>
+          <h1 className="hidden md:flex text-2xl font-bold text-blue-600">Ephantronics</h1>
+          <h1 className="md:hidden text-1.2xl font-bold text-blue-600">Ephantronics</h1>
         </Link>
 
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="relative w-full max-w-sm">
+        <form onSubmit={handleSearch} className="relative w-full max-w mx-2">
           <input
             type="text"
             placeholder="Search products..."
@@ -110,30 +120,74 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="relative">
-              <UserCircle
-                className="w-8 h-8 text-gray-700 cursor-pointer"
-                onClick={toggleDropdown}
-              />
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2">
-                  <Link href="/signin">
-                    <div className="px-4 py-2 text-gray-700 hover:bg-gray-100">Sign In</div>
-                  </Link>
-                  <Link href="/signup">
-                    <div className="px-4 py-2 text-gray-700 hover:bg-gray-100">Sign Up</div>
-                  </Link>
-                </div>
-              )}
+            <Link href="/signin">
+              <UserCircle className="w-8 h-8 text-gray-700 cursor-pointer" />
+            </Link>
             </div>
           )}
         </div>
       </div>
-      {/* Centered Navigation Links + Search Bar */}
-      <nav className="flex-1 mt-5 flex items-left space-x-6">
-        <Link href="/" className="text-gray-700 hover:text-blue-600">Home</Link>
-        <Link href="/categories" className="text-gray-700 hover:text-blue-600">Categories</Link>
-        <Link href="/contact" className="text-gray-700 hover:text-blue-600">Contact</Link>
-      </nav>
-    </nav>
+      
+      {/* Navbar */}
+      <div
+        className="absolute left-0 right-0 z-50 p-5 flex justify-between items-center"
+      >
+        {/* Mobile Menu Icon */}
+        <div className="md:hidden">
+          <button onClick={toggleMenu} className="text-gray-300 text-3xl">
+            {menuOpen ? <Smartphone /> : <Menu />}
+          </button>
+        </div>
+
+        {/* Desktop Menu */}
+        <div className="hidden top-30 md:flex justify-center gap-10 text-lg">
+          <a href="#about" className="text-gray-300 text-2 hover:text-grey block">
+            Home
+          </a>
+          <a href="#projects" className="text-gray-300 text-2 hover:text-grey block">
+            Projects
+          </a>
+          <a href="#contact" className="text-gray-300 text-2 hover:text-grey block">
+            Contact
+          </a>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      <div
+        initial={{ opacity: 0, x: -200 }}
+        animate={{ opacity: menuOpen ? 1 : 0, x: menuOpen ? 0 : -200 }}
+        transition={{ duration: 0.3 }}
+        className={`fixed  left-0 w-64 h-full bg-gray-800 z-40 p-5 space-y-4 md:hidden ${menuOpen ? 'block' : 'hidden'}`}
+      >
+      <Link href="/">
+        <h1 className="text-1.8xl font-bold text-blue-600">Ephantronics</h1>
+      </Link>
+      <a href="#about" className="text-gray-300 text-0.8xl hover:text-blue block" onClick={closeMenu}>
+        <Home size={18} className="inline mr-2" /> Home
+      </a>
+      <a href="#contact" className="text-gray-300 text-0.8xl hover:text-blue block" onClick={closeMenu}>
+        <Smartphone size={18} className="inline mr-2" /> Smartphones
+      </a>
+      <a href="#projects" className="text-gray-300 text-0.8xl hover:text-blue block" onClick={closeMenu}>
+        <Laptop size={18} className="inline mr-2" /> Laptops
+      </a>
+      <a href="#projects" className="text-gray-300 text-0.8xl hover:text-blue block" onClick={closeMenu}>
+        <Contact size={18} className="inline mr-2" /> Contacts
+      </a>
+      </div>
+
+      {/* Overlay for mobile menu */}
+      {menuOpen && (
+        <div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.5 }}
+          transition={{ duration: 0.3 }}
+          onClick={closeMenu}
+          className="absolute top-0 left-0 right-0 bottom-0 bg-black z-30"
+        />
+      )}
+
+</nav>
   );
 }

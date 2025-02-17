@@ -1,67 +1,120 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Input } from '../components/ui/input';
-import { Button } from '../components/ui/button';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { supabase } from "@/lib/supabaseClient";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 export default function Checkout() {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [amount, setAmount] = useState(0);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    // Retrieve cart items from localStorage
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    
-    // Calculate total price
-    const totalPrice = storedCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    
-    // Set the total as the default amount
-    setAmount(totalPrice);
+    async function fetchCartItems() {
+      const { data, error } = await supabase.from("cart").select("*");
+
+      if (error) {
+        console.error("Error fetching cart:", error.message);
+      } else {
+        setCartItems(data);
+      }
+      setLoading(false);
+    }
+
+    fetchCartItems();
   }, []);
 
-  const handlePayment = async () => {
-    setMessage('');
-    setError('');
-
-    try {
-      const response = await axios.post('/api/mpesa', { phoneNumber, amount });
-      setMessage(response.data.message);
-    } catch (err) {
-      console.error('Payment Error:', err.response?.data || err.message);
-      const errorMsg = err.response?.data?.error || 'Payment failed. Please try again.';
-      setError(errorMsg);
+  const handleCheckout = async () => {
+    if (!name || !address || !email) {
+      alert("Please fill in all details!");
+      return;
     }
+
+    setProcessing(true);
+
+    // Send data to backend for Stripe payment processing
+    const res = await fetch("/api/checkout-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cartItems, name, address, email }),
+    });
+
+    const session = await res.json();
+    const stripe = await stripePromise;
+    await stripe.redirectToCheckout({ sessionId: session.id });
+
+    setProcessing(false);
   };
 
   return (
-    <div className="max-w-md mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Checkout</h1>
+    <div style={{ maxWidth: "600px", margin: "auto", textAlign: "center" }}>
+      <h1>Checkout</h1>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-        <Input
-          type="tel"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          placeholder="Enter your M-Pesa phone number"
-        />
-      </div>
+      {loading ? (
+        <p>Loading cart...</p>
+      ) : cartItems.length === 0 ? (
+        <p>Your cart is empty.</p>
+      ) : (
+        <div>
+          {cartItems.map((item) => (
+            <div key={item.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
+              <img
+                src={item.image_url}
+                alt={item.name}
+                width="100px"
+                style={{ borderRadius: "5px" }}
+              />
+              <h3>{item.name}</h3>
+              <p style={{ fontWeight: "bold", color: "#0070f3" }}>${item.price}</p>
+            </div>
+          ))}
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Amount</label>
-        <Input
-          type="number"
-          value={amount}
-          readOnly // Prevents manual changes
-          className="bg-gray-200 cursor-not-allowed"
-        />
-      </div>
+          <div style={{ marginTop: "20px", textAlign: "left" }}>
+            <h3>Shipping Details</h3>
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+            />
+            <input
+              type="text"
+              placeholder="Shipping Address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              style={{ width: "100%", padding: "10px", marginBottom: "10px" }}
+            />
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ width: "100%", padding: "10px", marginBottom: "20px" }}
+            />
+          </div>
 
-      <Button onClick={handlePayment}>Pay with M-Pesa</Button>
-
-      {message && <p className="mt-4 text-green-600">{message}</p>}
-      {error && <p className="mt-4 text-red-600">{error}</p>}
+          <button
+            onClick={handleCheckout}
+            disabled={processing}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#28a745",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            {processing ? "Processing..." : "Proceed to Payment"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

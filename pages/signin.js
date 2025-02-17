@@ -69,6 +69,12 @@ export default function SignIn() {
           <span className="text-blue-500 cursor-pointer">Sign Up</span>
         </Link>
       </p>
+      <p className="mt-4">
+        Back to{' '}
+        <Link href="/">
+          <span className="text-blue-500 cursor-pointer">HomePage</span>
+        </Link>
+      </p>
       {message && <p className="mt-4 text-red-500">{message}</p>}
     </div>
   );
