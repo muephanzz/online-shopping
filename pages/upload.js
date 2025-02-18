@@ -1,4 +1,4 @@
-import UploadProduct from "@/components/UploadProduct";
+import UploadProduct from "../components/UploadProduct";
 
 export default function UploadPage() {
   return (

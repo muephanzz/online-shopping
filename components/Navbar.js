@@ -52,9 +52,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav 
-      style={{position:"fixed", width:"100%"}} 
-      className="bg-white shadow-md p-4 z-40">
+<nav style={{position:"fixed", width:"100%", top: "0"}} className="bg-white shadow-md p-4 z-40">
+
+
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         
         {/* Logo */}

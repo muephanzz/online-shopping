@@ -1,26 +1,47 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    async function fetchCartItems() {
-      const { data, error } = await supabase.from("cart").select("*");
+    async function fetchSession() {
+      const { data: session, error } = await supabase.auth.getSession();
 
-      if (error) {
-        console.error("Error fetching cart:", error.message);
+      if (session?.user) {
+        setUser(session.user);
       } else {
-        setCartItems(data);
+        console.error("No user session found:", error);
+      }
+    }
+
+    fetchSession();
+
+    async function fetchCartItems() {
+      if (user) {
+        const { data, error } = await supabase
+          .from("cart")
+          .select("*")
+          .eq("user_id", user.id);  // Fetch cart items for the logged-in user
+
+        if (error) {
+          console.error("Error fetching cart:", error.message);
+        } else {
+          setCartItems(data);
+        }
       }
       setLoading(false);
     }
 
-    fetchCartItems();
-  }, []);
+    if (user) {
+      fetchCartItems();
+    }
+
+  }, [user]);
 
   const handleRemoveItem = async (id) => {
     const { error } = await supabase.from("cart").delete().eq("id", id);
@@ -33,7 +54,7 @@ export default function Cart() {
   };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "auto", textAlign: "center" }}>
+    <div style={{ marginBottom: "20%", paddingTop: "14%", maxWidth: "800px", margin: "auto", textAlign: "center" }}>
       <h1>Your Cart</h1>
 
       {loading ? (
