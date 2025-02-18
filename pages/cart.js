@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -65,12 +66,11 @@ export default function Cart() {
         <div>
           {cartItems.map((item) => (
             <div key={item.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-              <img
-                src={item.image_url}
-                alt={item.name}
-                width="100px"
-                style={{ borderRadius: "5px" }}
-              />
+            <Image 
+              src={product.image_url} 
+              alt={product.name} 
+              width={200} height={200} 
+            />
               <h3>{item.name}</h3>
               <p style={{ fontWeight: "bold", color: "#0070f3" }}>${item.price}</p>
               <button

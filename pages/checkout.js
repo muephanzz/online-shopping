@@ -63,12 +63,11 @@ export default function Checkout() {
         <div>
           {cartItems.map((item) => (
             <div key={item.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-              <img
-                src={item.image_url}
-                alt={item.name}
-                width="100px"
-                style={{ borderRadius: "5px" }}
-              />
+            <Image 
+              src={product.image_url} 
+              alt={product.name} 
+              width={200} height={200} 
+            />
               <h3>{item.name}</h3>
               <p style={{ fontWeight: "bold", color: "#0070f3" }}>${item.price}</p>
             </div>
