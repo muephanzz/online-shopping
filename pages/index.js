@@ -23,7 +23,7 @@ export default function Products() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 mt-12">
+    <div className="max-w-7xl mx-auto px-4 py-10 mt-20 mb-60">
       <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Available Products</h1>
 
       {loading ? (
@@ -35,7 +35,7 @@ export default function Products() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <Link href={`/products/${product.id}`} key={product.id} className="group">
+            <Link href={`/products/${product.product_id}`} key={product.product_id} className="group">
               <div className="border rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300">
                 {/* Display First Image Only */}
                 <img 

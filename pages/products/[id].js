@@ -18,7 +18,7 @@ export default function ProductDetails() {
       const { data, error } = await supabase
         .from("products")
         .select("*")
-        .eq("id", id)
+        .eq("product_id", id)
         .single();
 
       if (error) {
@@ -35,18 +35,30 @@ export default function ProductDetails() {
 
   const handleAddToCart = async () => {
     if (!product) return;
-
+  
     setAdding(true);
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+  
+    if (sessionError) {
+      console.error("Error fetching session:", sessionError.message);
+      alert("Please log in to add items to cart.");
+      return;
+    }
+  
     const { error } = await supabase.from("cart").insert([
       {
-        product_id: product.id,
+        product_id: product.product_id,
         name: product.name,
         price: product.price,
         image_url: mainImage,
         quantity,
+        user_id: session.user.id, // Link to logged-in user
       },
     ]);
-
+  
     if (error) {
       console.error("Error adding to cart:", error.message);
       alert("Failed to add to cart!");
@@ -55,6 +67,8 @@ export default function ProductDetails() {
     }
     setAdding(false);
   };
+  
+  
 
   if (loading) return <p style={{ textAlign: "center" }}>Loading product...</p>;
   if (!product) return <p style={{ textAlign: "center" }}>Product not found!</p>;
@@ -92,9 +106,17 @@ export default function ProductDetails() {
       
       {/* Quantity Selector */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "15px" }}>
-        <button onClick={() => setQuantity(q => Math.max(1, q - 1))} style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>-</button>
-        <span style={{ padding: "0 15px", fontSize: "18px" }}>{quantity}</span>
-        <button onClick={() => setQuantity(q => q + 1)} style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>+</button>
+        <button 
+          onClick={() => setQuantity(q => Math.max(1, q - 1))} 
+          style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>-
+        </button>
+        <span 
+          style={{ padding: "0 15px", fontSize: "18px" }}>{quantity}
+        </span>
+        <button 
+          onClick={() => setQuantity(q => q + 1)} 
+          style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>+
+        </button>
       </div>
 
       {/* Buttons */}

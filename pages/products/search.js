@@ -1,9 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { supabase } from '../lib/supabaseClient';
-import { Input } from "../components/ui/input";
-import { Card, CardContent } from "../components/ui/card";
+import { supabase } from '../../lib/supabaseClient';
+import { Loader2 } from "lucide-react"
 
 export default function SearchPage() {
   const router = useRouter();
@@ -33,25 +32,30 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
+    <div className="max-w-7xl mx-auto p-4 mt-14 mb-60">
       <h1 className="text-2xl font-bold mt-8 mb-4">Search Results for "{query}"</h1>
       
       {loading ? (
-        <p>Loading...</p>
+        <div className="flex justify-center items-center h-32">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+        </div>
       ) : products.length === 0 ? (
         <p>No products found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <Card key={product.id} className="border rounded-lg shadow-sm hover:shadow-md transition">
-              <CardContent>
-                <Link href={`/product/${product.id}`}>
-                  <img src={product.image_url || '/default-product.png'} alt={product.name} className="w-full h-48 object-cover rounded-t-lg" />
-                  <h2 className="mt-2 text-lg font-semibold text-gray-800">{product.name}</h2>
-                  <p className="text-gray-600">${product.price}</p>
-                </Link>
-              </CardContent>
-            </Card>
+              <Link href={`/products/${product.id}`} key={product.id} className="group">
+              <div className="border rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300">
+                {/* Display First Image Only */}
+                <img 
+                  src={product.image_urls?.[0] || "/placeholder.jpg"} 
+                  alt={product.name} 
+                  className="w-full h-48 object-cover rounded-md"
+                />
+                <h3 className="mt-3 text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition">{product.name}</h3>
+                <p className="mt-1 font-bold text-blue-600">${product.price}</p>
+              </div>
+            </Link>
           ))}
         </div>
       )}

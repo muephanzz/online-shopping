@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
@@ -63,9 +63,9 @@ export default function Checkout() {
         <div>
           {cartItems.map((item) => (
             <div key={item.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-            <Image 
-              src={product.image_url} 
-              alt={product.name} 
+            <img
+              src={item.image_url} 
+              alt={item.name} 
               width={200} height={200} 
             />
               <h3>{item.name}</h3>

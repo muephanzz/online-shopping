@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "../../lib/supabaseClient";
 
 export default function OrderTracking() {
   const [email, setEmail] = useState("");
@@ -55,7 +55,7 @@ export default function OrderTracking() {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto", textAlign: "center" }}>
+    <div style={{ maxWidth: "600px", margin: "auto", textAlign: "center", marginTop : "100px" }}>
       <h1>Track Your Order</h1>
 
       <input

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
-import Image from "next/image";
+import { Loader2, Trash2 } from "lucide-react";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -10,101 +10,115 @@ export default function Cart() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    async function fetchSession() {
-      const { data: session, error } = await supabase.auth.getSession();
-
-      if (session?.user) {
+    // Fetch user session and cart items
+    async function fetchSessionAndCart() {
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+  
+      if (error) {
+        console.error("Error fetching session:", error.message);
+      } else if (session?.user) {
         setUser(session.user);
-      } else {
-        console.error("No user session found:", error);
-      }
-    }
-
-    fetchSession();
-
-    async function fetchCartItems() {
-      if (user) {
-        const { data, error } = await supabase
+  
+        // Fetch cart items along with product details
+        const { data, error: cartError } = await supabase
           .from("cart")
           .select("*")
-          .eq("user_id", user.id);  // Fetch cart items for the logged-in user
-
-        if (error) {
-          console.error("Error fetching cart:", error.message);
+          .eq("user_id", session.user.id);
+  
+        if (cartError) {
+          console.error("Error fetching cart:", cartError.message);
         } else {
+          console.log("Fetched Cart Items:", data); // Debugging line
           setCartItems(data);
         }
       }
       setLoading(false);
     }
+  
+    fetchSessionAndCart();
+  }, []);
+  
 
-    if (user) {
-      fetchCartItems();
-    }
-
-  }, [user]);
-
-  const handleRemoveItem = async (id) => {
-    const { error } = await supabase.from("cart").delete().eq("id", id);
+  const handleRemoveItem = async (cart_id) => {
+    const { error } = await supabase.from("cart").delete().eq("cart_id", cart_id);
 
     if (error) {
       console.error("Error removing item:", error.message);
     } else {
-      setCartItems(cartItems.filter((item) => item.id !== id));
+      setCartItems(cartItems.filter((item) => item.cart_id !== cart_id));
     }
   };
-
   return (
-    <div style={{ marginBottom: "20%", paddingTop: "14%", maxWidth: "800px", margin: "auto", textAlign: "center" }}>
-      <h1>Your Cart</h1>
+    <div className="mt-24 mb-60 text-center pt-4 max-w-md mx-auto">
+      <h1 className="pb-4 text-3xl font-semibold">Your Cart</h1>
 
       {loading ? (
-        <p>Loading cart...</p>
+        <div className="flex justify-center items-center h-32">
+          <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+        </div>
       ) : cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <>
+          <p>Oooops! Your cart is empty.</p>
+          <button
+            onClick={() => router.push("/")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#0070f3",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              marginTop: "20px",
+            }}
+          >
+            Add Products
+          </button>
+        </>
       ) : (
         <div>
           {cartItems.map((item) => (
-            <div key={item.id} style={{ borderBottom: "1px solid #ddd", padding: "10px 0" }}>
-            <Image 
-              src={product.image_url} 
-              alt={product.name} 
-              width={200} height={200} 
-            />
+            <div
+              key={item.cart_id}
+              className="flex flex-col md:flex-row items-center border-b pb-4"
+            >
+              <img
+                src={item.image_url}
+                alt={item.name}
+                width={200}
+                height={200}
+              />
               <h3>{item.name}</h3>
-              <p style={{ fontWeight: "bold", color: "#0070f3" }}>${item.price}</p>
+              <p style={{ fontWeight: "bold", color: "#0070f3" }}>
+                ${item.price}
+              </p>
               <button
-                onClick={() => handleRemoveItem(item.id)}
-                style={{
-                  padding: "5px 10px",
-                  backgroundColor: "#ff0000",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
+                onClick={() => handleRemoveItem(item.cart_id)}
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
               >
+                <Trash2 className="w-5 h-5 mr-2" />
                 Remove
               </button>
             </div>
           ))}
+          <button
+            onClick={() => router.push("/checkout")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#28a745",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              marginTop: "20px",
+            }}
+          >
+            Proceed to Checkout
+          </button>
         </div>
       )}
-
-      <button
-        onClick={() => router.push("/checkout")}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#28a745",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          marginTop: "20px",
-        }}
-      >
-        Proceed to Checkout
-      </button>
     </div>
   );
 }

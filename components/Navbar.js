@@ -1,17 +1,16 @@
-'useclient';
+'use client';
 
 import Link from 'next/link';
-import { ShoppingCart, UserCircle, Search, Menu, Contact } from 'lucide-react';
+import { ShoppingCart, UserCircle, Search, Menu, Contact, X, PersonStanding } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input"; 
-import { Home, User, Laptop, Smartphone } from 'lucide-react';
+import { Home, Laptop, Smartphone } from 'lucide-react';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [profilePic, setProfilePic] = useState('/default-profile.png'); // Default profile picture
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,21 +21,41 @@ export default function Navbar() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) return;
+
       setUser(user);
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching profile:", profileError.message);
+      } else if (profile.avatar_url) {
+        setProfilePic(profile.avatar_url);
+      }
     };
+
     fetchUser();
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user || null);
+      fetchUser();
     });
 
-    return () => listener.subscription.unsubscribe();
+    return () => {
+      if (listener?.subscription) {
+        listener.subscription.unsubscribe();
+      }
+    };
   }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    router.push('/signin');
+    router.push('/auth/signin');
   };
 
   const toggleDropdown = () => {
@@ -46,25 +65,21 @@ export default function Navbar() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?query=${searchQuery}`);
+      router.push(`/products/search?query=${searchQuery}`);
       setSearchQuery(""); // Clear search input after submission
     }
   };
 
   return (
-<nav style={{position:"fixed", width:"100%", top: "0"}} className="bg-white shadow-md p-4 z-40">
-
-
+    <nav style={{ position: "fixed", width: "100%", top: "0" }} className="bg-white shadow-md p-4 z-40">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        
         {/* Logo */}
         <Link href="/">
           <h1 className="hidden md:flex text-2xl font-bold text-blue-600">Ephantronics</h1>
-          <h1 className="md:hidden text-1.2xl font-bold text-blue-600">Ephantronics</h1>
         </Link>
 
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="relative w-full max-w mx-2">
+        <form onSubmit={handleSearch} className="relative w-full max-w ml-10 mr-2">
           <input
             type="text"
             placeholder="Search products..."
@@ -77,7 +92,6 @@ export default function Navbar() {
 
         {/* User & Cart Section */}
         <div className="flex items-center space-x-6">
-          
           {/* Cart Icon */}
           <div className="relative">
             <Link href="/cart">
@@ -98,11 +112,10 @@ export default function Navbar() {
                 onClick={toggleDropdown}
               >
                 <img
-                  src={user.user_metadata.avatar_url || '/default-profile.png'}
+                  src={profilePic} // Display the fetched profile picture
                   alt="Profile"
                   className="w-8 h-8 rounded-full"
                 />
-                <span className="text-gray-700">{user.user_metadata.firstName}</span>
               </div>
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2">
@@ -120,34 +133,35 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="relative">
-            <Link href="/signin">
-              <UserCircle className="w-8 h-8 text-gray-700 cursor-pointer" />
-            </Link>
+              <Link href="/auth/signin">
+                <UserCircle className="w-8 h-8 text-gray-700 cursor-pointer" />
+              </Link>
             </div>
           )}
         </div>
       </div>
-      
+
       {/* Navbar */}
-      <div
-        className="absolute left-0 right-0 z-50 p-5 flex justify-between items-center"
-      >
+      <div className="absolute left-0 right-0 z-50 p-5 flex justify-between items-center">
         {/* Mobile Menu Icon */}
         <div className="md:hidden">
-          <button onClick={toggleMenu} className="text-gray-300 text-3xl">
-            {menuOpen ? <Smartphone /> : <Menu />}
+          <button onClick={toggleMenu} className="fixed top-6 text-black-300 text-3xl">
+            {menuOpen ? <X /> : <Menu />}
           </button>
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden top-30 md:flex justify-center gap-10 text-lg">
-          <a href="#about" className="text-gray-300 text-2 hover:text-grey block">
+        <div className="hidden md:flex justify-left gap-5 text-lg border-b border-gray-100 w-full">
+          <a href="#home" className="text-black-300 text-2 hover:text-grey block">
             Home
           </a>
-          <a href="#projects" className="text-gray-300 text-2 hover:text-grey block">
-            Projects
+          <a href="#products" className="text-black-300 text-2 hover:text-grey block">
+            Products
           </a>
-          <a href="#contact" className="text-gray-300 text-2 hover:text-grey block">
+          <a href="#About" className="text-black-300 text-2 hover:text-grey block">
+            About
+          </a>
+          <a href="#contacts" className="text-black-300 text-2 hover:text-grey block">
             Contact
           </a>
         </div>
@@ -155,39 +169,29 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        initial={{ opacity: 0, x: -200 }}
-        animate={{ opacity: menuOpen ? 1 : 0, x: menuOpen ? 0 : -200 }}
-        transition={{ duration: 0.3 }}
-        className={`fixed  left-0 w-64 h-full bg-gray-800 z-40 p-5 space-y-4 md:hidden ${menuOpen ? 'block' : 'hidden'}`}
+        className={`fixed top-0 left-0 w-1/2 h-full bg-gray-800 z-40 space-y-4 md:hidden ${menuOpen ? 'block' : 'hidden'}`}
       >
-      <Link href="/">
-        <h1 className="text-1.8xl font-bold text-blue-600">Ephantronics</h1>
-      </Link>
-      <a href="#about" className="text-gray-300 text-0.8xl hover:text-blue block" onClick={closeMenu}>
-        <Home size={18} className="inline mr-2" /> Home
-      </a>
-      <a href="#contact" className="text-gray-300 text-0.8xl hover:text-blue block" onClick={closeMenu}>
-        <Smartphone size={18} className="inline mr-2" /> Smartphones
-      </a>
-      <a href="#projects" className="text-gray-300 text-0.8xl hover:text-blue block" onClick={closeMenu}>
-        <Laptop size={18} className="inline mr-2" /> Laptops
-      </a>
-      <a href="#projects" className="text-gray-300 text-0.8xl hover:text-blue block" onClick={closeMenu}>
-        <Contact size={18} className="inline mr-2" /> Contacts
-      </a>
+        <h1 className="border-b border-white-100 pl-16 py-5 text-2xl font-bold text-blue-600">Ephantronics</h1>
+        <a href="/" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+          <Home size={18} className="inline m-2" /> Home
+        </a>
+        <a href="#smartphones" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+          <Smartphone size={18} className="inline m-2" /> Smartphones
+        </a>
+        <a href="#laptops" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+          <Laptop size={18} className="inline m-2" /> Laptops
+        </a>
+        <a href="#about" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+          <PersonStanding size={18} className="inline m-2" /> About
+        </a>
+        <a href="#contacts" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+          <Contact size={18} className="inline m-2" /> Contacts
+        </a>
       </div>
 
-      {/* Overlay for mobile menu */}
       {menuOpen && (
-        <div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
-          transition={{ duration: 0.3 }}
-          onClick={closeMenu}
-          className="absolute top-0 left-0 right-0 bottom-0 bg-black z-30"
-        />
+        <div onClick={closeMenu} className="left-0 right-0 bottom-0 z-30" />
       )}
-
-</nav>
+    </nav>
   );
 }

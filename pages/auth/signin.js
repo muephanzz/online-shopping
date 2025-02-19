@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -37,15 +37,19 @@ export default function SignIn() {
   };
 
   return (
-    <div className="pt-60 p-6 max-w-md mx-auto bg-white rounded-xl shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Sign In</h1>
-      <form onSubmit={handleSignIn}>
+    <div className="mt-24 mb-4 pt-4 max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200">
+      <div className="text-center mb-6">
+        <h1 className="mt-4 border-b border-gray-100 text-2xl font-bold text-black-600">EPHANTRONICS</h1>
+        <p className="my-2 text-1xl font-bold text-gray-800">Experince the best services as never before</p>
+        <h1 className="text-2xl font-bold text-green-600">Sign Up</h1>
+      </div>
+      <form onSubmit={handleSignIn} className="p-4 space-y-4">
         <input
           type="email"
           name="email"
           placeholder="Email"
           onChange={handleChange}
-          className="border p-2 w-full mb-4"
+          className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:border-green-500"
           required
         />
         <input
@@ -53,29 +57,28 @@ export default function SignIn() {
           name="password"
           placeholder="Password"
           onChange={handleChange}
-          className="border p-2 w-full mb-4"
+          className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:border-green-500"
           required
         />
-        <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded">
+        <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition duration-300">
           Sign In
         </button>
       </form>
-      <p className="mt-4 text-blue-500 cursor-pointer">
-        <Link href="/forgot-password">Forgot Password?</Link>
+      <p className="py-4 text-center text-blue-500 hover:underline">
+        <Link href="/auth/forgot-password">Forgot Password?</Link>
       </p>
-      <p className="mt-4">
+      <p className="text-center">
         Don’t have an account?{' '}
-        <Link href="/signup">
-          <span className="text-blue-500 cursor-pointer">Sign Up</span>
+        <Link href="/auth/signup">
+          <span className="text-blue-500 hover:underline">Sign Up</span>
         </Link>
       </p>
-      <p className="mt-4">
-        Back to{' '}
+      <p className="py-4 text-center">
         <Link href="/">
-          <span className="text-blue-500 cursor-pointer">HomePage</span>
+          <span className="text-blue-500 hover:underline">View Products</span>
         </Link>
       </p>
-      {message && <p className="mt-4 text-red-500">{message}</p>}
+      {message && <p className="mb-4 text-center text-red-500">{message}</p>}
     </div>
   );
 }

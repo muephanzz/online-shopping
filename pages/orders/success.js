@@ -4,11 +4,11 @@ export default function Success() {
   const router = useRouter();
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
+    <div style={{ textAlign: "center", marginTop: "100px" }}>
       <h1>🎉 Payment Successful!</h1>
       <p>Thank you for your order.</p>
       <button
-        onClick={() => router.push("/products")}
+        onClick={() => router.push("/")}
         style={{
           padding: "10px 20px",
           backgroundColor: "#0070f3",

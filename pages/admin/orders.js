@@ -42,8 +42,9 @@ export default function AdminOrders() {
   };
 
   return (
-    <div style={{ maxWidth: "800px", margin: "auto", textAlign: "center" }}>
-      <h1>Admin Orders</h1>
+    <div style={{ maxWidth: "100%", textAlign: "center" }}
+      className="mt-24 p-4">
+      <h1 className="text-2xl">Admin Orders</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>

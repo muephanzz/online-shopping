@@ -80,9 +80,9 @@ export default function UploadProduct() {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-20">
+    <div className="mt-24 pt-4 max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200">
       <h2 className="text-2xl font-semibold text-center mb-4">Upload Product</h2>
-      <div className="flex flex-col gap-4">
+      <div className="px-4 flex flex-col gap-4">
         <input
           type="text"
           placeholder="Product Name"
@@ -100,7 +100,7 @@ export default function UploadProduct() {
 
         <input
           type="number"
-          placeholder="Price ($)"
+          placeholder="Price (Ksh)"
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           className="w-full p-2 border rounded-md"
@@ -119,7 +119,7 @@ export default function UploadProduct() {
         <button
           onClick={handleUpload}
           disabled={uploading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md transition"
+          className="my-4 w-full bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md transition"
         >
           {uploading ? "Uploading..." : "Upload Product"}
         </button>
