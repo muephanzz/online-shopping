@@ -31,7 +31,7 @@ export default function Profile() {
       const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, email, avatar_url')
-        .eq('user_id', user.id)
+        .eq('user_id', user.id)  // Ensure correct linkage
         .single();
 
       if (error) {
@@ -46,63 +46,55 @@ export default function Profile() {
   }, [router]);
 
   const handleUpdate = async () => {
-    // Check if required fields are filled
     if (!profile.first_name.trim() || !profile.last_name.trim()) {
       alert('Please fill in all required fields.');
       return;
     }
-  
+
     setLoading(true);
-  
     let avatar_url = profile.avatar_url;
-  
-    // If a new image is selected, upload it to Supabase Storage
+
     if (avatar) {
       const fileExt = avatar.name.split('.').pop();
       const fileName = `${user.id}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
-  
+
       // Upload the file
-      const { data, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, avatar, { upsert: true });
-  
+
       if (uploadError) {
         console.error('Error uploading avatar:', uploadError);
         setLoading(false);
         return;
       }
-  
+
       // Get the public URL of the uploaded image
-      const { data: publicURLData } = supabase
-        .storage
-        .from('avatars')
-        .getPublicUrl(filePath);
-  
-      avatar_url = publicURLData.publicUrl;
+      const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      avatar_url = data.publicUrl;
     }
-  
-    // Update the profiles table with the new avatar URL
+
+    // Update the profile table
     const { error } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        user_id: user.id,  // Ensure it's linked correctly
         first_name: profile.first_name,
         last_name: profile.last_name,
-        avatar_url, // Save the new avatar URL in the profiles table
-      })
-      .eq('user_id', user.id); // Ensure it updates the correct profile
-  
+        email: user.email,
+        avatar_url
+      }, { onConflict: ['user_id'] }); // Ensure it updates existing records
+
     if (error) {
       console.error('Error updating profile:', error);
     } else {
       alert('Profile updated successfully!');
       setProfile({ ...profile, avatar_url });
     }
-  
+
     setLoading(false);
   };
-  
-  
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -159,7 +151,7 @@ export default function Profile() {
           <Button className="w-full mb-2" onClick={handleUpdate} disabled={loading}>
             {loading ? 'Updating...' : 'Update Profile'}
           </Button>
-          </CardContent>
+        </CardContent>
       </Card>
     </div>
   );
