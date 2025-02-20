@@ -10,7 +10,7 @@ import { Home, Laptop, Smartphone } from 'lucide-react';
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [profilePic, setProfilePic] = useState('/default-profile.png'); // Default profile picture
+  const [profilePic, setProfilePic] = useState(''); // Default profile picture
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,7 +29,7 @@ export default function Navbar() {
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('avatar_url')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
 
       if (profileError) {
@@ -120,7 +120,7 @@ export default function Navbar() {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2">
                   <Link href="/profile">
-                    <div className="px-4 py-2 text-gray-700 hover:bg-gray-100">Profile</div>
+                    <div className="px-4 py-2 text-gray-700 hover:bg-gray-100 z-700">Profile</div>
                   </Link>
                   <button
                     onClick={handleSignOut}

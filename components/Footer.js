@@ -5,12 +5,20 @@ export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white p-4">
       <div>
-        <h2 className="mb-2 text-center text-lg font-bold">About</h2>
+        <h2 className="mt-4 mb-2 text-center text-lg font-bold">About</h2>
         <div>
           <p className="mb-6 text-sm">
-            We are a leading provider of quality 
-            electronics, offering a wide range of
-            products to meet your needs.
+          Welcome to [Your Website Name], your go-to destination for top-quality electronics at unbeatable prices! 🚀 We specialize in providing the latest gadgets, accessories, and tech essentials to keep you connected and ahead of the game.
+
+At [Your Website Name], we prioritize affordability, reliability, and fast delivery to ensure a seamless shopping experience. Whether you're looking for smartphones, laptops, gaming accessories, or smart home devices, we've got you covered!
+
+💡 Why Choose Us?
+✔ High-Quality Electronics
+✔ Secure & Fast Checkout
+✔ Reliable Customer Support
+✔ Exclusive Deals & Discounts
+
+Shop with confidence and upgrade your tech today! ⚡🛒.
           </p>
         </div>
       </div>

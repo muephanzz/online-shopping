@@ -31,7 +31,7 @@ export default function Profile() {
       const { data, error } = await supabase
         .from('profiles')
         .select('first_name, last_name, email, avatar_url')
-        .eq('id', user.id)
+        .eq('user_id', user.id)
         .single();
 
       if (error) {
@@ -90,7 +90,7 @@ export default function Profile() {
         last_name: profile.last_name,
         avatar_url, // Save the new avatar URL in the profiles table
       })
-      .eq('id', user.id); // Ensure it updates the correct profile
+      .eq('user_id', user.id); // Ensure it updates the correct profile
   
     if (error) {
       console.error('Error updating profile:', error);
@@ -159,11 +159,7 @@ export default function Profile() {
           <Button className="w-full mb-2" onClick={handleUpdate} disabled={loading}>
             {loading ? 'Updating...' : 'Update Profile'}
           </Button>
-
-          <Button variant="outline" className="w-full" onClick={handleSignOut}>
-            Sign Out
-          </Button>
-        </CardContent>
+          </CardContent>
       </Card>
     </div>
   );

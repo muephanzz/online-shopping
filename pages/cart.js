@@ -10,7 +10,6 @@ export default function Cart() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Fetch user session and cart items
     async function fetchSessionAndCart() {
       const {
         data: { session },
@@ -22,7 +21,6 @@ export default function Cart() {
       } else if (session?.user) {
         setUser(session.user);
   
-        // Fetch cart items along with product details
         const { data, error: cartError } = await supabase
           .from("cart")
           .select("*")
@@ -31,7 +29,6 @@ export default function Cart() {
         if (cartError) {
           console.error("Error fetching cart:", cartError.message);
         } else {
-          console.log("Fetched Cart Items:", data); // Debugging line
           setCartItems(data);
         }
       }
@@ -40,7 +37,6 @@ export default function Cart() {
   
     fetchSessionAndCart();
   }, []);
-  
 
   const handleRemoveItem = async (cart_id) => {
     const { error } = await supabase.from("cart").delete().eq("cart_id", cart_id);
@@ -51,9 +47,14 @@ export default function Cart() {
       setCartItems(cartItems.filter((item) => item.cart_id !== cart_id));
     }
   };
+
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const shippingFee = cartItems.length > 0 ? 10 : 0;
+  const totalAmount = subtotal + shippingFee;
+
   return (
-    <div className="mt-24 mb-60 text-center pt-4 max-w-md mx-auto">
-      <h1 className="pb-4 text-3xl font-semibold">Your Cart</h1>
+    <div className="mt-24 mb-60 text-center pt-4 max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
+      <h1 className="pb-4 text-3xl font-semibold text-gray-800">Your Cart</h1>
 
       {loading ? (
         <div className="flex justify-center items-center h-32">
@@ -61,18 +62,11 @@ export default function Cart() {
         </div>
       ) : cartItems.length === 0 ? (
         <>
-          <p>Oooops! Your cart is empty.</p>
+          <img src="/cart.webp" alt="Empty Cart" className="mx-auto w-60 mb-4" />
+          <p className="text-lg text-gray-600">Oooops! Your cart is empty.</p>
           <button
             onClick={() => router.push("/")}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#0070f3",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              marginTop: "20px",
-            }}
+            className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             Add Products
           </button>
@@ -82,38 +76,41 @@ export default function Cart() {
           {cartItems.map((item) => (
             <div
               key={item.cart_id}
-              className="flex flex-col md:flex-row items-center border-b pb-4"
+              className="flex flex-col md:flex-row items-center justify-between border-b pb-4 mb-4"
             >
-              <img
-                src={item.image_url}
-                alt={item.name}
-                width={200}
-                height={200}
-              />
-              <h3>{item.name}</h3>
-              <p style={{ fontWeight: "bold", color: "#0070f3" }}>
-                ${item.price}
-              </p>
+              <img src={item.image_url} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
+              <div className="text-left flex-1 px-4">
+                <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
+                <p className="text-blue-600 font-bold">${item.price.toFixed(2)}</p>
+              </div>
               <button
                 onClick={() => handleRemoveItem(item.cart_id)}
-                className="flex items-center px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
               >
-                <Trash2 className="w-5 h-5 mr-2" />
-                Remove
+                <Trash2 className="w-5 h-5 mr-2" /> Remove
               </button>
             </div>
           ))}
+
+          <div className="p-4 border-t mt-4">
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Order Summary</h2>
+            <div className="flex justify-between text-gray-700">
+              <p>Subtotal:</p>
+              <p>${subtotal.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between text-gray-700">
+              <p>Shipping Fee:</p>
+              <p>${shippingFee.toFixed(2)}</p>
+            </div>
+            <div className="flex justify-between font-bold text-lg text-gray-900 mt-2">
+              <p>Total:</p>
+              <p>${totalAmount.toFixed(2)}</p>
+            </div>
+          </div>
+
           <button
-            onClick={() => router.push("/checkout")}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#28a745",
-              color: "#fff",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
-              marginTop: "20px",
-            }}
+            onClick={() => router.push("/orders/checkout")}
+            className="mt-4 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition w-full"
           >
             Proceed to Checkout
           </button>

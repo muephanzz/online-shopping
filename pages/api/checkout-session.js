@@ -13,7 +13,7 @@ export default async function handler(req, res) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/orders/success`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cart`,
       customer_email: email,
       metadata: {
