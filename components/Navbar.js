@@ -151,7 +151,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex justify-left gap-5 text-lg border-b border-gray-100 w-full">
+        <div className="hidden md:flex justify-left gap-5 text-lg w-full bg-gray-100">
           <a href="#home" className="text-black-300 text-2 hover:text-grey block">
             Home
           </a>

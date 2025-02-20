@@ -45,30 +45,65 @@ export default function ProductDetails() {
     if (sessionError) {
       console.error("Error fetching session:", sessionError.message);
       alert("Please log in to add items to cart.");
+      setAdding(false);
       return;
     }
   
-    const { error } = await supabase.from("cart").insert([
-      {
-        product_id: product.product_id,
-        name: product.name,
-        price: product.price,
-        image_url: mainImage,
-        quantity,
-        user_id: session.user.id, // Link to logged-in user
-      },
-    ]);
+    const userId = session.user.id;
   
-    if (error) {
-      console.error("Error adding to cart:", error.message);
-      alert("Failed to add to cart!");
-    } else {
-      alert("Added to cart!");
+    // Check if item already exists in the cart
+    const { data: existingCartItem, error: fetchError } = await supabase
+      .from("cart")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("product_id", product.product_id)
+      .single();
+  
+    if (fetchError && fetchError.code !== "PGRST116") {
+      console.error("Error checking cart:", fetchError.message);
+      alert("Error adding to cart.");
+      setAdding(false);
+      return;
     }
+  
+    if (existingCartItem) {
+      // Update the quantity instead of adding a new entry
+      const { error: updateError } = await supabase
+        .from("cart")
+        .update({ quantity: existingCartItem.quantity + quantity })
+        .eq("cart_id", existingCartItem.cart_id);
+  
+      if (updateError) {
+        console.error("Error updating cart:", updateError.message);
+        alert("Failed to update cart!");
+      } else {
+        alert(`Updated cart! Total: ${existingCartItem.quantity + quantity} items.`);
+      }
+    } else {
+      // Insert as a new item if it doesn't exist
+      const { error } = await supabase.from("cart").insert([
+        {
+          product_id: product.product_id,
+          name: product.name,
+          price: product.price,
+          image_url: mainImage,
+          quantity, // Correctly stores quantity
+          user_id: userId,
+        },
+      ]);
+  
+      if (error) {
+        console.error("Error adding to cart:", error.message);
+        alert("Failed to add to cart!");
+      } else {
+        alert(`Added ${quantity} item(s) to cart!`);
+      }
+    }
+  
     setAdding(false);
   };
   
-  
+
 
   if (loading) return <p style={{ textAlign: "center" }}>Loading product...</p>;
   if (!product) return <p style={{ textAlign: "center" }}>Product not found!</p>;

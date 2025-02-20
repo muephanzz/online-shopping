@@ -20,30 +20,36 @@ export default function Profile() {
   useEffect(() => {
     const getUserProfile = async () => {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
-
+  
       if (userError || !user) {
         router.push('/auth/signin');
         return;
       }
-
+  
       setUser(user);
-
+  
+      // Fetch profile data from profiles table
       const { data, error } = await supabase
         .from('profiles')
-        .select('first_name, last_name, email, avatar_url')
-        .eq('user_id', user.id)  // Ensure correct linkage
+        .select('first_name, last_name, avatar_url')
+        .eq('user_id', user.id)
         .single();
-
+  
       if (error) {
         console.error('Error fetching profile:', error);
       } else {
-        setProfile(data);
+        setProfile({
+          first_name: data.first_name,
+          last_name: data.last_name,
+          avatar_url: data.avatar_url
+        });
       }
       setLoading(false);
     };
-
+  
     getUserProfile();
   }, [router]);
+  
 
   const handleUpdate = async () => {
     if (!profile.first_name.trim() || !profile.last_name.trim()) {
@@ -76,15 +82,16 @@ export default function Profile() {
     }
 
     // Update the profile table
-    const { error } = await supabase
-      .from('profiles')
-      .upsert({
-        user_id: user.id,  // Ensure it's linked correctly
-        first_name: profile.first_name,
-        last_name: profile.last_name,
-        email: user.email,
-        avatar_url
-      }, { onConflict: ['user_id'] }); // Ensure it updates existing records
+const { error } = await supabase
+  .from('profiles')
+  .update({
+    first_name: profile.first_name,
+    last_name: profile.last_name,
+    avatar_url
+  })
+  .eq('user_id', user.id);
+
+
 
     if (error) {
       console.error('Error updating profile:', error);
@@ -107,7 +114,7 @@ export default function Profile() {
     <div className="mt-24 pt-4 max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200">
       <Card>
         <CardContent>
-          <h1 className="text-2xl font-bold mb-4">Profile</h1>
+          <h1 className="z-900 text-2xl font-bold mb-4">Profile</h1>
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Update Profile Picture</label>

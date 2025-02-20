@@ -48,7 +48,7 @@ export default function Cart() {
     }
   };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price, 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shippingFee = cartItems.length > 0 ? 10 : 0;
   const totalAmount = subtotal + shippingFee;
 
@@ -81,7 +81,8 @@ export default function Cart() {
               <img src={item.image_url} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
               <div className="text-left flex-1 px-4">
                 <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
-                <p className="text-blue-600 font-bold">${item.price.toFixed(2)}</p>
+                <p className="text-blue-600 font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="text-gray-600">Quantity: {item.quantity}</p>
               </div>
               <button
                 onClick={() => handleRemoveItem(item.cart_id)}

@@ -31,27 +31,19 @@ export default function Signup() {
 
     const { data, error } = await supabase.auth.signUp({
       email,
-      password
+      password,
+      options: {
+        data: { first_name: firstName, last_name: lastName }
+      }
     });
 
     if (error) {
       setMessage(`Error: ${error.message}`);
-      setTimeout(() => setMessage(''), 3000);
     } else {
-      const user = data.user;
-
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert([{ user_id: user.id, first_name: firstName, last_name: lastName, user_id: user.id }]);
-
-      if (profileError) {
-        setMessage(`Profile Error: ${profileError.message}`);
-        setTimeout(() => setMessage(''), 3000);
-      } else {
-        setMessage('Signup successful! Check your email for confirmation.');
-        setTimeout(() => setMessage(''), 3000);
-      }
+      setMessage('Signup successful! Check your email for confirmation.');
     }
+
+    setTimeout(() => setMessage(''), 3000);
   };
 
   return (
@@ -66,6 +58,7 @@ export default function Signup() {
           type="text"
           name="firstName"
           placeholder="First Name"
+          value={formData.firstName}
           onChange={handleChange}
           className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:border-green-500"
           required
@@ -74,6 +67,7 @@ export default function Signup() {
           type="text"
           name="lastName"
           placeholder="Last Name"
+          value={formData.lastName}
           onChange={handleChange}
           className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:border-green-500"
           required
@@ -82,6 +76,7 @@ export default function Signup() {
           type="email"
           name="email"
           placeholder="Email"
+          value={formData.email}
           onChange={handleChange}
           className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:border-green-500"
           required
@@ -90,6 +85,7 @@ export default function Signup() {
           type="password"
           name="password"
           placeholder="Password"
+          value={formData.password}
           onChange={handleChange}
           className="border border-gray-300 p-3 w-full rounded-lg focus:outline-none focus:border-green-500"
           required
