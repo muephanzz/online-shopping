@@ -1,17 +1,19 @@
 import Link from 'next/link';
-import { Facebook, Twitter, Instagram, Factory, Car, Linkedin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Factory, Car, Linkedin, Youtube, CarFront } from 'lucide-react';
 
 export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white p-4">
-      <div>
+      <div id='about'>
         <h2 className="mb-2 text-center text-lg font-bold border-b border-gray-100">About</h2>
         <div className="mb-6 text-sm">
           <p>
-          Welcome to [Your Website Name], your go-to destination for top-quality electronics at unbeatable prices! 🚀 We specialize in providing the latest gadgets, accessories, and tech essentials to keep you connected and ahead of the game.
+          Welcome to Ephantronics, your go-to destination for top-quality electronics at unbeatable prices! 🚀 
+          We specialize in providing the latest gadgets, accessories, and tech essentials to keep you connected and ahead of the game.
           </p>
           <p className="mt-2">         
-          At [Your Website Name], we prioritize affordability, reliability, and fast delivery to ensure a seamless shopping experience. Whether you're looking for smartphones, laptops, gaming accessories, or smart home devices, we've got you covered!
+          At Ephantronics, we prioritize affordability, reliability, and fast delivery to ensure a seamless shopping experience.
+          Whether you're looking for smartphones, laptops, woofers, smart home devices or other electronic accessories, we've got you covered!
           </p>
           <h2 className="my-2">💡 Why Choose Us?</h2>
           <div className="max-w-7xl flex flex-2col md:flex-row">
@@ -32,7 +34,7 @@ export default function Footer() {
         <div className="mr-2">
           <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Accepted Payments</h2>
           <p className="mb-2 mr-8">
-            <Car size={20} style={{display: "inline" }} /> Visa
+            <CarFront size={20} style={{display: "inline" }} /> Visa
             <Factory size={20} style={{display: "inline"}} className='ml-4'/> M-Pesa
           </p>
         </div>
@@ -51,15 +53,17 @@ export default function Footer() {
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-400">
               <Linkedin size={20} />
             </a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-400">
+              <Youtube size={20} />
+            </a>
           </div>
         </div>
         <div className="mr-2"> 
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Quick Links</h2>
+          <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Our Products</h2>
           <div className="block space-x-4 mb-4 md:mb-0">
-            <Link href="/" className="hover:text-blue-400">Back to Top</Link>
-            <Link href="/pivacy-policy" className="hover:text-blue-400">Privacy-Policy</Link>
-            <Link href="/t&c" className="hover:text-blue-400">T&C</Link>
-            <Link href="/FAQs" className="hover:text-blue-400">FAQs</Link>
+            <Link href="#smartphones" className="hover:text-blue-400">Smatphones</Link>
+            <Link href="#laptops" className="hover:text-blue-400">Laptops</Link>
+            <Link href="#woofers" className="hover:text-blue-400">Woofers</Link>
           </div>
         </div>
         <div className="mr-2"> 
@@ -72,8 +76,8 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      <div className="text-center mb-4 md:mb-0 border-b border-t border-gray-100">
-        <p className=" text-sm">
+      <div className="text-center mb-4 md:mb-0">
+        <p className="mt-8 border-y border-gray-100 text-sm">
           &copy; {(new Date().getFullYear())} Ephantronics. All rights reserved.
         </p>
       </div>

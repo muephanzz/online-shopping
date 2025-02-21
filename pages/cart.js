@@ -62,7 +62,7 @@ export default function Cart() {
         </div>
       ) : cartItems.length === 0 ? (
         <>
-          <img src="/cart.webp" alt="Empty Cart" className="mx-auto w-60 mb-4" />
+          <img src="/cart.jpg" alt="Empty Cart" className="mx-auto w-60 mb-4" />
           <p className="text-lg text-gray-600">Oooops! Your cart is empty.</p>
           <button
             onClick={() => router.push("/")}
