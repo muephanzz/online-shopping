@@ -26,7 +26,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="max-w-7xl flex flex-col md:flex-row">
-        <div className="mr-2"> 
+        <div id='contacts' className="mr-2"> 
           <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Contacts</h2>
           <p className="mb-2 mr-8">Email: muephanzz@gmail.com</p>
           <p className="mb-4 mr-8">Phone: +254798229783</p>

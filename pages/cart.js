@@ -81,7 +81,7 @@ export default function Cart() {
               <img src={item.image_url} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
               <div className="text-left flex-1 px-4">
                 <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
-                <p className="text-blue-600 font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                <p className="text-blue-600 font-bold">Ksh{(item.price * item.quantity).toFixed(2)}</p>
                 <p className="text-gray-600">Quantity: {item.quantity}</p>
               </div>
               <button
@@ -97,15 +97,15 @@ export default function Cart() {
             <h2 className="text-xl font-semibold text-gray-800 mb-2">Order Summary</h2>
             <div className="flex justify-between text-gray-700">
               <p>Subtotal:</p>
-              <p>${subtotal.toFixed(2)}</p>
+              <p>Ksh{subtotal.toFixed(2)}</p>
             </div>
             <div className="flex justify-between text-gray-700">
               <p>Shipping Fee:</p>
-              <p>${shippingFee.toFixed(2)}</p>
+              <p>Ksh{shippingFee.toFixed(2)}</p>
             </div>
             <div className="flex justify-between font-bold text-lg text-gray-900 mt-2">
               <p>Total:</p>
-              <p>${totalAmount.toFixed(2)}</p>
+              <p>Ksh{totalAmount.toFixed(2)}</p>
             </div>
           </div>
 

@@ -110,80 +110,90 @@ export default function ProductDetails() {
 
   return (
     <div style={{ maxWidth: "700px", margin: "auto", textAlign: "center", padding: "20px", marginTop: "60px" }}>
-      <h1>{product.name}</h1>
-      
-      {/* Main Image with Zoom Effect */}
-      <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px" }}>
-        <img
-          src={mainImage}
-          alt={product.name}
-          style={{ width: "400px", maxHeight: "400px", objectFit: "fill", transition: "transform 0.3s" }}
-          onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
-          onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-        />
+      <div className="inline gap-4">
+        <a href="#description">Description</a>
+        <a href="#reviews">Reviews</a>
       </div>
 
-      {/* Small Images */}
-      <div style={{ display: "flex", justifyContent: "center", marginTop: "10px", gap: "10px" }}>
-        {product.image_urls?.map((img, index) => (
-          <img
-            key={index}
-            src={img}
-            alt={`Thumbnail ${index}`}
-            style={{ width: "70px", height: "70px", borderRadius: "5px", cursor: "pointer", border: mainImage === img ? "2px solid #0070f3" : "none" }}
-            onClick={() => setMainImage(img)}
-          />
-        ))}
+      <div className="max-w-7xl flex flex-col md:flex-row">
+        <div className="p-8">
+          {/* Main Image with Zoom Effect */}
+          <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px" }}>
+            <img
+              src={mainImage}
+              alt={product.name}
+              style={{ width: "400px", maxHeight: "400px", objectFit: "fill", transition: "transform 0.3s" }}
+              onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.1)")}
+              onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+            />
+          </div>
+
+          {/* Small Images */}
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "10px", gap: "10px" }}>
+            {product.image_urls?.map((img, index) => (
+              <img
+                key={index}
+                src={img}
+                alt={`Thumbnail ${index}`}
+                style={{ width: "70px", height: "70px", borderRadius: "5px", cursor: "pointer", border: mainImage === img ? "2px solid #0070f3" : "none" }}
+                onClick={() => setMainImage(img)}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="p-8">
+          <p>{product.description || "No description available."}</p>
+          <h1>{product.name}</h1>
+          <h2 style={{ color: "#0070f3" }}>Price: Ksh{product.price}</h2>
+          
+          {/* Quantity Selector */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "15px" }}>
+            <button 
+              onClick={() => setQuantity(q => Math.max(1, q - 1))} 
+              style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>-
+            </button>
+            <span 
+              style={{ padding: "0 15px", fontSize: "18px" }}>{quantity}
+            </span>
+            <button 
+              onClick={() => setQuantity(q => q + 1)} 
+              style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>+
+            </button>
+          </div>
+
+          {/* Buttons */}
+          <button
+            onClick={handleAddToCart}
+            disabled={adding}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#ff6600",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              marginRight: "10px",
+            }}
+          >
+            {adding ? "Adding..." : "Add to Cart"}
+          </button>
+
+          <button
+            onClick={() => router.push("/cart")}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#0070f3",
+              color: "#fff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+            }}
+          >
+            View Cart
+          </button>
+        </div>
       </div>
-
-      <h2 style={{ color: "#0070f3" }}>${product.price}</h2>
-      <p>{product.description || "No description available."}</p>
-      
-      {/* Quantity Selector */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "15px" }}>
-        <button 
-          onClick={() => setQuantity(q => Math.max(1, q - 1))} 
-          style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>-
-        </button>
-        <span 
-          style={{ padding: "0 15px", fontSize: "18px" }}>{quantity}
-        </span>
-        <button 
-          onClick={() => setQuantity(q => q + 1)} 
-          style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>+
-        </button>
-      </div>
-
-      {/* Buttons */}
-      <button
-        onClick={handleAddToCart}
-        disabled={adding}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#ff6600",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-          marginRight: "10px",
-        }}
-      >
-        {adding ? "Adding..." : "Add to Cart"}
-      </button>
-
-      <button
-        onClick={() => router.push("/cart")}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#0070f3",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        View Cart
-      </button>
     </div>
   );
 }

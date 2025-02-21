@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ShoppingCart, UserCircle, Search, Menu, Contact, X, PersonStanding } from 'lucide-react';
+import { ShoppingCart, UserCircle, Search, Menu, Contact, X, PersonStanding, Music, Music2, TrainTrack, CarFront } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
@@ -152,12 +152,21 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex justify-left gap-5 text-lg w-full bg-gray-100">
-          <a href="#home" className="text-black-300 text-2 hover:text-grey block">
+          <a href="/" className="text-black-300 text-2 hover:text-grey block">
             Home
           </a>
-          <a href="#products" className="text-black-300 text-2 hover:text-grey block">
-            Products
+          <a href="#smartphones" className="text-black-300 text-2 hover:text-grey block">
+            Smartphones
           </a>
+          <a href="#laptops" className="text-black-300 text-2 hover:text-grey block">
+            Laptops
+          </a>
+          <a href="#woofers" className="text-black-300 text-2 hover:text-grey block">
+            Woofers
+          </a>
+          <a href="#amplifiers" className="text-black-300 text-2 hover:text-grey block">
+            Amplifiers
+          </a>    
           <a href="#about" className="text-black-300 text-2 hover:text-grey block">
             About
           </a>
@@ -172,17 +181,11 @@ export default function Navbar() {
         className={`fixed top-0 left-0 w-1/2 h-full bg-gray-800 z-40 space-y-4 md:hidden ${menuOpen ? 'block' : 'hidden'}`}
       >
         <h1 className="border-b border-white-100 pl-16 py-5 text-2xl font-bold text-blue-600">Ephantronics</h1>
-        <div style={{maxHeight: "1000vh", overflowY: "scroll"}}>
+        <div style={{height: "90vh", overflowY: "scroll"}}>
         <div className='mb-2'> 
         <h1 className="border-b border-white-100  mb-2 pb-2 text-xl font-bold text-gray-400">Top Links</h1>
           <a href="/" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
             <Home size={18} className="inline m-2" /> Home
-          </a>
-          <a href="#smartphones" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
-            <Smartphone size={18} className="inline m-2" /> Smartphones
-          </a>
-          <a href="#laptops" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
-            <Laptop size={18} className="inline m-2" /> Laptops
           </a>
           <a href="#about" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
             <PersonStanding size={18} className="inline m-2" /> About
@@ -191,29 +194,38 @@ export default function Navbar() {
             <Contact size={18} className="inline m-2" /> Contacts
           </a>
         </div>   
-        <div className='mb-2 py-2 border-y border-white-100'>
-        <h1 className="border-b border-white-100  mb-2 pb-2 text-xl font-bold text-gray-400">Nav Links</h1>
-          <a href="/" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
-            <Home size={18} className="inline m-2" /> Home
-          </a>
+        <div className='py-2 border-y border-white-100'>
+        <h1 className="border-b border-white-100  mb-2 pb-2 text-xl font-bold text-gray-400">Products</h1>
           <a href="#smartphones" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
             <Smartphone size={18} className="inline m-2" /> Smartphones
           </a>
           <a href="#laptops" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
             <Laptop size={18} className="inline m-2" /> Laptops
           </a>
-          <a href="#about" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
-            <PersonStanding size={18} className="inline m-2" /> About
+          <a href="#Woofers" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+            <Music size={18} className="inline m-2" /> Woofers
           </a>
-          <a href="#contacts" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
-            <Contact size={18} className="inline m-2" /> Contacts
+          <a href="#amplifiers" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+            <Music2 size={18} className="inline m-2" /> Amplifiers
           </a>
-          </div>        
+          </div>
+          <div className='mb-2 py-2 border-b border-white-100'>
+          <h1 className="border-b border-white-100  mb-2 pb-2 text-xl font-bold text-gray-400">Useful Links</h1>
+          <Link href="/profile" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+            <UserCircle size={18} className="inline m-2" /> Update Profile
+          </Link>
+          <Link href="/orders/order-tracking" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+            <CarFront size={18} className="inline m-2" /> Track Orders
+          </Link>
+          <Link href="/cart" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
+            <ShoppingCart size={18} className="inline m-2" /> View Cart
+          </Link>
+          </div>            
         <div className='flex pb-2 border-b border-white-100'>
           <a href="/privacy-policy" className="mx-2 text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
             Privacy Policy
           </a>
-          <p>--------</p>
+          <p className='text-gray-400'>--------</p>
           <a href="/T&Cs" className="mx-2 text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>
             T&Cs
           </a>

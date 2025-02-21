@@ -55,8 +55,8 @@ export default function OrderTracking() {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto", textAlign: "center", marginTop : "100px" }}>
-      <h1>Track Your Order</h1>
+    <div style={{ maxWidth: "460px", margin: "auto", textAlign: "center", marginTop : "100px", marginBottom: "200px" }}>
+      <h1 className="m-2">Track Your Order</h1>
 
       <input
         type="email"
