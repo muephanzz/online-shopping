@@ -109,14 +109,14 @@ export default function ProductDetails() {
   if (!product) return <p style={{ textAlign: "center" }}>Product not found!</p>;
 
   return (
-    <div style={{ maxWidth: "700px", margin: "auto", textAlign: "center", padding: "20px", marginTop: "60px" }}>
+    <div style={{ padding: "10px", marginTop: "100px" }}>
       <div className="inline gap-4">
         <a href="#description">Description</a>
         <a href="#reviews">Reviews</a>
       </div>
 
-      <div className="max-w-7xl flex flex-col md:flex-row">
-        <div className="p-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2">
+        <div className="bg-gray-200 p-4">
           {/* Main Image with Zoom Effect */}
           <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px" }}>
             <img
@@ -129,7 +129,7 @@ export default function ProductDetails() {
           </div>
 
           {/* Small Images */}
-          <div style={{ display: "flex", justifyContent: "center", marginTop: "10px", gap: "10px" }}>
+          <div style={{ display: "flex", justifyContent: "", marginTop: "10px", gap: "10px" }}>
             {product.image_urls?.map((img, index) => (
               <img
                 key={index}
@@ -142,13 +142,13 @@ export default function ProductDetails() {
           </div>
         </div>
 
-        <div className="p-8">
+        <div className="bg-gray-200 p-4">
           <p>{product.description || "No description available."}</p>
-          <h1>{product.name}</h1>
-          <h2 style={{ color: "#0070f3" }}>Price: Ksh{product.price}</h2>
+          <h1 style={{ color: "#0070f3", margin: "15px 0 15px" }}>{product.name}</h1>
+          <h2 style={{ color: "#0070f3", margin: "15px 0 15px" }}>Price: Ksh{product.price}</h2>
           
           {/* Quantity Selector */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "15px" }}>
+          <div style={{ display: "flex", alignItems: "center", margin: "15px 0 15px" }}>
             <button 
               onClick={() => setQuantity(q => Math.max(1, q - 1))} 
               style={{ padding: "5px 15px", fontSize: "18px", background: "#ddd", border: "none", cursor: "pointer" }}>-

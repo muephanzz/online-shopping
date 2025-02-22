@@ -142,16 +142,16 @@ export default function Navbar() {
       </div>
 
       {/* Navbar */}
-      <div className="absolute left-0 right-0 z-50 p-5 flex justify-between items-center">
+      <div className="absolute left-0 right-0 z-50 flex justify-between items-center">
         {/* Mobile Menu Icon */}
-        <div className="md:hidden">
+        <div className="md:hidden ml-4">
           <button onClick={toggleMenu} className="fixed top-6 text-black-300 text-3xl">
-            {menuOpen ? <X /> : <Menu />}
+            {menuOpen ? <X className='text-gray-100' /> : <Menu />}
           </button>
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex justify-left gap-5 text-lg w-full bg-gray-100">
+        <div className="hidden md:flex justify-left my-4 pl-4 gap-5 text-lg w-full bg-gray-200">
           <a href="/" className="text-black-300 text-2 hover:text-grey block">
             Home
           </a>
@@ -181,7 +181,7 @@ export default function Navbar() {
         className={`fixed top-0 left-0 w-1/2 h-full bg-gray-800 z-40 space-y-4 md:hidden ${menuOpen ? 'block' : 'hidden'}`}
       >
         <h1 className="border-b border-white-100 pl-16 py-5 text-2xl font-bold text-blue-600">Ephantronics</h1>
-        <div style={{height: "90vh", overflowY: "scroll"}}>
+        <div className="custom-scrollbar">
         <div className='mb-2'> 
         <h1 className="border-b border-white-100  mb-2 pb-2 text-xl font-bold text-gray-400">Top Links</h1>
           <a href="/" className="text-gray-300 text-0.8xl hover:bg-gray-100 hover:text-gray-800 block" onClick={closeMenu}>

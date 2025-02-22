@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Facebook, Twitter, Instagram, Factory, Car, Linkedin, Youtube, CarFront } from 'lucide-react';
+import { FaCcVisa } from "react-icons/fa";
+import { SiMpesa } from "react-icons/si";
 
 export default function Footer() {
   return (
@@ -34,8 +36,7 @@ export default function Footer() {
         <div className="mr-2">
           <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Accepted Payments</h2>
           <p className="mb-2 mr-8">
-            <CarFront size={20} style={{display: "inline" }} /> Visa
-            <Factory size={20} style={{display: "inline"}} className='ml-4'/> M-Pesa
+            <FaCcVisa size={24} className="inline text-blue-600" />
           </p>
         </div>
         <div className="mr-2">
