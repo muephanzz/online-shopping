@@ -100,7 +100,7 @@ export default function Checkout() {
             <label className="pl-2 font-semibold">Choose Shipping Address</label>
             <table><tbody><tr><td><select
               onChange={(e) => setAddress(e.target.value)}
-              value={productCategory}
+              value={address}
               className="w-full p-2 border rounded-md"
             >
               <option value="Muranga">Murang'a Town Near Magunas Supermarket</option>

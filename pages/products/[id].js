@@ -134,16 +134,16 @@ export default function ProductDetails() {
 
           {/* Small Images */}
           <div style={{ display: "flex", justifyContent: "", marginTop: "10px", gap: "10px" }}>
-            {product.image_urls?.map((Image, index) => (
+            {product.image_urls?.map((img, index) => (
               <Image 
-              width={500} 
-              height={500}
-              unoptimized
+                                width={500} 
+                  height={500}
+                  unoptimized
                 key={index}
-                src={Image}
+                src={img}
                 alt={`Thumbnail ${index}`}
-                style={{ width: "70px", height: "70px", borderRadius: "5px", cursor: "pointer", border: mainImage === Image ? "2px solid #0070f3" : "none" }}
-                onClick={() => setMainImage(Image)}
+                style={{ width: "70px", height: "70px", borderRadius: "5px", cursor: "pointer", border: mainImage === img ? "2px solid #0070f3" : "none" }}
+                onClick={() => setMainImage(img)}
               />
             ))}
           </div>
