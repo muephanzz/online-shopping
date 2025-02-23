@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import { Home, Laptop, Smartphone } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -111,7 +112,10 @@ export default function Navbar() {
                 className="flex items-center space-x-2 cursor-pointer"
                 onClick={toggleDropdown}
               >
-                <img
+                <Image
+                  width={500} 
+                  height={500}
+                  unoptimized
                   src={profilePic} // Display the fetched profile picture
                   alt="Profile"
                   className="w-8 h-8 rounded-full"
@@ -152,13 +156,13 @@ export default function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex justify-left my-4 pl-4 gap-5 text-lg w-full bg-gray-200">
-          <button><a href="/">Home</a></button>
-          <button><a href="#smartphones">Smartphones</a></button>
-          <button><a href="#laptops">Laptops</a></button>
-          <button><a href="#woofers">Woofers</a></button>
-          <button><a href="#amplifiers">Amplifiers</a></button>
-          <button><a href="#about">About</a></button>
-          <button><a href="#contacts">Contact</a></button>  
+          <button><Link href="/">Home</Link></button>
+          <button><Link href="#smartphones">Smartphones</Link></button>
+          <button><Link href="#laptops">Laptops</Link></button>
+          <button><Link href="#woofers">Woofers</Link></button>
+          <button><Link href="#amplifiers">Amplifiers</Link></button>
+          <button><Link href="#about">About</Link></button>
+          <button><Link href="#contacts">Contact</Link></button>  
         </div>
 
       </div>
@@ -173,43 +177,43 @@ export default function Navbar() {
           <div className='mb-2'> 
             <h1 className="border-y border-gray-500 mb-2 py-2 text-xl font-bold text-gray-400">Top Links</h1>
             <button className='block hover:text-blue-500'>
-              <a href="/" onClick={closeMenu}>
+              <Link href="/" onClick={closeMenu}>
                 <Home size={18} className="inline m-2" /> Home 
-              </a>
+              </Link>
             </button>
             <button className='block hover:text-blue-500'>
-              <a href="#about" onClick={closeMenu}>
+              <Link href="#about" onClick={closeMenu}>
                 <PersonStanding size={18} className="inline m-2" /> About 
-              </a>
+              </Link>
             </button>
             <button className='block hover:text-blue-500'>
-              <a href="#contacts" onClick={closeMenu}>
+              <Link href="#contacts" onClick={closeMenu}>
                 <Contact size={18} className="inline m-2" /> Contacts
-              </a>
+              </Link>
             </button>
           </div>
 
           <div className='mb-2'>
             <h1 className="border-y border-gray-500 mb-2 py-2 text-xl font-bold text-gray-400">Products</h1>
             <button className='block hover:text-blue-500'>
-              <a href="#smartphones" onClick={closeMenu}>
+              <Link href="#smartphones" onClick={closeMenu}>
                 <Smartphone size={18} className="inline m-2" /> Smartphones
-              </a>
+              </Link>
             </button>
             <button className='block hover:text-blue-500'>
-              <a href="#laptops" onClick={closeMenu}>
+              <Link href="#laptops" onClick={closeMenu}>
                 <Laptop size={18} className="inline m-2" /> Laptops
-              </a>
+              </Link>
             </button>
             <button className='block hover:text-blue-500'>
-              <a href="#Woofers" onClick={closeMenu}>
+              <Link href="#Woofers" onClick={closeMenu}>
                 <Music size={18} className="inline m-2" /> Woofers
-              </a>
+              </Link>
             </button>
             <button className='name hover:text-blue-500'>
-              <a href="#amplifiers" onClick={closeMenu}>
+              <Link href="#amplifiers" onClick={closeMenu}>
                 <Music2 size={18} className="inline m-2" /> Amplifiers
-              </a>
+              </Link>
             </button>
 
           </div>
@@ -235,15 +239,15 @@ export default function Navbar() {
 
           <div className='flex border-y border-gray-500 mb-2 p-2 font-bold text-gray-400'>
             <button className='hover:text-blue-500'>
-              <a href="/privacy-policy" onClick={closeMenu}>
+              <Link href="/privacy-policy" onClick={closeMenu}>
                 Privacy Policy
-              </a>
+              </Link>
             </button>
             <h2 className='text-gray-400'>--------</h2>
             <button className='hover:text-blue-500'>
-              <a href="/T&Cs" onClick={closeMenu}>
+              <Link href="/T&Cs" onClick={closeMenu}>
                 T&Cs
-              </a>
+              </Link>
             </button>
           </div>
 
