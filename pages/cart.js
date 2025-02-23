@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
 import { Loader2, Trash2 } from "lucide-react";
+import Image from "next/image";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -62,7 +63,9 @@ export default function Cart() {
         </div>
       ) : cartItems.length === 0 ? (
         <>
-          <img src="/cart.jpg" alt="Empty Cart" className="mx-auto w-60 mb-4" />
+          <Image                   width={500} 
+                  height={500}
+                  unoptimized src="/cart.jpg" alt="Empty Cart" className="mx-auto w-60 mb-4" />
           <p className="text-lg text-gray-600">Oooops! Your cart is empty.</p>
           <button
             onClick={() => router.push("/")}
@@ -78,7 +81,9 @@ export default function Cart() {
               key={item.cart_id}
               className="flex flex-col md:flex-row items-center justify-between border-b pb-4 mb-4"
             >
-              <img src={item.image_url} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
+              <Image                   width={500} 
+                  height={500}
+                  unoptimized src={item.image_url} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
               <div className="text-left flex-1 px-4">
                 <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
                 <p className="text-blue-600 font-bold">Ksh{(item.price * item.quantity).toFixed(2)}</p>

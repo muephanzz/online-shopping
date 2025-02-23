@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '../../lib/supabaseClient';
 import { Loader2 } from "lucide-react"
+import Image from 'next/image';
 
 export default function SearchPage() {
   const router = useRouter();
@@ -47,7 +48,9 @@ export default function SearchPage() {
               <Link href={`/products/${product.id}`} key={product.id} className="group">
               <div className="border rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300">
                 {/* Display First Image Only */}
-                <img 
+                <Image                   width={500} 
+                  height={500}
+                  unoptimized 
                   src={product.image_urls?.[0] || "/placeholder.jpg"} 
                   alt={product.name} 
                   className="w-full h-48 object-cover rounded-md"

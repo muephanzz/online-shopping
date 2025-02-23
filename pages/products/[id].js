@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../../lib/supabaseClient";
+import Image from "next/image";
 
 export default function ProductDetails() {
   const router = useRouter();
@@ -119,7 +120,10 @@ export default function ProductDetails() {
         <div className="bg-gray-200 p-4">
           {/* Main Image with Zoom Effect */}
           <div style={{ position: "relative", overflow: "hidden", borderRadius: "10px" }}>
-            <img
+            <Image
+                              width={500} 
+                              height={500}
+                              unoptimized
               src={mainImage}
               alt={product.name}
               style={{ width: "400px", maxHeight: "400px", objectFit: "fill", transition: "transform 0.3s" }}
@@ -130,13 +134,16 @@ export default function ProductDetails() {
 
           {/* Small Images */}
           <div style={{ display: "flex", justifyContent: "", marginTop: "10px", gap: "10px" }}>
-            {product.image_urls?.map((img, index) => (
-              <img
+            {product.image_urls?.map((Image, index) => (
+              <Image 
+              width={500} 
+              height={500}
+              unoptimized
                 key={index}
-                src={img}
+                src={Image}
                 alt={`Thumbnail ${index}`}
-                style={{ width: "70px", height: "70px", borderRadius: "5px", cursor: "pointer", border: mainImage === img ? "2px solid #0070f3" : "none" }}
-                onClick={() => setMainImage(img)}
+                style={{ width: "70px", height: "70px", borderRadius: "5px", cursor: "pointer", border: mainImage === Image ? "2px solid #0070f3" : "none" }}
+                onClick={() => setMainImage(Image)}
               />
             ))}
           </div>
