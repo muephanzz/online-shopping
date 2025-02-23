@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const { cartItems, name, address, email } = req.body;
+  const { cartItems, address, email } = req.body;
 
   try {
     const session = await stripe.checkout.sessions.create({
