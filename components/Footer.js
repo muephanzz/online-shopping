@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-gray-800 text-white p-4">
       <div id='about'>
-        <h2 className="mb-2 text-center text-lg font-bold border-b border-gray-100">About</h2>
+        <h2 className="mb-2 text-center text-lg font-bold border-b border-gray-500">About</h2>
         <div className="mb-6 text-sm">
           <p>
           Welcome to Ephantronics, your go-to destination for top-quality electronics at unbeatable prices! 🚀 
@@ -29,18 +29,18 @@ export default function Footer() {
       </div>
       <div className="max-w-7xl flex flex-col md:flex-row">
         <div id='contacts' className="mr-2"> 
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Contacts</h2>
+          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Contacts</h2>
           <p className="mb-2 mr-8">Email: muephanzz@gmail.com</p>
           <p className="mb-4 mr-8">Phone: +254798229783</p>
         </div>
         <div className="mr-2">
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Accepted Payments</h2>
+          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Accepted Payments</h2>
           <p className="mb-2 mr-8">
             <FaCcVisa size={24} className="inline text-blue-600" />
           </p>
         </div>
         <div className="mr-2">
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Follow me</h2>
+          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Follow me</h2>
           <div className="block mr-8 mb-6 flex space-x-4">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
               <Facebook size={20} />
@@ -60,7 +60,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mr-2"> 
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Our Products</h2>
+          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Our Products</h2>
           <div className="block space-x-4 mb-4 md:mb-0">
             <Link href="#smartphones" className="hover:text-blue-400">Smatphones</Link>
             <Link href="#laptops" className="hover:text-blue-400">Laptops</Link>
@@ -68,7 +68,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="mr-2"> 
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-100">Quick Links</h2>
+          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Quick Links</h2>
           <div className="block space-x-4 mb-4 md:mb-0">
             <Link href="/" className="hover:text-blue-400">Back to Top</Link>
             <Link href="/pivacy-policy" className="hover:text-blue-400">Privacy-Policy</Link>
@@ -78,7 +78,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="text-center mb-4 md:mb-0">
-        <p className="mt-8 border-y border-gray-100 text-sm">
+        <p className="mt-8 border-y border-gray-500 text-sm">
           &copy; {(new Date().getFullYear())} Ephantronics. All rights reserved.
         </p>
       </div>

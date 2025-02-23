@@ -47,7 +47,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="mt-24 mb-4 pt-4 max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200">
+    <div className="mt-28 mb-4 pt-4 max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200">
       <div className="text-center mb-6">
         <h1 className="mt-4 border-b border-gray-100 text-2xl font-bold text-black-600">⚡EPHANTRONICS⚡</h1>
         <p className="my-2 text-1xl font-bold text-gray-800">Experience the best services as never before</p>

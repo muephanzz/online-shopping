@@ -53,8 +53,8 @@ export default function Cart() {
   const totalAmount = subtotal + shippingFee;
 
   return (
-    <div className="mt-24 mb-60 text-center pt-4 max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="pb-4 text-3xl font-semibold text-gray-800">Your Cart</h1>
+    <div className="mt-28 mb-4 p-4  text-center max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+      <h1 className="border-y border-gray-100 m-2 text-3xl font-semibold text-gray-800">Your Cart</h1>
 
       {loading ? (
         <div className="flex justify-center items-center h-32">
