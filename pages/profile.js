@@ -15,6 +15,7 @@ export default function Profile() {
     email: '',
     avatar_url: ''
   });
+
   const [avatar, setAvatar] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -116,7 +117,7 @@ export default function Profile() {
     <div className="mt-24 pt-4 max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200">
       <Card>
         <CardContent>
-          <h1 className="text-2xl font-bold mb-4">Profile</h1>
+          <h1 className="text-2xl font-bold mb-4" onClick={closeMenu}>Profile</h1>
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Update Profile Picture</label>

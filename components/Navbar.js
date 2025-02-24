@@ -1,7 +1,8 @@
 'use client';
 
+import { motion } from "framer-motion";
 import Link from 'next/link';
-import { ShoppingCart, UserCircle, Search, Menu, Contact, X, PersonStanding, Music, Music2, TrainTrack, CarFront } from 'lucide-react';
+import { ShoppingCart, UserCircle, Search, Menu, Contact, X, PersonStanding, Music, Music2, CarFront } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
@@ -122,9 +123,9 @@ export default function Navbar() {
                 />
               </div>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2">
+                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-10000">
                   <Link href="/profile">
-                    <div className="px-4 py-2 text-gray-700 z-700">Profile</div>
+                    <div className="px-4 py-2 text-gray-700" onClick={dropdownOpen}>Profile</div>
                   </Link>
                   <button
                     onClick={handleSignOut}
@@ -168,7 +169,12 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <div className={`fixed top-0 left-0 w-1/2 h-full bg-gray-800 z-40 md:hidden ${menuOpen ? 'block' : 'hidden'}`}>
+      <motion.div 
+      initial={{ opacity: 0, x: -200 }}
+      animate={{ opacity: menuOpen ? 1 : 0, x: menuOpen ? 0 : -200 }}
+      transition={{ duration: 0.3 }}
+      className={`fixed top-0 left-0 w-1/2 h-full bg-gray-800 z-40 md:hidden ${menuOpen ? 'block' : 'hidden'}`}
+      >
 
         <h1 className="pl-16 my-5 text-2xl font-bold text-blue-600">Ephantronics</h1>
 
@@ -253,10 +259,15 @@ export default function Navbar() {
 
         </div>
 
-      </div>
+      </motion.div>
 
       {menuOpen && (
-        <div onClick={closeMenu} className="left-0 right-0 bottom-0 z-30" />
+        <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.5 }}
+        transition={{ duration: 0.3 }}
+        onClick={closeMenu}
+        className="fixed top-0 left-0 right-0 bottom-0 bg-black z-30" />
       )}
 
     </nav>

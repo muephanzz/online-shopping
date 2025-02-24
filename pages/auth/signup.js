@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import Link from 'next/link';
+import { FcGoogle } from 'react-icons/fc';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -44,6 +45,17 @@ export default function Signup() {
     }
 
     setTimeout(() => setMessage(''), 3000);
+  };
+
+  const handleGoogleSignUp = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google'
+    });
+
+    if (error) {
+      setMessage(`Error: ${error.message}`);
+      setTimeout(() => setMessage(''), 3000);
+    }
   };
 
   return (
@@ -94,6 +106,20 @@ export default function Signup() {
           Sign Up
         </button>
       </form>
+
+      <div className="flex items-center justify-center my-4">
+        <hr className="flex-grow border-gray-300" />
+        <span className="mx-2 text-gray-500">OR</span>
+        <hr className="flex-grow border-gray-300" />
+      </div>
+
+      <button
+        onClick={handleGoogleSignUp}
+        className="w-full flex items-center justify-center bg-white border border-gray-300 py-3 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition duration-300"
+      >
+        <FcGoogle className="mr-2" size={24} /> Sign Up with Google
+      </button>
+
       <p className="my-4 text-center">
         Already have an account?{' '}
         <Link href="/auth/signin">

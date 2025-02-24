@@ -1,88 +1,80 @@
-import { useState, useEffect } from "react";
+// pages/admin/orders.js
+import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import AdminLayout from "../../components/AdminLayout";
 
-export default function AdminOrders() {
+export default function ManageOrders() {
   const [orders, setOrders] = useState([]);
-  const [updating, setUpdating] = useState(false);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function fetchOrders() {
-      const { data, error } = await supabase.from("orders").select("*");
-
-      if (error) {
-        setError("Failed to fetch orders.");
-      } else {
-        setOrders(data);
-      }
-    }
-
     fetchOrders();
   }, []);
 
-  const handleUpdateStatus = async (orderId, newStatus) => {
-    setUpdating(true);
+  // Fetch orders from Supabase
+  const fetchOrders = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from("orders").select("*");
+    if (error) console.error("Error fetching orders:", error);
+    else setOrders(data);
+    setLoading(false);
+  };
 
+  // Update order status
+  const handleStatusUpdate = async (id, newStatus) => {
     const { error } = await supabase
       .from("orders")
       .update({ status: newStatus })
-      .eq("id", orderId);
+      .eq("id", id);
+    if (error) alert("Error updating status: " + error.message);
+    else fetchOrders();
+  };
 
-    if (error) {
-      setError("Failed to update order status.");
-    } else {
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.id === orderId ? { ...order, status: newStatus } : order
-        )
-      );
-    }
-
-    setUpdating(false);
+  // Delete an order
+  const handleDelete = async (id) => {
+    const { error } = await supabase.from("orders").delete().eq("id", id);
+    if (error) alert("Error deleting order: " + error.message);
+    else fetchOrders();
   };
 
   return (
-    <div style={{ maxWidth: "100%", textAlign: "center" }}
-      className="mt-24 p-4">
-      <h1 className="text-2xl">Admin Orders</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <AdminLayout>
+      <h1 className="text-3xl font-bold mb-6">Manage Orders</h1>
 
-      <table style={{ width: "100%", marginTop: "20px", borderCollapse: "collapse" }}>
-        <thead>
-          <tr style={{ borderBottom: "2px solid #ccc" }}>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Update Status</th>
-          </tr>
-        </thead>
-        <tbody>
+      {loading ? (
+        <p>Loading orders...</p>
+      ) : (
+        <ul className="space-y-4">
           {orders.map((order) => (
-            <tr key={order.id} style={{ borderBottom: "1px solid #eee" }}>
-              <td>{order.email}</td>
-              <td>{order.status}</td>
-              <td>
-                <select
-                  onChange={(e) => handleUpdateStatus(order.id, e.target.value)}
-                  value={order.status}
-                  disabled={updating}
-                  style={{
-                    padding: "5px",
-                    borderRadius: "5px",
-                    border: "1px solid #ccc",
-                  }}
+            <li key={order.id} className="border p-4 rounded-lg">
+              <p>
+                <strong>Order ID:</strong> {order.id}
+              </p>
+              <p>
+                <strong>User ID:</strong> {order.user_id}
+              </p>
+              <p>
+                <strong>Status:</strong> {order.status}
+              </p>
+
+              <div className="mt-4">
+                <button
+                  onClick={() => handleStatusUpdate(order.id, "shipped")}
+                  className="bg-blue-500 text-white p-2 rounded mr-2"
                 >
-                  <option value="pending">Pending</option>
-                  <option value="paid">Paid</option>
-                  <option value="processing">Processing</option>
-                  <option value="shipped">Shipped</option>
-                  <option value="delivered">Delivered</option>
-                  <option value="cancelled">Cancelled</option>
-                </select>
-              </td>
-            </tr>
+                  Mark as Shipped
+                </button>
+                <button
+                  onClick={() => handleDelete(order.id)}
+                  className="bg-red-500 text-white p-2 rounded"
+                >
+                  Delete Order
+                </button>
+              </div>
+            </li>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </ul>
+      )}
+    </AdminLayout>
   );
 }
