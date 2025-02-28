@@ -1,40 +1,17 @@
 // components/AdminLayout.js
-import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { supabase } from "../lib/supabaseClient";
+import Link from 'next/link';
 
-export default function AdminLayout({ children }) {
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const router = useRouter();
+const AdminLayout = ({ children }) => {
+  return (
+    <div className="min-h-screen p-8 bg-gray-100">
+      <nav className="mb-6">
+        <Link href="/admin">
+          <span className="text-xl font-bold text-green-600 cursor-pointer">Admin Panel</span>
+        </Link>
+      </nav>
+      <main>{children}</main>
+    </div>
+  );
+};
 
-  useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        router.push("/auth/signin");
-      } else {
-        const { data, error } = await supabase
-          .from("users")
-          .select("role")
-          .eq("id", user.id)
-          .single();
-
-        if (error || data?.role !== "admin") {
-          router.push("/");
-        } else {
-          setIsAdmin(true);
-        }
-      }
-      setLoading(false);
-    };
-
-    checkAdmin();
-  }, [router]);
-
-  if (loading) return <p>Loading...</p>;
-  if (!isAdmin) return <p>Access Denied</p>;
-
-  return <div>{children}</div>;
-}
+export default AdminLayout;

@@ -1,9 +1,9 @@
-// next.config.js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true, // Disable ESLint during build
+  reactStrictMode: true,
+  images: {
+    domains: ["znjrafazpveysjguzxri.supabase.co"],
   },
 };
 
-module.exports = nextConfig; // ✅ Use "module.exports" in CommonJS
+module.exports = nextConfig;

@@ -20,9 +20,9 @@ export default function SignIn() {
 
     if (error) {
       setMessage(`Error: ${error.message}`);
-      setTimeout(() => setMessage(''), 3000);
+      setTimeout(() => setMessage(''), 5000);
     } else {
-      setMessage('Sign in successful! Redirecting...');
+      setMessage('Sign in successful!');
       setTimeout(() => {
         setMessage('');
         router.push('/');
@@ -46,7 +46,7 @@ export default function SignIn() {
     <div className="mt-28 mb-4 pt-4 max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200">
       <div className="text-center mb-6">
         <h1 className="mt-4 border-b border-gray-100 text-2xl font-bold">⚡EPHANTRONICS⚡</h1>
-        <p className="my-2 text-xl font-bold text-gray-800">Experience the best services as never before</p>
+        <p className="my-2 text-sm font-bold text-gray-800">Experience the best services as never before</p>
         <h1 className="text-2xl font-bold text-green-600">Sign In</h1>
       </div>
       <form onSubmit={handleSignIn} className="p-4 space-y-4">
@@ -72,6 +72,7 @@ export default function SignIn() {
         >
           Sign In
         </button>
+        {message && <p className="mb-4 text-center text-red-500">{message}</p>}
       </form>
 
       <div className="flex items-center justify-center">
@@ -80,13 +81,13 @@ export default function SignIn() {
         <hr className="flex-grow border-gray-300" />
       </div>
 
-      <button
+      <div className='mx-4'><button
         type="button"
         onClick={handleGoogleSignIn}
-        className="w-full mt-4 flex items-center justify-center bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold transition duration-300"
+        className="w-full mt-4 flex items-center justify-center bg-white border border-gray-300 py-3 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition duration-300"
       >
-        <FcGoogle size={24} className="mr-2" /> Sign in with Google
-      </button>
+        <FcGoogle size={24} className="mr-2" /> Continue with Google
+      </button></div>
 
       <p className="py-4 text-center text-blue-500 hover:underline">
         <Link href="/auth/forgot-password">Forgot Password?</Link>
@@ -102,7 +103,6 @@ export default function SignIn() {
           <span className="text-blue-500 hover:underline">View Products</span>
         </Link>
       </p>
-      {message && <p className="mb-4 text-center text-red-500">{message}</p>}
     </div>
   );
 }

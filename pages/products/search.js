@@ -45,20 +45,21 @@ export default function SearchPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-              <Link href={`/products/${product.id}`} key={product.id} className="group">
-              <div className="border rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300">
-                {/* Display First Image Only */}
-                <Image                   width={500} 
-                  height={500}
-                  unoptimized 
-                  src={product.image_urls?.[0] || "/placeholder.jpg"} 
-                  alt={product.name} 
-                  className="w-full h-48 object-cover rounded-md"
-                />
-                <h3 className="mt-3 text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition">{product.name}</h3>
-                <p className="mt-1 font-bold text-blue-600">${product.price}</p>
-              </div>
-            </Link>
+            <Link href={`/products/${product.product_id}`} key={product.product_id} className="group">
+            <div className="border rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300">
+              {/* Display First Image Only */}
+              <Image
+                src={product.image_urls?.[0] || "/placeholder.jpg"}
+                alt={product.name || "Product Image"}
+                className="w-full h-48 object-cover rounded-md"
+                width={500} 
+                height={500}
+                unoptimized // If using external URLs like Supabase
+              />
+              <h3 className="mt-3 text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition">{product.name}</h3>
+              <p className="mt-1 font-bold text-blue-600">${product.price}</p>
+            </div>
+          </Link>
           ))}
         </div>
       )}

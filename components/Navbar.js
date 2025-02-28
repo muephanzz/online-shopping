@@ -1,31 +1,33 @@
 'use client';
-
+import { Contact, PersonStanding, Music, Music2, CarFront } from 'lucide-react';
 import { motion } from "framer-motion";
 import Link from 'next/link';
-import { ShoppingCart, UserCircle, Search, Menu, Contact, X, PersonStanding, Music, Music2, CarFront } from 'lucide-react';
+import { Home, Smartphone, Laptop, ShoppingCart, UserCircle, Search, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
-import { Home, Laptop, Smartphone } from 'lucide-react';
 import Image from 'next/image';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [profilePic, setProfilePic] = useState(''); // Default profile picture
+  const [profilePic, setProfilePic] = useState('https://znjrafazpveysjguzxri.supabase.co/storage/v1/object/public/avatars//4762fc3a-cc10-49b6-8072-ad721fff4578.jpg'); // Default avatar
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const [newprofile, setNewProfle] = useState({
+    avatar_url: "",
+  });
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
 
+  // Fetch user and profile picture
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) return;
-
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) return;
       setUser(user);
 
       const { data: profile, error: profileError } = await supabase
@@ -36,7 +38,7 @@ export default function Navbar() {
 
       if (profileError) {
         console.error("Error fetching profile:", profileError.message);
-      } else if (profile.avatar_url) {
+      } else if (profile?.avatar_url) {
         setProfilePic(profile.avatar_url);
       }
     };
@@ -48,11 +50,7 @@ export default function Navbar() {
       fetchUser();
     });
 
-    return () => {
-      if (listener?.subscription) {
-        listener.subscription.unsubscribe();
-      }
-    };
+    return () => listener?.subscription.unsubscribe();
   }, []);
 
   const handleSignOut = async () => {
@@ -60,9 +58,29 @@ export default function Navbar() {
     router.push('/auth/signin');
   };
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+  // Upload images to Supabase storage
+  const uploadImages = async () => {
+    const avatarUrl = await Promise.all(
+      files.map(async (file) => {
+        const fileName = `${Date.now()}-${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("profiles")
+          .upload(`image/${fileName}`, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) throw new Error(uploadError.message);
+
+        const { data: urlData } = supabase.storage.from("profiles").getPublicUrl(`image/${fileName}`);
+        return urlData.publicUrl;
+      })
+    );
+
+    return avatarUrl;
   };
+
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -123,10 +141,21 @@ export default function Navbar() {
                 />
               </div>
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-10000">
-                  <Link href="/profile">
-                    <div className="px-4 py-2 text-gray-700" onClick={dropdownOpen}>Profile</div>
+                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50">
+                  <label className="block px-4 py-2 text-gray-700 cursor-pointer">
+                    Update ProfilePic
+                    <input
+                      type="file"
+                      className="hidden"
+                      onChange={handleImageUpload}
+                      accept="image/*"
+                    />
+                  </label>
+                  <div className="relative">
+                    <Link href="/orders/completed"
+                    className="w-8 pl-4 h-8 text-gray-700 cursor-pointer"> Completed Orders
                   </Link>
+                </div>
                   <button
                     onClick={handleSignOut}
                     className="w-full text-left px-4 py-2 text-red-500"

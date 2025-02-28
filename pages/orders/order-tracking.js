@@ -2,34 +2,44 @@ import { useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 
 export default function OrderTracking() {
-  const [email, setEmail] = useState("");
+  const [orderId, setOrderId] = useState("");
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const statusSteps = ["pending", "paid", "processing", "shipped", "delivered"];
+  const statusSteps = ["pending", "paid", "processing", "shipped", "completed"];
   const getStatusIndex = (status) => statusSteps.indexOf(status);
 
   const handleTrackOrder = async () => {
     setLoading(true);
     setError("");
+    setOrderId("");
     setOrder(null);
-
+  
+    if (!orderId.trim()) {
+      setError('Order number cannot be empty!');
+      setLoading(false); // Stop loading if the field is empty
+      setTimeout(() => setError(''), 5000);
+      return; // Exit early to prevent the query
+    }
+  
     const { data, error } = await supabase
       .from("orders")
       .select("*")
-      .eq("email", email)
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    if (error || !data || data.length === 0) {
-      setError("No order found with this email.");
+      .eq("order_id", orderId)
+      .single();
+  
+    if (error || !data) {
+      setError("No order found with this order ID.");
     } else {
-      setOrder(data[0]);
+      setOrder(data);
     }
+  
     setLoading(false);
   };
+  
 
   const handleCancelOrder = async () => {
     if (!order) return;
@@ -40,7 +50,7 @@ export default function OrderTracking() {
       const { error } = await supabase
         .from("orders")
         .update({ status: "cancelled" })
-        .eq("id", order.id);
+        .eq("order_id", order.order_id);
 
       if (error) {
         setError("Failed to cancel the order.");
@@ -50,19 +60,20 @@ export default function OrderTracking() {
 
       setUpdating(false);
     } else {
-      setError("Order cannot be cancelled after processing.");
+      setError("Order cannot be cancelled after processing. Call 0798229783 for help");
+      setTimeout(() => setError(''), 5000);
     }
   };
 
   return (
-    <div style={{ maxWidth: "460px", margin: "auto", textAlign: "center", marginTop : "100px", marginBottom: "200px" }}>
+    <div style={{ maxWidth: "460px", margin: "auto", textAlign: "center", marginTop: "100px", marginBottom: "200px" }}>
       <h1 className="m-2">Track Your Order</h1>
 
       <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Enter your email"
+        type="text"
+        value={orderId}
+        onChange={(e) => setOrderId(e.target.value)}
+        placeholder="Enter your order ID"
         style={{
           padding: "10px",
           width: "100%",
@@ -70,6 +81,7 @@ export default function OrderTracking() {
           border: "1px solid #ccc",
           borderRadius: "5px",
         }}
+        required
       />
       <button
         onClick={handleTrackOrder}
@@ -90,6 +102,7 @@ export default function OrderTracking() {
       {order && (
         <div style={{ marginTop: "30px", textAlign: "left" }}>
           <h2>Order Details</h2>
+          <h2>Order Number: {order.order_id}</h2>
           <p>
             <strong>Status:</strong> {order.status}
           </p>
@@ -99,19 +112,24 @@ export default function OrderTracking() {
           <p>
             <strong>Shipping Address:</strong> {order.shipping_address}
           </p>
-
           <h3>Items:</h3>
           <ul>
-            {JSON.parse(order.items).map((item, index) => (
-              <li key={index}>
-                <p>
-                  {item.name} - ${item.price}
-                </p>
-              </li>
-            ))}
+            {(() => {
+              try {
+                const items = JSON.parse(order.items);
+                return items.map((item, index) => (
+                  <li key={index}>
+                    <p>
+                      {item.name} - ${item.price}
+                    </p>
+                  </li>
+                ));
+              } catch {
+                return <li>Unable to load items.</li>;
+              }
+            })()}
           </ul>
 
-          {/* ✅ Progress Bar (Only show when order exists) */}
           <div style={{ marginTop: "20px" }}>
             <h3>Order Status</h3>
             <div
@@ -141,7 +159,6 @@ export default function OrderTracking() {
             </div>
           </div>
 
-          {/* Cancel Button */}
           {order.status !== "cancelled" && (
             <button
               onClick={handleCancelOrder}

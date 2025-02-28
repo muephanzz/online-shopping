@@ -26,7 +26,7 @@ export default function Signup() {
 
     if (!firstName || !lastName || !email || !password) {
       setMessage('All fields are required!');
-      setTimeout(() => setMessage(''), 3000);
+      setTimeout(() => setMessage(''), 5000);
       return;
     }
 
@@ -62,7 +62,7 @@ export default function Signup() {
     <div className="mt-28 mb-4 pt-4 max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-gray-200">
       <div className="text-center mb-6">
         <h1 className="mt-4 border-b border-gray-100 text-2xl font-bold text-black-600">⚡EPHANTRONICS⚡</h1>
-        <p className="my-2 text-1xl font-bold text-gray-800">Experience the best services as never before</p>
+        <p className="my-2 text-sm font-bold text-gray-800">Experience the best services as never before</p>
         <h1 className="text-2xl font-bold text-green-600">Sign Up</h1>
       </div>
       <form onSubmit={handleSignup} className="px-4 space-y-4">
@@ -105,6 +105,7 @@ export default function Signup() {
         <button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition duration-300">
           Sign Up
         </button>
+        {message && <p className="mb-4 text-center text-red-500">{message}</p>}
       </form>
 
       <div className="flex items-center justify-center my-4">
@@ -113,12 +114,12 @@ export default function Signup() {
         <hr className="flex-grow border-gray-300" />
       </div>
 
-      <button
+      <div className='mx-4'><button
         onClick={handleGoogleSignUp}
         className="w-full flex items-center justify-center bg-white border border-gray-300 py-3 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition duration-300"
       >
         <FcGoogle className="mr-2" size={24} /> Sign Up with Google
-      </button>
+      </button></div>
 
       <p className="my-4 text-center">
         Already have an account?{' '}
@@ -126,7 +127,6 @@ export default function Signup() {
           <span className="text-blue-500 hover:underline">Sign In</span>
         </Link>
       </p>
-      {message && <p className="mb-4 text-center text-red-500">{message}</p>}
     </div>
   );
 }
