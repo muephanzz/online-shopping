@@ -7,80 +7,45 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../lib/supabaseClient';
 import Image from 'next/image';
+import SignInModal from './SignInModal';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [profilePic, setProfilePic] = useState('https://znjrafazpveysjguzxri.supabase.co/storage/v1/object/public/avatars//4762fc3a-cc10-49b6-8072-ad721fff4578.jpg'); // Default avatar
+  const [profilePic, setProfilePic] = useState("/logo.jpg");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSignIn, setShowSignIn] = useState(false);
   const router = useRouter();
-  const [newprofile, setNewProfle] = useState({
-    avatar_url: "",
-  });
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
 
-  // Fetch user and profile picture
+  // Fetch user and cart data
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) return;
+      const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('avatar_url')
-        .eq('user_id', user.id)
-        .single();
-
-      if (profileError) {
-        console.error("Error fetching profile:", profileError.message);
-      } else if (profile?.avatar_url) {
-        setProfilePic(profile.avatar_url);
-      }
     };
-
     fetchUser();
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-      fetchUser();
-    });
-
-    return () => listener?.subscription.unsubscribe();
+    const fetchCart = async () => {
+      const { data, error } = await supabase
+        .from('cart')
+        .select('*');
+      if (!error && data) {
+        setCartCount(data.length);
+      }
+    };
+    fetchCart();
   }, []);
 
-  const handleSignOut = async () => {
+  const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push('/auth/signin');
+    setUser(null);
+    router.push('/');
   };
-
-  // Upload images to Supabase storage
-  const uploadImages = async () => {
-    const avatarUrl = await Promise.all(
-      files.map(async (file) => {
-        const fileName = `${Date.now()}-${file.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from("profiles")
-          .upload(`image/${fileName}`, file, {
-            cacheControl: "3600",
-            upsert: false,
-          });
-
-        if (uploadError) throw new Error(uploadError.message);
-
-        const { data: urlData } = supabase.storage.from("profiles").getPublicUrl(`image/${fileName}`);
-        return urlData.publicUrl;
-      })
-    );
-
-    return avatarUrl;
-  };
-
-  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -95,11 +60,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link href="/">
-          <h1 className="hidden md:flex text-2xl font-bold text-blue-600">Ephantronics</h1>
+          <h1 className="hidden md:flex text-2xl font-bold text-blue-600 cursor-pointer">Ephantronics</h1>
         </Link>
 
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="relative w-full max-w ml-10 mr-2">
+        <form onSubmit={handleSearch} className="relative w-full max-w-sm ml-10 mr-2">
           <input
             type="text"
             placeholder="Search products..."
@@ -126,52 +91,20 @@ export default function Navbar() {
 
           {/* User Dropdown */}
           {user ? (
-            <div className="relative">
-              <div
-                className="flex items-center space-x-2 cursor-pointer"
-                onClick={toggleDropdown}
-              >
-                <Image
-                  width={500} 
-                  height={500}
-                  unoptimized
-                  src={profilePic} // Display the fetched profile picture
-                  alt="Profile"
-                  className="w-8 h-8 rounded-full"
-                />
-              </div>
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50">
-                  <label className="block px-4 py-2 text-gray-700 cursor-pointer">
-                    Update ProfilePic
-                    <input
-                      type="file"
-                      className="hidden"
-                      onChange={handleImageUpload}
-                      accept="image/*"
-                    />
-                  </label>
-                  <div className="relative">
-                    <Link href="/orders/completed"
-                    className="w-8 pl-4 h-8 text-gray-700 cursor-pointer"> Completed Orders
-                  </Link>
-                </div>
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full text-left px-4 py-2 text-red-500"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+            <div>
+              <p>Hello, {user.email}</p>
+              <button onClick={handleLogout} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
+                Logout
+              </button>
             </div>
           ) : (
-            <div className="relative">
-              <Link href="/auth/signin">
-                <UserCircle className="w-8 h-8 text-gray-700 cursor-pointer" />
-              </Link>
-            </div>
+            <button onClick={() => setShowSignIn(true)} className="bg-blue-600 text-white px-6 py-3 rounded-lg">
+              Sign In / Sign Up
+            </button>
           )}
+
+          {/* Sign-In Modal */}
+          <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />
         </div>
       </div>
 

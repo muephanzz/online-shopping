@@ -231,7 +231,10 @@ export default function ProductDetails() {
         </div>
 
         <div className="bg-gray-200 p-4">
-          <p>{product.description || "No description available."}</p>
+          {/* Preserve line breaks from textarea */}
+          <p style={{ whiteSpace: "pre-line" }}>
+            {product.description || "No description available."}
+          </p>
           <h1 style={{ color: "#0070f3", margin: "15px 0" }}>{product.name}</h1>
           <h2 style={{ color: "#0070f3", margin: "15px 0" }}>Price: Ksh{product.price}</h2>
 
