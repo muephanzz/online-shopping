@@ -1,24 +1,7 @@
-"use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { ShoppingCart } from "lucide-react";
+import Link from 'next/link';
+import { ShoppingCart } from 'lucide-react';
 
 export default function CartIcon({ cartCount }) {
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  useEffect(() => {
-    const checkDevice = () => {
-      setIsDesktop(window.innerWidth >= 500 && !/Mobi|Android/i.test(navigator.userAgent));
-    };
-
-    checkDevice();
-    window.addEventListener("resize", checkDevice);
-
-    return () => window.removeEventListener("resize", checkDevice);
-  }, []);
-
-  if (!isDesktop) return null; // Hide on non-desktop devices
-
   return (
     <div className="relative">
       <Link href="/cart">
