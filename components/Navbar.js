@@ -12,40 +12,31 @@ import SignInModal from './SignInModal';
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [profilePic, setProfilePic] = useState("/logo.jpg");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showSignIn, setShowSignIn] = useState(false);
   const router = useRouter();
+  const [showSignIn, setShowSignIn] = useState(false);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
 
-  // Fetch user and cart data
+  // Fetch user
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
     };
     fetchUser();
-
-    const fetchCart = async () => {
-      const { data, error } = await supabase
-        .from('cart')
-        .select('*');
-      if (!error && data) {
-        setCartCount(data.length);
-      }
-    };
-    fetchCart();
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
     router.push('/');
   };
+
+  const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -60,11 +51,11 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link href="/">
-          <h1 className="hidden md:flex text-2xl font-bold text-blue-600 cursor-pointer">Ephantronics</h1>
+          <h1 className="hidden md:flex text-2xl font-bold text-blue-600">Ephantronics</h1>
         </Link>
 
         {/* Search Bar */}
-        <form onSubmit={handleSearch} className="relative w-full max-w-sm ml-10 mr-2">
+        <form onSubmit={handleSearch} className="relative w-full max-w ml-10 mr-2">
           <input
             type="text"
             placeholder="Search products..."
@@ -75,8 +66,8 @@ export default function Navbar() {
           <Search className="absolute left-3 top-2.5 text-gray-500" size={20} />
         </form>
 
-        {/* User & Cart Section */}
-        <div className="flex items-center space-x-6">
+       {/* User & Cart Section */}
+       <div className="flex items-center space-x-6">
           {/* Cart Icon */}
           <div className="relative">
             <Link href="/cart">
@@ -91,19 +82,38 @@ export default function Navbar() {
 
           {/* User Dropdown */}
           {user ? (
-            <div>
-              <p>Hello, {user.email}</p>
-              <button onClick={handleLogout} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
-                Logout
-              </button>
+            <div className="relative">
+              <div
+                className="flex items-center space-x-2 cursor-pointer"
+                onClick={toggleDropdown}
+              >
+              <div>
+                <UserCircle className="w-8 h-8 text-gray-700 cursor-pointer" />
+              </div>
+              </div>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2 z-50">
+                <div>
+                  <p>{user.email}</p>
+                </div>
+                  <div className="relative">
+                    <Link href="/orders/completed"
+                    className="w-8 pl-4 h-8 text-gray-700 cursor-pointer"> Completed Orders
+                  </Link>
+                </div>
+                <button onClick={handleLogOut} className="mt-4 bg-red-500 text-white px-4 py-2 rounded">
+                  Logout
+                </button>
+                </div>
+              )}
             </div>
           ) : (
-            <button onClick={() => setShowSignIn(true)} className="bg-blue-600 text-white px-6 py-3 rounded-lg">
-              Sign In / Sign Up
-            </button>
+            <div className="relative">
+              <button onClick={() => setShowSignIn(true)}>
+                <UserCircle className="w-8 h-8 text-gray-700 cursor-pointer" />
+              </button>
+            </div>
           )}
-
-          {/* Sign-In Modal */}
           <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />
         </div>
       </div>
@@ -118,7 +128,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex justify-left my-4 pl-4 gap-5 text-lg w-full bg-gray-200">
+        <div className="hidden md:flex justify-left my-4 pl-4 gap-5 text-lg w-full">
           <button><Link href="/">Home</Link></button>
           <button><Link href="#smartphones">Smartphones</Link></button>
           <button><Link href="#laptops">Laptops</Link></button>
