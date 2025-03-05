@@ -15,7 +15,7 @@ export default function Navbar() {
   const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
   const [showSignIn, setShowSignIn] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 500);
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
   // Fetch authenticated user
