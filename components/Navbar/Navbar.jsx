@@ -49,19 +49,20 @@ export default function Navbar() {
   return (
     <nav className="bg-white shadow-md p-4 fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Show SearchBar on all devices */}
-        <SearchBar />
+
 
         {/* Desktop components (hidden on mobile) */}
         {!isMobile && (
           <>
             <Logo />
+            <MobileMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+            {/* Show SearchBar on all devices */}
+            <SearchBar />
             <div className="flex items-center space-x-6">
               <CartIcon cartCount={cartCount} />
               <UserMenu user={user} onLogout={handleLogOut} onSignIn={() => setShowSignIn(true)} />
             </div>
             <DesktopMenu />
-            <MobileMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
           </>
         )}
 
