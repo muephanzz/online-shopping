@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
-import ProductCard from '@/components/ProductCard';
-import Pagination from '@/components/Pagination';
+import ProductCard from '../../components/ProductCard';
+import Pagination from '../../components/Pagination';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -39,8 +39,8 @@ export default function ProductsPage() {
       if (error) {
         console.error('Error fetching products:', error);
       } else {
-        setProducts(data);
-        setTotalProducts(count);
+        setProducts(data || []);
+        setTotalProducts(count || 0);
       }
 
       setLoading(false);
@@ -71,7 +71,7 @@ export default function ProductsPage() {
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
-        category_id={category_id}
+        onPageChange={(page) => router.push(`/products?category_id=${category_id}&page=${page}`)}
       />
     </div>
   );
