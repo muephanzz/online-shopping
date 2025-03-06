@@ -15,7 +15,7 @@ export default function SearchBar() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative w-full max-w-md ml-4">
+    <form onSubmit={handleSubmit} className="relative w-full max-w-md mx-2">
       <input
         type="text"
         placeholder="Search products..."

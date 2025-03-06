@@ -14,8 +14,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
-  const [showSignIn, setShowSignIn] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showSignIn, setShowSignIn] = useState(false);
   const router = useRouter();
 
   // Fetch authenticated user
@@ -41,13 +41,12 @@ export default function Navbar() {
     fetchCartCount();
   }, [user]);
 
-  // Detect if device is mobile
   useEffect(() => {
-    const checkDevice = () => {
-      setIsMobile(window.innerWidth < 500);
+    // Detect mobile devices (Android, iPhone, iPad, iPod)
+    const checkMobile = () => {
+      setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
     };
-    window.addEventListener("resize", checkDevice);
-    return () => window.removeEventListener("resize", checkDevice);
+    checkMobile();
   }, []);
 
   const handleLogOut = async () => {
@@ -60,9 +59,14 @@ export default function Navbar() {
     }
   };
 
+
   return (
     <nav className="bg-white shadow-md p-4 fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
+      
+      {!isMobile && (
+        <MobileMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      )}
 
         <Logo />
 
@@ -70,7 +74,7 @@ export default function Navbar() {
         <SearchBar />
 
         {/* Desktop components */}
-        {!isMobile ? (
+        {!isMobile && (
           <>
             <DesktopMenu />
             <div className="flex items-center space-x-6">
@@ -78,8 +82,6 @@ export default function Navbar() {
               <UserMenu user={user} onLogout={handleLogOut} onSignIn={() => setShowSignIn(true)} />
             </div>
           </>
-        ) : (
-          <MobileMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
         )}
       </div>
 
