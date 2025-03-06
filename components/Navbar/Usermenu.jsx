@@ -11,7 +11,7 @@ export default function UserMenu({ user, onLogout, onSignIn }) {
         <>
           <UserCircle
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="w-8 h-8 text-gray-700 cursor-pointer"
+            className="w-  h-8 text-gray-700 cursor-pointer"
           />
           {dropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg py-2">
