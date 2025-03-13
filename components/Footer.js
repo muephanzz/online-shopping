@@ -1,9 +1,21 @@
+"use client";
 import Link from 'next/link';
 import { Facebook, Twitter, Instagram, Factory, Car, Linkedin, Youtube, CarFront } from 'lucide-react';
 import { FaCcVisa } from "react-icons/fa";
-import { SiMpesa } from "react-icons/si";
+import { useEffect, useState } from "react";
 
 export default function Footer() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Detect mobile devices (Android, iPhone, iPad, iPod)
+    const checkMobile = () => {
+      setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
+
+  if (isMobile) return null;
   return (
     <footer className="bg-gray-800 text-white p-4">
       <div id='about'>

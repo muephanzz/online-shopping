@@ -32,7 +32,7 @@ export default function OrderTracking() {
       .single();
   
     if (error || !data) {
-      setError("No order found with this order ID.");
+      setError("No order found with this id");
     } else {
       setOrder(data);
     }

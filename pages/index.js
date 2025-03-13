@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
+import Footer from "../components/Footer";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -35,7 +36,7 @@ export default function Home() {
   }, [currentPage]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 mt-20 mb-60">
+    <div className="py-2 mt-20">
       <h1 className="text-4xl font-extrabold text-center mb-12">Our Products</h1>
 
       {loading ? (
@@ -55,6 +56,10 @@ export default function Home() {
           />
         </>
       )}
+      <div className="py-10 mt-60">
+        <Footer />
+      </div>
+      
     </div>
   );
 }

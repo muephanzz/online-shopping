@@ -12,7 +12,6 @@ function MyApp({ Component, pageProps }) {
       <ToastContainer position="top-right" autoClose={3000} />
       <Component {...pageProps} />
       <BottomNav /> 
-      <Footer />
     </>
   );
 }

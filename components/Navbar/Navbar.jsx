@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import { supabase } from "../../lib/supabaseClient";
 import SignInModal from "../SignInModal";
 import Logo from "../Navbar/Logo";
@@ -62,7 +62,7 @@ export default function Navbar() {
 
   return (
     <nav className="bg-white shadow-md p-4 fixed w-full top-0 z-50">
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="w-full mx-auto flex justify-between items-center">
       
       {!isMobile && (
         <MobileMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />

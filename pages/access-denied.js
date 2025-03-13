@@ -1,4 +1,3 @@
-// pages/access-denied.js
 import Link from 'next/link';
 
 export default function AccessDenied() {

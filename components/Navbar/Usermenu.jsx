@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { UserCircle } from 'lucide-react';
+import { User2 } from 'lucide-react';
 
 export default function UserMenu({ user, onLogout, onSignIn }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -9,7 +9,7 @@ export default function UserMenu({ user, onLogout, onSignIn }) {
     <div className="relative">
       {user ? (
         <>
-          <UserCircle
+          <User2
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="w-8  h-8 text-gray-700 cursor-pointer"
           />
@@ -26,9 +26,9 @@ export default function UserMenu({ user, onLogout, onSignIn }) {
           )}
         </>
       ) : (
-        <button onClick={onSignIn}>
-          <UserCircle className="w-8 h-8 text-gray-700 cursor-pointer" />
-        </button>
+        <div onClick={onSignIn}>
+          <User2 className="flex flex-col items-center text-gray-600 hover:text-black"/>
+        </div>
       )}
     </div>
   );

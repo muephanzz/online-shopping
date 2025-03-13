@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
 import { Loader2, Trash2 } from "lucide-react";
 import Image from "next/image";
+import OrderSummary from "../components/OrderSummary";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
@@ -85,9 +86,14 @@ export default function Cart() {
               key={item.cart_id}
               className="flex flex-col md:flex-row items-center justify-between border-b pb-4 mb-4"
             >
-              <Image                   width={500} 
-                  height={500}
-                  unoptimized src={item.image_url} alt={item.name} className="w-24 h-24 object-cover rounded-lg" />
+              <Image 
+                width={500} 
+                height={500}
+                unoptimized 
+                src={item.image_url} 
+                alt={item.name} 
+                className="w-24 h-24 object-cover rounded-lg" 
+              />
               <div className="text-left flex-1 px-4">
                 <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
                 <p className="text-blue-600 font-bold">Ksh{(item.price * item.quantity).toFixed(2)}</p>
@@ -102,21 +108,7 @@ export default function Cart() {
             </div>
           ))}
 
-          <div className="p-4 border-t mt-4">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Order Summary</h2>
-            <div className="flex justify-between text-gray-700">
-              <p>Subtotal:</p>
-              <p>Ksh{subtotal.toFixed(2)}</p>
-            </div>
-            <div className="flex justify-between text-gray-700">
-              <p>Shipping Fee:</p>
-              <p>Ksh{shippingFee.toFixed(2)}</p>
-            </div>
-            <div className="flex justify-between font-bold text-lg text-gray-900 mt-2">
-              <p>Total:</p>
-              <p>Ksh{totalAmount.toFixed(2)}</p>
-            </div>
-          </div>
+          <OrderSummary />
 
           <button
             onClick={() => router.push("/orders/checkout")}
