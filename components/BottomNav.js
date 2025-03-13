@@ -32,7 +32,7 @@ export default function BottomNav() {
   };
 
   // Hide if not on a mobile device
-  if (isMobile) return null;
+  if (!isMobile) return null;
 
   return (
     <nav className="shadow-md p-4 fixed w-full z-50">
@@ -45,12 +45,10 @@ export default function BottomNav() {
             </button>
         </Link>
 
-        <Link href="/categories">
           <button className="flex flex-col items-center text-gray-600 hover:text-black">
             <Menu size={24} />
             <span className="text-xs mt-1">Categories</span>
           </button>
-        </Link>
 
         <button>
           <CartIcon cartCount={cartCount} />

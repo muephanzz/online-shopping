@@ -3,6 +3,7 @@ import { supabase } from "../lib/supabaseClient";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 import Footer from "../components/Footer";
+import UnifiedChat from '../components/UnifiedChat';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -49,6 +50,8 @@ export default function Home() {
             ))}
           </div>
 
+          <UnifiedChat />
+
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -56,7 +59,7 @@ export default function Home() {
           />
         </>
       )}
-      <div className="py-10 mt-60">
+      <div className="mt-60">
         <Footer />
       </div>
       
