@@ -1,28 +1,25 @@
-import { useState } from "react";
-import Slider from "react-slick";
-import Image from "next/image";
+import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabaseClient";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 import Footer from "../components/Footer";
-import UnifiedChat from "../components/UnifiedChat";
+import UnifiedChat from '../components/UnifiedChat';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import Slider from "react-slick";
+import Image from "next/image";
 
 export default function Home() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
-  const products = [
-    { product_id: 1, name: "Product 1", price: 100 },
-    { product_id: 2, name: "Product 2", price: 200 },
-  ];
-
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const [totalPages, setTotalPages] = useState(1);
 
   // Local slideshow images stored in the public folder
   const slides = [
-    "/slides/slide1.jpg",
-    "/slides/slide2.jpg",
-    "/slides/slide3.jpg",
+    "/home1.webp",
+    "/home2.webp",
   ];
 
   const sliderSettings = {
@@ -33,12 +30,37 @@ export default function Home() {
     slidesToScroll: 1,
     autoplay: true,
     autoplaySpeed: 4000,
+    arrows: false,
   };
+
+  useEffect(() => {
+    async function fetchProducts() {
+      setLoading(true);
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage - 1;
+
+      const { data, count, error } = await supabase
+        .from("products")
+        .select("*", { count: "exact" })
+        .range(start, end);
+
+      if (error) {
+        console.error("Error fetching products:", error);
+      } else {
+        setProducts(data);
+        setTotalPages(Math.ceil(count / itemsPerPage));
+      }
+
+      setLoading(false);
+    }
+
+    fetchProducts();
+  }, [currentPage]);
 
   return (
     <div className="py-2 mt-20">
       <h1 className="text-4xl font-extrabold text-center mb-12">Our Products</h1>
-
+      
       {/* Slideshow */}
       <div className="mb-12">
         <Slider {...sliderSettings}>
@@ -56,24 +78,26 @@ export default function Home() {
         </Slider>
       </div>
 
-      {/* Products Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard key={product.product_id} product={product} />
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-center">Loading...</p>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.product_id} product={product} />
+            ))}
+          </div>
 
-      {/* Pagination */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={setCurrentPage}
-      />
+          <UnifiedChat />
 
-      {/* Unified Chat */}
-      <UnifiedChat />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </>
+      )}
 
-      {/* Footer */}
       <div className="mt-60">
         <Footer />
       </div>
