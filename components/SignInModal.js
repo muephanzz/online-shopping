@@ -31,7 +31,7 @@ export default function SignInModal({ isOpen, onClose }) {
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
-  
+
   const updateForm = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -109,13 +109,24 @@ export default function SignInModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black bg-opacity-50 z-60 flex justify-center items-center">
-      <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }} transition={{ type: 'spring', stiffness: 200 }} className="bg-white p-8 rounded-xl shadow-lg max-w-md w-full relative">
-        <button onClick={onClose} className="absolute top-3 right-3 text-gray-600" aria-label="Close Modal">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black bg-opacity-50 z-60 flex justify-center items-center p-4"
+    >
+      <motion.div
+        initial={{ scale: 0.8 }}
+        animate={{ scale: 1 }}
+        exit={{ scale: 0.8 }}
+        transition={{ type: 'spring', stiffness: 200 }}
+        className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative"
+      >
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-600 hover:text-gray-800 transition-colors" aria-label="Close Modal">
           <X size={24} />
         </button>
 
-        <h2 className="text-2xl font-bold mb-6 text-blue-600">
+        <h2 className="text-2xl font-semibold mb-6 text-blue-600 text-center">
           {view === 'signIn' ? 'Welcome Back' : view === 'signUp' ? 'Create an Account' : 'Reset Password'}
         </h2>
 
@@ -124,13 +135,15 @@ export default function SignInModal({ isOpen, onClose }) {
             <>
               {['first_name', 'last_name'].map((field) => (
                 <div key={field}>
-                  <label className="block mb-1 font-medium">{field.replace('_', ' ')}</label>
+                  <label className="block mb-2 font-medium capitalize text-sm text-gray-700">
+                    {field.replace('_', ' ')}
+                  </label>
                   <input
                     type="text"
                     name={field}
                     value={form[field]}
                     onChange={updateForm}
-                    className="w-full p-2 border rounded-lg"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-200 text-sm"
                     placeholder={`Enter your ${field.replace('_', ' ')}`}
                     autoComplete={field}
                     required
@@ -141,14 +154,14 @@ export default function SignInModal({ isOpen, onClose }) {
           )}
 
           <div>
-            <label className="block mb-1 font-medium">Email</label>
+            <label className="block mb-2 font-medium text-sm text-gray-700">Email</label>
             <input
               id="email"
               type="email"
               name="email"
               value={form.email}
               onChange={updateForm}
-              className="w-full p-2 border rounded-lg"
+              className="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-200 text-sm"
               placeholder="Enter your email"
               autoComplete="email"
               required
@@ -157,27 +170,38 @@ export default function SignInModal({ isOpen, onClose }) {
 
           {view !== 'forgotPassword' && (
             <div>
-              <label className="block mb-1 font-medium">Password</label>
+              <label className="block mb-2 font-medium text-sm text-gray-700">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={form.password}
                   onChange={updateForm}
-                  className="w-full p-2 border rounded-lg"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring focus:ring-blue-200 text-sm"
                   placeholder="Enter your password"
                   autoComplete={view === 'signUp' ? 'new-password' : 'current-password'}
                   required
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-2 top-2 text-gray-600" aria-label="Toggle password visibility">
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-gray-600 hover:text-gray-800 transition-colors"
+                  aria-label="Toggle password visibility"
+                >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
           )}
-          <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded-lg" disabled={loading}>{loading ? 'Processing...' : view === 'signIn' ? 'Sign In' : view === 'signUp' ? 'Sign Up' : 'Send Reset Link'}</button>
-          {view !== 'forgotPassword' && (
           <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            disabled={loading}
+          >
+            {loading ? 'Processing...' : view === 'signIn' ? 'Sign In' : view === 'signUp' ? 'Sign Up' : 'Send Reset Link'}
+          </button>
+          {view !== 'forgotPassword' && (
+            <button
             onClick={handleGoogleAuth}
             className="w-full mt-4 flex items-center justify-center bg-white border border-gray-300 py-3 rounded-lg font-semibold text-gray-700 hover:bg-gray-100 transition duration-300"
           >

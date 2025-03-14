@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import axios from "axios";
@@ -17,6 +18,7 @@ const UnifiedChat = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   // Fetch logged-in user
   useEffect(() => {
@@ -52,9 +54,12 @@ const UnifiedChat = () => {
   const handleSendMessage = async () => {
     if (!userMessage.trim() || !user) return;
 
+    const receiverId = isAdmin ? selectedUserId : user.id;
+
     const newMessage = {
       sender_id: user.id,
-      recipient_id: isAdmin ? "user" : "bot",
+      receiver_id: receiverId,
+      receiver_type: isAdmin ? "user" : "bot",
       message: userMessage,
       status: "sent",
     };
@@ -65,7 +70,7 @@ const UnifiedChat = () => {
 
     setMessages((prev) => [...prev, newMessage]);
     setUserMessage("");
-    setIsTyping(true);
+    setIsTyping(!isAdmin);
 
     // If user, send message to chatbot
     if (!isAdmin) {
@@ -73,7 +78,7 @@ const UnifiedChat = () => {
         const { data } = await axios.post("/api/chatbot", { userMessage });
         const botResponse = {
           sender_id: "bot",
-          recipient_id: user.id,
+          receiver_id: user.id,
           message: data.botResponse || "Sorry, I couldn't understand.",
           status: "delivered",
         };
@@ -97,6 +102,7 @@ const UnifiedChat = () => {
   // Real-time message listener
   useEffect(() => {
     fetchMessages();
+
     const subscription = supabase
       .channel("realtime:messages")
       .on(
@@ -119,6 +125,14 @@ const UnifiedChat = () => {
   // Hide chat if no user is logged in
   if (!user) return null;
 
+  // Filter messages for user or admin
+  const filteredMessages = messages.filter(
+    (msg) =>
+      msg.sender_id === user?.id ||
+      msg.receiver_id === user?.id ||
+      (isAdmin && msg.receiver_id === selectedUserId)
+  );
+
   return (
     <div>
       {/* Chat Icon */}
@@ -138,9 +152,27 @@ const UnifiedChat = () => {
             <button onClick={() => setIsOpen(false)}>&times;</button>
           </div>
 
+          {/* User Selector (Admin Only) */}
+          {isAdmin && (
+            <select
+              onChange={(e) => setSelectedUserId(e.target.value)}
+              value={selectedUserId || ""}
+              className="mb-4 p-2 border rounded"
+            >
+              <option value="">Select User</option>
+              {messages
+                .filter((msg) => msg.sender_id !== user?.id)
+                .map((msg) => (
+                  <option key={msg.sender_id} value={msg.sender_id}>
+                    {msg.sender_id}
+                  </option>
+                ))}
+            </select>
+          )}
+
           {/* Chat Messages */}
           <div className="h-96 overflow-y-auto mb-4 space-y-2">
-            {messages.map((msg) => (
+            {filteredMessages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${

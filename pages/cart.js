@@ -17,17 +17,17 @@ export default function Cart() {
         data: { session },
         error,
       } = await supabase.auth.getSession();
-  
+
       if (error) {
         console.error("Error fetching session:", error.message);
       } else if (session?.user) {
         setUser(session.user);
-  
+
         const { data, error: cartError } = await supabase
           .from("cart")
           .select("*")
           .eq("user_id", session.user.id);
-  
+
         if (cartError) {
           console.error("Error fetching cart:", cartError.message);
         } else {
@@ -36,7 +36,7 @@ export default function Cart() {
       }
       setLoading(false);
     }
-  
+
     fetchSessionAndCart();
   }, []);
 
@@ -52,10 +52,9 @@ export default function Cart() {
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const shippingFee = cartItems.length > 0 ? 10 : 0;
-  const totalAmount = subtotal + shippingFee;
 
   return (
-    <div className="mt-28 mb-4 p-4  text-center max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
+    <div className="mt-28 mb-4 p-4 text-center max-w-3xl mx-auto bg-white shadow-lg rounded-lg">
       <h1 className="border-y border-gray-100 m-2 text-3xl font-semibold text-gray-800">Your Cart</h1>
 
       {loading ? (
@@ -64,13 +63,14 @@ export default function Cart() {
         </div>
       ) : cartItems.length === 0 ? (
         <>
-          <Image  
-          width={500} 
-          height={500}
-          unoptimized 
-          src="/cart.jpg" 
-          alt="Empty Cart" 
-          className="mx-auto w-60 mb-4" />
+          <Image
+            width={500}
+            height={500}
+            unoptimized
+            src="/cart.jpg"
+            alt="Empty Cart"
+            className="mx-auto w-60 mb-4"
+          />
           <p className="text-lg text-gray-600">Oooops! Your cart is empty.</p>
           <button
             onClick={() => router.push("/")}
@@ -86,13 +86,13 @@ export default function Cart() {
               key={item.cart_id}
               className="flex flex-col md:flex-row items-center justify-between border-b pb-4 mb-4"
             >
-              <Image 
-                width={500} 
+              <Image
+                width={500}
                 height={500}
-                unoptimized 
-                src={item.image_url} 
-                alt={item.name} 
-                className="w-24 h-24 object-cover rounded-lg" 
+                unoptimized
+                src={item.image_url}
+                alt={item.name}
+                className="w-24 h-24 object-cover rounded-lg"
               />
               <div className="text-left flex-1 px-4">
                 <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
@@ -108,7 +108,8 @@ export default function Cart() {
             </div>
           ))}
 
-          <OrderSummary />
+          {/* Pass subtotal and shippingFee to OrderSummary */}
+          <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
 
           <button
             onClick={() => router.push("/orders/checkout")}

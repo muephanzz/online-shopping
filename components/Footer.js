@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
-import { Facebook, Twitter, Instagram, Factory, Car, Linkedin, Youtube, CarFront } from 'lucide-react';
-import { FaCcVisa } from "react-icons/fa";
+import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
+import { FaCcVisa, FaCcMastercard, FaPaypal } from 'react-icons/fa';
 import { useEffect, useState } from "react";
 
 export default function Footer() {
@@ -16,83 +16,76 @@ export default function Footer() {
   }, []);
 
   if (isMobile) return null;
+
   return (
-    <footer className="bg-gray-800 text-white p-4">
-      <div id='about'>
-        <h2 className="mb-2 text-center text-lg font-bold border-b border-gray-500">About</h2>
-        <div className="mb-6 text-sm">
-          <p>
-          Welcome to Ephantronics, your go-to destination for top-quality electronics at unbeatable prices! 🚀 
-          We specialize in providing the latest gadgets, accessories, and tech essentials to keep you connected and ahead of the game.
+    <footer className="bg-gray-900 text-white p-8 mt-12">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
+
+        {/* About Section */}
+        <div id='about'>
+          <h2 className="mb-4 text-2xl font-semibold">About Ephantronics</h2>
+          <p className="text-sm leading-6">
+            Welcome to <span className="font-bold">Ephantronics</span>, your ultimate destination for cutting-edge electronics at unbeatable prices! We bring you the latest in technology—smartphones, laptops, woofers, and much more.
           </p>
-          <p className="mt-2">         
-          At Ephantronics, we prioritize affordability, reliability, and fast delivery to ensure a seamless shopping experience.
-          Whether you're looking for smartphones, laptops, woofers, smart home devices or other electronic accessories, we've got you covered!
-          </p>
-          <h2 className="my-2">💡 Why Choose Us?</h2>
-          <div className="max-w-7xl flex flex-2col md:flex-row">
-          <p className="mr-8 mb-1">✔ High-Quality Electronics</p>
-          <p className="mr-8 mb-1">✔ Secure & Fast Checkout</p>
-          <p className="mr-8 mb-1">✔ Reliable Customer Support</p>
-          <p className="mr-8 mb-4">✔ Exclusive Deals & Discounts</p>
-        </div>
-        <p>Shop with confidence and upgrade your tech today! ⚡🛒</p>         
-        </div>
-      </div>
-      <div className="max-w-7xl flex flex-col md:flex-row">
-        <div id='contacts' className="mr-2"> 
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Contacts</h2>
-          <p className="mb-2 mr-8">Email: muephanzz@gmail.com</p>
-          <p className="mb-4 mr-8">Phone: +254798229783</p>
-        </div>
-        <div className="mr-2">
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Accepted Payments</h2>
-          <p className="mb-2 mr-8">
-            <FaCcVisa size={24} className="inline text-blue-600" />
+          <p className="mt-4 text-sm leading-6">
+            Enjoy a seamless shopping experience with fast delivery, secure payment, and outstanding customer support. Elevate your tech game today! ⚡🛒
           </p>
         </div>
-        <div className="mr-2">
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Follow me</h2>
-          <div className="block mr-8 mb-6 flex space-x-4">
+
+        {/* Contact Section */}
+        <div id='contacts'>
+          <h2 className="mb-4 text-2xl font-semibold">Contact Us</h2>
+          <p className="text-sm mb-2">📧 Email: <a href="mailto:muephanzz@gmail.com" className="hover:text-blue-400">muephanzz@gmail.com</a></p>
+          <p className="text-sm">📞 Phone: <a href="tel:+254798229783" className="hover:text-blue-400">+254798229783</a></p>
+        </div>
+
+        {/* Payment Methods */}
+        <div>
+          <h2 className="mb-4 text-2xl font-semibold">Payment Methods</h2>
+          <div className="flex space-x-4">
+            <FaCcVisa size={32} className="text-blue-500" />
+            <FaCcMastercard size={32} className="text-red-600" />
+            <FaPaypal size={32} className="text-blue-400" />
+          </div>
+        </div>
+
+        {/* Follow Us */}
+        <div>
+          <h2 className="mb-4 text-2xl font-semibold">Follow Us</h2>
+          <div className="flex space-x-4">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
-              <Facebook size={20} />
+              <Facebook size={24} />
             </a>
             <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">
-              <Twitter size={20} />
+              <Twitter size={24} />
             </a>
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-400">
-              <Instagram size={20} />
+              <Instagram size={24} />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-400">
-              <Linkedin size={20} />
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500">
+              <Linkedin size={24} />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-400">
-              <Youtube size={20} />
+            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-red-500">
+              <Youtube size={24} />
             </a>
           </div>
         </div>
-        <div className="mr-2"> 
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Our Products</h2>
-          <div className="block space-x-4 mb-4 md:mb-0">
-            <Link href="#smartphones" className="hover:text-blue-400">Smatphones</Link>
-            <Link href="#laptops" className="hover:text-blue-400">Laptops</Link>
-            <Link href="#woofers" className="hover:text-blue-400">Woofers</Link>
-          </div>
-        </div>
-        <div className="mr-2"> 
-          <h2 className="mb-2 text-lg font-bold border-b border-gray-500">Quick Links</h2>
-          <div className="block space-x-4 mb-4 md:mb-0">
-            <Link href="/" className="hover:text-blue-400">Back to Top</Link>
-            <Link href="/pivacy-policy" className="hover:text-blue-400">Privacy-Policy</Link>
-            <Link href="/t&c" className="hover:text-blue-400">T&C</Link>
-            <Link href="/FAQs" className="hover:text-blue-400">FAQs</Link>
-          </div>
+
+        {/* Quick Links */}
+        <div>
+          <h2 className="mb-4 text-2xl font-semibold">Quick Links</h2>
+          <ul className="space-y-2 text-sm">
+            <li><Link href="/" className="hover:text-blue-400">🏠 Home</Link></li>
+            <li><Link href="/privacy-policy" className="hover:text-blue-400">🔒 Privacy Policy</Link></li>
+            <li><Link href="/terms" className="hover:text-blue-400">📄 Terms & Conditions</Link></li>
+            <li><Link href="/faqs" className="hover:text-blue-400">❓ FAQs</Link></li>
+          </ul>
         </div>
       </div>
-      <div className="text-center mb-4 md:mb-0">
-        <p className="mt-8 border-y border-gray-500 text-sm">
-          &copy; {(new Date().getFullYear())} Ephantronics. All rights reserved.
-        </p>
+
+      {/* Copyright */}
+      <div className="text-center mt-12 border-t border-gray-700 pt-4">
+        <p className="text-sm">&copy; {new Date().getFullYear()} Ephantronics. All rights reserved.</p>
       </div>
     </footer>
   );

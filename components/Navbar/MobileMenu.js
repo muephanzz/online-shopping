@@ -8,7 +8,7 @@ export default function MobileMenu() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-        <div className="md:hidden ml-4">
+        <div className="md:hidden mr-6">
           <button onClick={toggleMenu} className="fixed top-6 ">
             {menuOpen ? <X /> : <Menu />}
           </button>

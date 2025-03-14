@@ -1,14 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { supabase } from "../../lib/supabaseClient";
-import SignInModal from "../SignInModal";
-import Logo from "../Navbar/Logo";
-import SearchBar from "../Navbar/SearchBar";
-import CartIcon from "../Navbar/CartIcon";
-import UserMenu from "../Navbar/UserMenu";
-import DesktopMenu from "../Navbar/DesktopMenu";
-import MobileMenu from "../Navbar/MobileMenu";
+import { supabase } from "../lib/supabaseClient";
+import SignInModal from "./SignInModal";
+import Logo from "./Navbar/Logo";
+import SearchBar from "./Navbar/SearchBar";
+import CartIcon from "./Navbar/CartIcon";
+import UserMenu from "./Navbar/UserMenu";
+import DesktopMenu from "./Navbar/DesktopMenu";
+import MobileMenu from "./Navbar/MobileMenu";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
