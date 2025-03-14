@@ -16,6 +16,20 @@ export default function ProductDetails() {
   const [mainImage, setMainImage] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [sortOrder, setSortOrder] = useState("newest");
+  const [purchased, setPurchased] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    // Detect mobile devices (Android, iPhone, iPad, iPod)
+    const checkMobile = () => {
+      setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+    };
+    checkMobile();
+  }, []);
+
+  // Hide if not on a mobile device
+  if (!isMobile) return;
 
   useEffect(() => {
     if (!id) return;
@@ -24,13 +38,16 @@ export default function ProductDetails() {
       try {
         setLoading(true);
 
-        const [{ data: productData }, { data: reviewsData }] = await Promise.all([
+        const [{ data: productData, error: productError }, { data: reviewsData, error: reviewsError }] = await Promise.all([
           supabase.from("products").select("*").eq("product_id", id).single(),
-          supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, user_id, full_name").eq("product_id", id),
+          supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, user_id, full_name").eq("product_id", id)
         ]);
 
+        if (productError) throw productError;
+        if (reviewsError) throw reviewsError;
+
         setProduct(productData);
-        setMainImage(productData?.image_urls?.[0] || "");
+        setMainImage(productData.image_urls?.[0] || "");
         setReviews(reviewsData || []);
       } catch (err) {
         console.error("Error fetching data:", err.message);
@@ -40,6 +57,30 @@ export default function ProductDetails() {
     };
 
     fetchProductAndReviews();
+  }, [id]);
+
+  useEffect(() => {
+    async function checkUserPurchase() {
+      try {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !session?.user) return;
+
+        const { data: orderData, error: orderError } = await supabase
+          .from("orders")
+          .select("product_id")
+          .eq("user_id", session.user.id)
+          .eq("product_id", id)
+          .eq("status", "completed")
+          .maybeSingle();
+
+        if (orderError) throw orderError;
+        if (orderData) setPurchased(true);
+      } catch (err) {
+        console.error("Error checking purchase:", err.message);
+      }
+    }
+
+    if (id) checkUserPurchase();
   }, [id]);
 
   const handleAddToCart = async () => {
@@ -84,6 +125,21 @@ export default function ProductDetails() {
     }
   };
 
+  const sortedReviews = [...reviews].sort((a, b) => {
+    switch (sortOrder) {
+      case "newest":
+        return new Date(b.created_at) - new Date(a.created_at);
+      case "oldest":
+        return new Date(a.created_at) - new Date(b.created_at);
+      case "highest":
+        return b.rating - a.rating;
+      case "lowest":
+        return a.rating - b.rating;
+      default:
+        return 0;
+    }
+  });
+
   if (loading) return <p>Loading product...</p>;
   if (!product) return <p>Product not found!</p>;
 
@@ -92,24 +148,7 @@ export default function ProductDetails() {
       <div className="flex flex-col lg:flex-row gap-8">
         <div>
           <Image src={mainImage} width={600} height={600} alt={product.name} className="rounded-lg" />
-
-          {/* Image Scrolling for Mobile */}
-          <div className="mt-4 md:hidden overflow-x-auto flex space-x-2">
-            {product.image_urls?.map((img, index) => (
-              <Image
-                key={index}
-                src={img}
-                width={100}
-                height={100}
-                alt="Thumbnail"
-                onClick={() => setMainImage(img)}
-                className={`cursor-pointer rounded ${mainImage === img ? "border-2 border-blue-500" : ""}`}
-              />
-            ))}
-          </div>
-
-          {/* Thumbnail Display for Desktop */}
-          <div className="hidden md:flex gap-2 mt-4">
+          <div className="flex gap-2 mt-4">
             {product.image_urls?.map((img, index) => (
               <Image
                 key={index}
@@ -137,6 +176,21 @@ export default function ProductDetails() {
             {adding ? "Adding..." : "Add to Cart"}
           </button>
         </div>
+      </div>
+
+      <div className="mb-16 mt-12">
+        <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
+        {sortedReviews.length === 0 ? (
+          <p>No reviews yet. Be the first to review!</p>
+        ) : (
+          sortedReviews.map((review) => (
+            <div key={review.review_id} className="mb-6 border-b pb-4">
+              <p className="font-semibold">{review.full_name}</p>
+              <p>Rating: {review.rating}/5</p>
+              <p>{review.comment}</p>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
