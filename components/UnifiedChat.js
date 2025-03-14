@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
-import axios from "axios";
 import { MessageCircle } from "lucide-react";
 
 // Initialize Supabase client
@@ -15,7 +14,6 @@ const UnifiedChat = () => {
   const [user, setUser] = useState(null);
   const [userMessage, setUserMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -26,7 +24,6 @@ const UnifiedChat = () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
 
-      // Check if user is an admin
       if (user) {
         const { data: adminData } = await supabase
           .from("profiles")
@@ -54,49 +51,27 @@ const UnifiedChat = () => {
   const handleSendMessage = async () => {
     if (!userMessage.trim() || !user) return;
 
-    const receiverId = isAdmin ? selectedUserId : user.id;
+    const receiverId = isAdmin ? selectedUserId : "admin";
+    if (!receiverId) return;
 
     const newMessage = {
       sender_id: user.id,
       receiver_id: receiverId,
-      receiver_type: isAdmin ? "user" : "bot",
+      receiver_type: isAdmin ? "user" : "admin",
       message: userMessage,
       status: "sent",
     };
 
-    // Insert user's message
     const { error } = await supabase.from("messages").insert([newMessage]);
     if (error) return console.error("Error sending message:", error);
 
     setMessages((prev) => [...prev, newMessage]);
     setUserMessage("");
-    setIsTyping(!isAdmin);
-
-    // If user, send message to chatbot
-    if (!isAdmin) {
-      try {
-        const { data } = await axios.post("/api/chatbot", { userMessage });
-        const botResponse = {
-          sender_id: "bot",
-          receiver_id: user.id,
-          message: data.botResponse || "Sorry, I couldn't understand.",
-          status: "delivered",
-        };
-        await supabase.from("messages").insert([botResponse]);
-      } catch (error) {
-        console.error("Chatbot API error:", error);
-      } finally {
-        setIsTyping(false);
-      }
-    }
   };
 
   // Mark message as seen
   const markMessageAsSeen = async (messageId) => {
-    await supabase
-      .from("messages")
-      .update({ status: "seen" })
-      .eq("id", messageId);
+    await supabase.from("messages").update({ status: "seen" }).eq("id", messageId);
   };
 
   // Real-time message listener
@@ -160,12 +135,10 @@ const UnifiedChat = () => {
               className="mb-4 p-2 border rounded"
             >
               <option value="">Select User</option>
-              {messages
-                .filter((msg) => msg.sender_id !== user?.id)
-                .map((msg) => (
-                  <option key={msg.sender_id} value={msg.sender_id}>
-                    {msg.sender_id}
-                  </option>
+              {[...new Set(messages.map((msg) => msg.sender_id))]
+                .filter((id) => id !== user?.id)
+                .map((id) => (
+                  <option key={id} value={id}>{id}</option>
                 ))}
             </select>
           )}
@@ -175,25 +148,18 @@ const UnifiedChat = () => {
             {filteredMessages.map((msg) => (
               <div
                 key={msg.id}
-                className={`flex ${
-                  msg.sender_id === user?.id ? "justify-end" : "justify-start"
-                }`}
+                className={`flex ${msg.sender_id === user?.id ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`p-2 max-w-xs rounded-lg ${
-                    msg.sender_id === user?.id
-                      ? "bg-blue-500 text-white"
-                      : msg.sender_id === "bot"
-                      ? "bg-gray-300"
-                      : "bg-green-500 text-white"
-                  }`}
+                  className={`p-2 max-w-xs rounded-lg ${msg.sender_id === user?.id ? "bg-blue-500 text-white" : "bg-gray-300"}`}
                 >
                   <p>{msg.message}</p>
-                  <span className="text-xs block mt-1">{msg.status}</span>
+                  <span className="text-xs block mt-1">
+                    {new Date(msg.created_at).toLocaleTimeString()}
+                  </span>
                 </div>
               </div>
             ))}
-            {isTyping && <div className="text-gray-500">Bot is typing...</div>}
           </div>
 
           {/* Message Input */}
@@ -202,7 +168,7 @@ const UnifiedChat = () => {
               type="text"
               value={userMessage}
               onChange={(e) => setUserMessage(e.target.value)}
-              placeholder={isAdmin ? "Reply to user..." : "Type your message..."}
+              placeholder="Type a message..."
               className="flex-grow p-2 border rounded-lg focus:outline-none"
             />
             <button
