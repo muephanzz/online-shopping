@@ -1,5 +1,5 @@
 "use client";
-import { Menu } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import Link from 'next/link';
 import { useEffect, useState } from "react";
 import { Home, User2} from 'lucide-react';
@@ -41,6 +41,13 @@ export default function BottomNav() {
         <Link href="/">
             <button className="flex flex-col items-center text-gray-600 hover:text-black">
               <Home size={24} />
+              <span className="text-xs mt-1">Home</span>
+            </button>
+        </Link>
+
+        <Link href="">
+            <button className="flex flex-col items-center text-gray-600 hover:text-black">
+              <Search size={24} />
               <span className="text-xs mt-1">Home</span>
             </button>
         </Link>

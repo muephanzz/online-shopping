@@ -165,7 +165,7 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      <div className="mt-12">
+      <div className="mb-16 mt-12">
         <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
         {sortedReviews.length === 0 ? (
           <p>No reviews yet. Be the first to review!</p>
