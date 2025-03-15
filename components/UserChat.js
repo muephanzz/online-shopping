@@ -105,7 +105,7 @@ const UserChat = () => {
               messages.map((msg) => (
                 <div key={msg.id} className="mb-2">
                   {msg.user_message && (
-                    <div className="flex justify-start">
+                    <div className="flex justify-end">
                       <div className="p-2 bg-gray-200 rounded-lg max-w-xs">
                         {msg.user_message}
                       </div>
@@ -113,7 +113,7 @@ const UserChat = () => {
                   )}
 
                   {msg.admin_reply && (
-                    <div className="flex justify-end">
+                    <div className="flex justify-start">
                       <div className="p-2 bg-blue-500 text-white rounded-lg max-w-xs">
                         {msg.admin_reply}
                       </div>
