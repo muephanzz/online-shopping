@@ -3,7 +3,7 @@ import { supabase } from "../lib/supabaseClient";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 import Footer from "../components/Footer";
-import UnifiedChat from '../components/UnifiedChat';
+import UserChat from '../components/UserChat';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -58,9 +58,7 @@ export default function Home() {
   }, [currentPage]);
 
   return (
-    <div className="py-2 mt-20">
-      <h1 className="text-4xl font-extrabold text-center mb-12">Our Products</h1>
-      
+    <div className="pb-2 mt-20">  
       {/* Slideshow */}
       <div className="mb-12">
         <Slider {...sliderSettings}>
@@ -88,7 +86,7 @@ export default function Home() {
             ))}
           </div>
 
-          <UnifiedChat />
+          <UserChat />
 
           <Pagination
             currentPage={currentPage}

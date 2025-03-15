@@ -15,31 +15,30 @@ const AdminChat = () => {
   const [reply, setReply] = useState('');
   const [admin, setAdmin] = useState(null);
 
-  // Fetch admin user
   useEffect(() => {
-    const getAdmin = async () => {
+    const fetchAdmin = async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error) console.error('Error fetching admin:', error);
       if (user) setAdmin(user);
     };
-    getAdmin();
+    fetchAdmin();
   }, []);
 
-  // Fetch all unique users who have sent messages
   useEffect(() => {
     if (!admin) return;
 
     const fetchUsers = async () => {
       const { data, error } = await supabase
         .from('messages')
-        .select('sender_id')
-        .neq('sender_id', admin.id)
-        .order('created_at', { ascending: false });
+        .select('user_id')
+        .neq('user_id', admin.id);
 
       if (error) return console.error('Error fetching users:', error);
 
-      const uniqueUsers = Array.from(new Set(data.map((msg) => msg.sender_id)));
-      setUsers(uniqueUsers);
+      const uniqueUserIds = [...new Set(data.map((msg) => msg.user_id))];
+      const userDetails = uniqueUserIds.map((userId) => ({ id: userId, email: userId }));
+
+      setUsers(userDetails);
     };
 
     fetchUsers();
@@ -54,15 +53,14 @@ const AdminChat = () => {
     };
   }, [admin]);
 
-  // Fetch messages for the selected user
   useEffect(() => {
-    if (!selectedUser || !admin) return;
+    if (!selectedUser) return;
 
     const fetchMessages = async () => {
       const { data, error } = await supabase
         .from('messages')
         .select('*')
-        .or(`and(sender_id.eq.${admin.id},receiver_id.eq.${selectedUser}),and(sender_id.eq.${selectedUser},receiver_id.eq.${admin.id})`)
+        .eq('user_id', selectedUser)
         .order('created_at', { ascending: true });
 
       if (error) return console.error('Error fetching messages:', error);
@@ -74,83 +72,75 @@ const AdminChat = () => {
     const channel = supabase
       .channel('admin-chat-messages')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) => {
-        setMessages((prev) => [...prev, payload.new]);
+        if (payload.new.user_id === selectedUser) {
+          setMessages((prev) => [...prev, payload.new]);
+        }
       })
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [selectedUser, admin]);
+  }, [selectedUser]);
 
-  // Send admin reply to the selected user
   const handleSendReply = async () => {
-    if (!reply.trim() || !selectedUser || !admin) return;
+    if (!reply.trim() || !selectedUser) return;
 
-    const messagePayload = {
-      sender_id: admin.id,
-      receiver_id: selectedUser,
-      receiver_type: 'user',
-      message: reply,
-      status: 'sent',
-    };
+    const { error } = await supabase
+      .from('messages')
+      .insert({ user_id: selectedUser, admin_reply: reply, created_at: new Date().toISOString() });
 
-    const { error } = await supabase.from('messages').insert(messagePayload);
-    if (error) return console.error('Error sending message:', error);
-
+    if (error) return console.error('Error sending reply:', error);
     setReply('');
   };
 
   return (
     <AdminLayout>
       <h1 className="text-3xl font-bold mb-4">Manage Chat</h1>
-
       <div className="flex space-x-6">
-        {/* User List */}
-        <div className="w-1/3 border-r">
+        <div className="w-1/3 border-r p-4">
           <h2 className="text-xl font-semibold mb-4">Users</h2>
           {users.length === 0 ? (
             <p>No active users.</p>
           ) : (
-            users.map((userId) => (
+            users.map((user) => (
               <button
-                key={userId}
-                onClick={() => setSelectedUser(userId)}
-                className={`block p-2 border-b ${selectedUser === userId ? 'bg-gray-200' : ''}`}
+                key={user.id}
+                onClick={() => setSelectedUser(user.id)}
+                className={`block w-full text-left p-2 border-b ${selectedUser === user.id ? 'bg-blue-500 text-white' : 'hover:bg-gray-100'}`}
               >
-                {userId}
+                {user.id} 
               </button>
             ))
           )}
         </div>
 
-        {/* Chat Messages */}
-        <div className="w-2/3">
+        <div className="w-2/3 flex flex-col">
           {selectedUser ? (
             <>
-              <h2 className="text-xl font-semibold mb-4">Chat with User</h2>
-              <div className="border p-4 h-96 overflow-y-auto mb-4">
+              <h2 className="text-xl font-semibold mb-4">Chat with {selectedUser}</h2>
+              <div className="border p-4 h-96 overflow-y-auto flex flex-col">
                 {messages.length === 0 ? (
                   <p>No messages yet.</p>
                 ) : (
                   messages.map((msg) => (
-                    <div
-                      key={msg.id}
-                      className={`mb-2 ${msg.sender_id === admin.id ? 'text-right' : 'text-left'}`}
-                    >
-                      <p className={`p-2 rounded-lg inline-block ${msg.sender_id === admin.id ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}>
-                        {msg.message}
-                      </p>
-                      <span className="text-xs block mt-1 text-gray-500">
-                        {new Date(msg.created_at).toLocaleTimeString()}
-                      </span>
+                    <div key={msg.id} className="mb-3">
+                      {msg.user_message && (
+                        <div className="flex justify-start">
+                          <div className="p-2 bg-gray-200 rounded-lg max-w-xs">{msg.user_message}</div>
+                        </div>
+                      )}
+                      {msg.admin_reply && (
+                        <div className="flex justify-end">
+                          <div className="p-2 bg-blue-500 text-white rounded-lg max-w-xs">{msg.admin_reply}</div>
+                        </div>
+                      )}
                     </div>
                   ))
                 )}
               </div>
 
-              {/* Reply Input */}
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 mt-4">
                 <input
                   type="text"
                   value={reply}
@@ -167,7 +157,7 @@ const AdminChat = () => {
               </div>
             </>
           ) : (
-            <p>Select a user to view their messages.</p>
+            <p className="text-gray-500">Select a user to view their messages.</p>
           )}
         </div>
       </div>

@@ -1,5 +1,5 @@
 "use client";
-import { Menu, Search } from "lucide-react";
+import { Heart, Menu, Search } from "lucide-react";
 import Link from 'next/link';
 import { useEffect, useState } from "react";
 import { Home, User2} from 'lucide-react';
@@ -45,18 +45,18 @@ export default function BottomNav() {
             </button>
         </Link>
 
-        <Link href="">
-            <button className="flex flex-col items-center text-gray-600 hover:text-black">
-              <Search size={24} />
-              <span className="text-xs mt-1">Home</span>
-            </button>
-        </Link>
-
           <button className="flex flex-col items-center text-gray-600 hover:text-black">
             <Menu size={24} />
             <span className="text-xs mt-1">Categories</span>
           </button>
 
+        <Link href="/wishlist">
+          <button className="flex flex-col items-center text-gray-600 hover:text-black">
+            <Heart size={24} />
+            <span className="text-xs mt-1">Wishlist</span>
+          </button>
+        </Link>
+            
         <button>
           <CartIcon cartCount={cartCount} />
           <span className="text-xs mt-1">Cart</span>

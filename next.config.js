@@ -15,6 +15,11 @@ const nextConfig = {
       },
     ],
   },
+  env: {
+    MPESA_CONSUMER_KEY: process.env.MPESA_CONSUMER_KEY,
+    MPESA_CONSUMER_SECRET: process.env.MPESA_CONSUMER_SECRET,
+  },
 };
 
 module.exports = nextConfig;
+

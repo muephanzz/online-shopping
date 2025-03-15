@@ -1,9 +1,8 @@
-// Improved and responsive ProductDetails component
-
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../../lib/supabaseClient";
 import Image from "next/image";
+import toast from "react-hot-toast"; // Install react-hot-toast for better notifications
 
 export default function ProductDetails() {
   const router = useRouter();
@@ -17,55 +16,51 @@ export default function ProductDetails() {
   const [quantity, setQuantity] = useState(1);
   const [sortOrder, setSortOrder] = useState("newest");
   const [purchased, setPurchased] = useState(false);
-
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Detect mobile devices (Android, iPhone, iPad, iPod)
-    const checkMobile = () => {
-      setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
-    };
-    checkMobile();
+    // Check device type once on mount
+    setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
   }, []);
-
-  // Hide if not on a mobile device
-  if (!isMobile) return;
 
   useEffect(() => {
     if (!id) return;
 
-    const fetchProductAndReviews = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-
         const [{ data: productData, error: productError }, { data: reviewsData, error: reviewsError }] = await Promise.all([
           supabase.from("products").select("*").eq("product_id", id).single(),
-          supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, user_id, full_name").eq("product_id", id)
+          supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, user_id, full_name").eq("product_id", id),
         ]);
 
         if (productError) throw productError;
         if (reviewsError) throw reviewsError;
 
-        setProduct(productData);
-        setMainImage(productData.image_urls?.[0] || "");
+        if (productData) {
+          setProduct(productData);
+          setMainImage(productData.image_urls?.[0] || "");
+        }
+
         setReviews(reviewsData || []);
       } catch (err) {
         console.error("Error fetching data:", err.message);
+        toast.error("Failed to load product details.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProductAndReviews();
+    fetchData();
   }, [id]);
 
   useEffect(() => {
-    async function checkUserPurchase() {
+    const checkUserPurchase = async () => {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError || !session?.user) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
 
-        const { data: orderData, error: orderError } = await supabase
+        const { data: orderData } = await supabase
           .from("orders")
           .select("product_id")
           .eq("user_id", session.user.id)
@@ -73,23 +68,24 @@ export default function ProductDetails() {
           .eq("status", "completed")
           .maybeSingle();
 
-        if (orderError) throw orderError;
         if (orderData) setPurchased(true);
       } catch (err) {
         console.error("Error checking purchase:", err.message);
       }
-    }
+    };
 
     if (id) checkUserPurchase();
   }, [id]);
 
   const handleAddToCart = async () => {
     if (!product) return;
+    if (quantity < 1) return toast.error("Please select a valid quantity.");
+
     setAdding(true);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) return alert("Please log in to add items to cart.");
+      if (!session?.user) return toast.error("Please log in to add items to the cart.");
 
       const { data: existingCartItem } = await supabase
         .from("cart")
@@ -116,10 +112,10 @@ export default function ProductDetails() {
         ]);
       }
 
-      alert("Item added to cart successfully!");
+      toast.success("Item added to cart!");
     } catch (err) {
       console.error("Error adding to cart:", err.message);
-      alert("Failed to add item to cart.");
+      toast.error("Failed to add item to cart.");
     } finally {
       setAdding(false);
     }
@@ -140,8 +136,8 @@ export default function ProductDetails() {
     }
   });
 
-  if (loading) return <p>Loading product...</p>;
-  if (!product) return <p>Product not found!</p>;
+  if (loading) return <p className="text-center">Loading product...</p>;
+  if (!product) return <p className="text-center">Product not found!</p>;
 
   return (
     <div className="p-4 md:p-8">
@@ -180,6 +176,12 @@ export default function ProductDetails() {
 
       <div className="mb-16 mt-12">
         <h2 className="text-2xl font-bold mb-4">Customer Reviews</h2>
+        <select onChange={(e) => setSortOrder(e.target.value)} value={sortOrder} className="mb-4 p-2 border">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="highest">Highest Rated</option>
+          <option value="lowest">Lowest Rated</option>
+        </select>
         {sortedReviews.length === 0 ? (
           <p>No reviews yet. Be the first to review!</p>
         ) : (
