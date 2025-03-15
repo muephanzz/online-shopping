@@ -98,7 +98,8 @@ export default function ProductDetails() {
     <div className="p-4 mt-24 md:p-8">
       <div className="flex flex-col lg:flex-row gap-8">
         <div>
-          <Image src={mainImage} width={400} height={400} alt={product.name} className="rounded-lg" />
+          <Image src={mainImage} className="w-30 md:h-40"
+           width={400} height={400} alt={product.name} />
           <div className="flex gap-2 mt-4">
             {product.image_urls?.map((img, index) => (
               <Image
@@ -115,9 +116,10 @@ export default function ProductDetails() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <h1 className="text-2xl font-bold">{product.name}</h1>
+          <h1 className="mt-10 text-2xl font-bold">{product.name}</h1>
           <p className="text-gray-600">{product.short_description || "No description available."}</p>
           <p className="text-xl text-blue-600 font-semibold">Ksh {product.price}</p>
+          <div >
           <button
             onClick={handleAddToCart}
             disabled={adding}
@@ -125,6 +127,14 @@ export default function ProductDetails() {
           >
             {adding ? "Adding..." : "Add to Cart"}
           </button>
+          <button
+            onClick={handleAddToCart}
+            disabled={adding}
+            className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
+          >
+            {adding ? "Adding..." : "Buy Now"}
+          </button>
+          </div>
         </div>
       </div>
 
