@@ -172,7 +172,7 @@ export default function Cart() {
             <div className="text-left flex-1 px-4">
               <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
               <p className="text-blue-600 font-bold">Ksh {(item.price * item.quantity).toFixed(2)}</p>
-              <p className="text-sm text-red-500">Stock: {item.products?.stock || 0}</p>
+              <p className="text-sm text-red-500">In Stock: {item.products?.stock || 0}</p>
               <div className="flex items-center space-x-4 mt-2">
                 <button
                   onClick={() => updateQuantity(item.cart_id, item.quantity - 1, item.products?.stock)}
