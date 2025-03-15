@@ -1,4 +1,4 @@
-import { businessBuyGoods } from '../../utils/mpesa';
+import { businessBuyGoods } from '../../lib/mpesa';
 
 export default async function handler(req, res) {
     if (req.method !== "POST") {
