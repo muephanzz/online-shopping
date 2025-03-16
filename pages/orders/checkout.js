@@ -56,7 +56,7 @@ export default function Checkout() {
         ) : (
           <form onSubmit={handleMpesaPayment} className="space-y-4">
             <div>
-              <label className="block text-gray-700">Amount (Ksh)</label>
+              <label className="block text-gray-700">Total payable (Ksh)</label>
               <input type="number" value={amount} readOnly className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
             </div>
             <div>

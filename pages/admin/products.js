@@ -11,6 +11,8 @@ const ManageProducts = () => {
   const [newProduct, setNewProduct] = useState({
     name: "",
     description: "",
+    specification: "",
+    stock: "",
     price: "",
     image_urls: [],
     category_id: "",
@@ -108,6 +110,8 @@ const ManageProducts = () => {
         const { error: updateError } = await supabase.from("products").update({
           name: newProduct.name,
           description: newProduct.description,
+          specification: newProduct.specification,
+          stock: newProduct.stock,
           price: parseFloat(newProduct.price),
           image_urls: imageUrls,
           category_id: newProduct.category_id,
@@ -122,6 +126,8 @@ const ManageProducts = () => {
           {
             name: newProduct.name,
             description: newProduct.description,
+            specification: newProduct.specification,
+            stock: newProduct.stock,
             price: parseFloat(newProduct.price),
             image_urls: imageUrls,
             category_id: newProduct.category_id,
@@ -165,6 +171,7 @@ const ManageProducts = () => {
     setNewProduct({
       name: product.name,
       description: product.description,
+      specification: product.specification,
       price: product.price,
       image_urls: product.image_urls,
       category_id: product.category_id,
@@ -175,7 +182,7 @@ const ManageProducts = () => {
 
   // Reset form
   const resetForm = () => {
-    setNewProduct({ name: "", description: "", price: "", image_urls: [], category_id: "" });
+    setNewProduct({ name: "", description: "", specification: "", price: "", image_urls: [], category_id: "" });
     setFiles([]);
     setPreviews([]);
     setEditingProduct(null);
@@ -212,8 +219,17 @@ const ManageProducts = () => {
 
         <textarea
           name="description"
-          placeholder="Description"
+          placeholder="description"
           value={newProduct.description}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
+
+        <textarea
+          name="specification"
+          placeholder="specification"
+          value={newProduct.specification}
           onChange={handleChange}
           required
           className="border p-2 w-full rounded"
@@ -222,8 +238,20 @@ const ManageProducts = () => {
         <input
           type="number"
           name="price"
+          min={1}
           placeholder="Price"
           value={newProduct.price}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
+
+        <input
+          type="number"
+          name="stock"
+          min={0}
+          placeholder="In stock"
+          value={newProduct.stock}
           onChange={handleChange}
           required
           className="border p-2 w-full rounded"
@@ -252,15 +280,19 @@ const ManageProducts = () => {
           {products.map((product) => (
             <li key={product.product_id} className="border p-4 rounded-lg">
               <h2 className="text-xl font-semibold">{product.name}</h2>
-              <p>{product.description}</p>
-              <p className="text-green-600">${product.price}</p>
+              <p className="mt-2 mb-4">{product.description}</p>
+              <p>{product.specification}</p>
+              <p className="text-green-600 my-4">Ksh {product.price}</p>
+              <p className="text-green-600"><strong>In Stock:</strong> {product.stock}</p>
               <div className="flex gap-2 mt-3">
                 {product.image_urls.map((url, index) => (
                   <img key={index} src={url} alt="Product" className="w-24 h-24 object-cover rounded-lg border" />
                 ))}
               </div>
-              <button onClick={() => handleEdit(product)}>Edit</button>
-              <button onClick={() => handleDelete(product.product_id)} className="text-red-500 mt-2">Delete</button>
+              <div className="flex gap-4 mt-4">
+                <button onClick={() => handleEdit(product)} className="text-white px-10 bg-blue-500 rounded">Edit</button>
+                <button onClick={() => handleDelete(product.product_id)} className="text-red-800 px-10 bg-blue-500 rounded">Delete</button>
+              </div>
             </li>
           ))}
         </ul>

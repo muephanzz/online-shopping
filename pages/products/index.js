@@ -16,12 +16,25 @@ export default function ProductsPage() {
 
   const [products, setProducts] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
+  const [categoryName, setCategoryName] = useState('');
   const [loading, setLoading] = useState(true);
 
   const productsPerPage = 8;
   const currentPage = parseInt(page) || 1;
 
   useEffect(() => {
+    const fetchCategoryName = async () => {
+      if (!category_id) return;
+      const { data, error } = await supabase
+        .from('categories')
+        .select('category')
+        .eq('id', category_id)
+        .single();
+
+      if (error) console.error('Error fetching category:', error);
+      else setCategoryName(data?.category || 'Unknown Category');
+    };
+
     const fetchProducts = async () => {
       if (!category_id) return;
 
@@ -46,6 +59,7 @@ export default function ProductsPage() {
       setLoading(false);
     };
 
+    fetchCategoryName();
     fetchProducts();
   }, [category_id, currentPage]);
 
@@ -55,24 +69,22 @@ export default function ProductsPage() {
   if (!category_id) return <p>Please select a category.</p>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Products</h1>
+    <div className="p-6 mt-28">
+      <h1 className="text-3xl font-bold mb-6">Products in {categoryName} category</h1>
 
       {products.length === 0 ? (
-        <p>No products found for this category.</p>
+        <p className="text-gray-600">No products found in this category.</p>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
-            <ProductCard key={product.product_id} product={product} />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       )}
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => router.push(`/products?category_id=${category_id}&page=${page}`)}
-      />
+      {totalPages > 1 && (
+        <Pagination totalPages={totalPages} currentPage={currentPage} />
+      )}
     </div>
   );
 }
