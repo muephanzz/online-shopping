@@ -144,6 +144,7 @@ export default function ProductDetails() {
 
       {/* Colors Section */}
       <div className="flex px-14 items-center gap-2 mt-2 w-full">
+      <p><strong>Color:</strong></p>
         {product.color?.map((color, index) => (
           <span key={index} className="text-xs mt-1 px-2 py-1 border rounded w-full text-center">
             {color}

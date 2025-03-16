@@ -94,7 +94,7 @@ const UserChat = () => {
           className="fixed bottom-16 right-6 w-80 bg-white border shadow-lg rounded-lg"
         >
           <div className="p-3 border-b bg-blue-500 text-white flex justify-between">
-            <span>Chat with Admin</span>
+            <span>Chat with an agent</span>
             <button onClick={() => setIsOpen(false)}>&times;</button>
           </div>
 
