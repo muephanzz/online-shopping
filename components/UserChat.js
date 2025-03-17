@@ -162,7 +162,7 @@ const UserChat = () => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Type your message..."
-              className="flex-1 border p-2 rounded-lg focus:outline-none"
+              className="flex-1 w-3/4 border p-2 rounded-lg focus:outline-none"
             />
             <button
               onClick={sendMessage}

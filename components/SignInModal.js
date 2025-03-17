@@ -30,7 +30,7 @@ export default function SignIn({ onClose }) {
   }, []);
 
   return (
-    <div className="fixed top-5 right-5 z-50">
+    <div className="fixed top-18 right-0 z-50">
       <div ref={modalRef} className="bg-white shadow-lg rounded-lg p-5 w-80 relative">
         {/* Close Button */}
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 hover:text-gray-800">

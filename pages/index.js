@@ -58,12 +58,12 @@ export default function Home() {
   }, [currentPage]);
 
   return (
-    <div className="pb-2 mt-20">  
+    <div className="relative pb-2 mt-20">  
       {/* Slideshow */}
       <div className="mb-12">
         <Slider {...sliderSettings}>
           {slides.map((image, index) => (
-            <div key={index} className="relative w-full h-[300px] md:h-[500px]">
+            <div key={index} className="relative w-full h-[30px] md:h-[50px]">
               <Image
                 src={image}
                 alt={`Slide ${index + 1}`}
@@ -96,7 +96,7 @@ export default function Home() {
         </>
       )}
 
-      <div className="mt-60">
+      <div>
         <Footer />
       </div>
     </div>

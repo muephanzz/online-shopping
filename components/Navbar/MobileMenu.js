@@ -13,7 +13,7 @@ export default function MobileMenu() {
       {/* Menu Button */}
       <button
         onClick={toggleMenu}
-        className="fixed top-6 right-6 bg-gray-900 text-white p-2 rounded-full shadow-md hover:bg-gray-700 transition-all duration-300"
+        className="top-4  text-black p-2 rounded-full hover:bg-white transition-all duration-300"
       >
         {menuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>

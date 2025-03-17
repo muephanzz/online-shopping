@@ -23,11 +23,9 @@ export default function DesktopMenu() {
   }, []);
 
   return (
-    <nav className="absolute p-0 bg-blue-200 shadow-md hidden md:flex space-x-6 mt-28 w-full text-lg">
+    <nav className="absolute shadow-md hidden md:flex space-x-6 mt-28 w-full text-lg">
       {[
         { name: "Home", path: "/" },
-        { name: "About", path: "/about" },
-        { name: "Contact", path: "/contact" },
       ].map((item) => (
         <Link
           key={item.path}
