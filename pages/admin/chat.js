@@ -144,6 +144,9 @@ const AdminChat = () => {
                         <div className="flex justify-start">
                           <div className="p-2 bg-gray-200 rounded-lg max-w-xs">
                             {msg.user_message}
+                              <p className="text-xs text-gray-500 text-right mt-1">
+                                {moment(msg.created_at).format('MMMM Do YYYY, h:mm a')}
+                              </p>
                           </div>
                         </div>
                       )}
@@ -151,10 +154,12 @@ const AdminChat = () => {
                         <div className="flex justify-end">
                           <div className="p-2 bg-blue-500 text-white rounded-lg max-w-xs">
                             {msg.admin_reply}
+                              <p className="text-xs text-white text-left mt-1">
+                                {moment(msg.created_at).format('MMMM Do YYYY, h:mm a')}
+                              </p>
                           </div>
                         </div>
                       )}
-                      <p className="text-xs text-gray-500 text-right">{moment(msg.created_at).format('MMMM Do YYYY, h:mm a')}</p>
                     </div>
                   ))
                 )}
