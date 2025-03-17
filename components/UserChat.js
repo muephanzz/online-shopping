@@ -16,6 +16,7 @@ const UserChat = () => {
   const [user, setUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const messagesEndRef = useRef(null);
+  const chatRef = useRef(null); // Ref for click outside
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,6 +26,19 @@ const UserChat = () => {
     };
     fetchUser();
   }, []);
+
+  // Click outside to close chat box
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (chatRef.current && !chatRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!user) return;
@@ -42,23 +56,38 @@ const UserChat = () => {
 
     fetchMessages();
 
+    // Real-time updates
     const channel = supabase
-      .channel(`chat-${user.id}`)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, (payload) => {
-        if (payload.new.user_id === user.id) {
-          setMessages((prev) => [...prev, payload.new]);
+      .channel("realtime-messages")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "messages" },
+        (payload) => {
+          if (payload.new.user_id === user.id) {
+            setMessages((prev) => [...prev, payload.new]);
+          }
         }
-      })
+      )
       .subscribe();
 
     return () => {
-      supabase.channel(`chat-${user.id}`).unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, [user]);
 
   const sendMessage = async () => {
     if (!message.trim() || !user) return;
 
+    // Optimistic update (adds the message immediately)
+    const newMessage = {
+      id: Math.random(), // Temporary ID
+      user_id: user.id,
+      user_message: message,
+      created_at: new Date().toISOString(),
+    };
+    setMessages((prev) => [...prev, newMessage]);
+
+    // Save message to Supabase
     const { error } = await supabase
       .from("messages")
       .insert({ user_id: user.id, user_message: message });
@@ -79,7 +108,7 @@ const UserChat = () => {
       <motion.div
         drag
         dragConstraints={{ left: -200, right: 200, top: -200, bottom: 200 }}
-        className="fixed bottom-20 right-6 bg-blue-500 text-white p-3 rounded-full cursor-pointer shadow-lg"
+        className="fixed bottom-16 right-6 bg-blue-500 text-white p-3 rounded-full cursor-pointer shadow-lg"
         onClick={() => setIsOpen(!isOpen)}
       >
         <MessageSquare size={28} />
@@ -88,17 +117,18 @@ const UserChat = () => {
       {/* Chat Box */}
       {isOpen && (
         <motion.div
+          ref={chatRef}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
-          className="fixed bottom-16 right-6 w-80 bg-white border shadow-lg rounded-lg"
+          className="fixed bottom-20 right-6 w-72 bg-white border shadow-lg rounded-lg"
         >
           <div className="p-3 border-b bg-blue-500 text-white flex justify-between">
             <span>Chat with an agent</span>
-            <button onClick={() => setIsOpen(false)}>&times;</button>
+            <button onClick={() => setIsOpen(false)} className="text-white text-xl">&times;</button>
           </div>
 
-          <div className="p-3 h-80 overflow-y-auto flex flex-col">
+          <div className="p-3 h-64 overflow-y-auto flex flex-col">
             {messages.length === 0 ? (
               <p className="text-gray-500">No messages yet.</p>
             ) : (

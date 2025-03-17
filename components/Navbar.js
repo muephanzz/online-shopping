@@ -79,7 +79,7 @@ export default function Navbar() {
             <DesktopMenu />
             <div className="flex items-center space-x-6">
               <CartIcon cartCount={cartCount} />
-              <UserMenu user={user} onLogout={handleLogOut} onSignIn={() => setShowSignIn(true)} />
+              <UserMenu user={user} setUser={setUser} onSignIn={() => setShowSignIn(true)} />
             </div>
           </>
         )}

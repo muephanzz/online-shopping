@@ -218,7 +218,7 @@ export default function Cart() {
       <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
 
       <button
-        onClick={() => router.push({ pathname: "/orders/checkout", query: { total: subtotal } })}
+        onClick={() => router.push({ pathname: "/orders/checkout", query: { total: subtotal.toFixed(2) } })}
         className={`mt-6 px-6 py-3 text-white rounded-lg w-full transition ${
           outOfStockItems ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
         }`}
@@ -228,4 +228,4 @@ export default function Cart() {
       </button>
     </div>
   );
-}
+}  
