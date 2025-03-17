@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
+import moment from "moment"; // Import moment.js for formatting date/time
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -138,6 +139,9 @@ const UserChat = () => {
                     <div className="flex justify-end">
                       <div className="p-2 bg-gray-200 rounded-lg max-w-xs">
                         {msg.user_message}
+                        <p className="text-xs text-gray-500 text-right mt-1">
+                          {moment(msg.created_at).format("hh:mm A - MMM D")}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -146,6 +150,9 @@ const UserChat = () => {
                     <div className="flex justify-start">
                       <div className="p-2 bg-blue-500 text-white rounded-lg max-w-xs">
                         {msg.admin_reply}
+                        <p className="text-xs text-white text-left mt-1">
+                          {moment(msg.created_at).format("hh:mm A - MMM D")}
+                        </p>
                       </div>
                     </div>
                   )}

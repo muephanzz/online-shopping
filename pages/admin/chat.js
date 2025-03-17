@@ -86,19 +86,16 @@ const AdminChat = () => {
   const handleSendReply = async () => {
     if (!reply.trim() || !selectedUser) return;
   
-    // Create a new message object
     const newMessage = {
-      id: Date.now(), // Temporary ID until Supabase assigns one
+      id: Date.now(),
       user_id: selectedUser,
       admin_reply: reply,
       created_at: new Date().toISOString(),
     };
   
-    // Optimistically update state
     setMessages((prev) => [...prev, newMessage]);
     setReply('');
   
-    // Insert message into Supabase
     const { error } = await supabase.from('messages').insert({
       user_id: selectedUser,
       admin_reply: reply,
@@ -107,7 +104,6 @@ const AdminChat = () => {
   
     if (error) {
       console.error('Error sending reply:', error);
-      // Revert state update if error occurs
       setMessages((prev) => prev.filter((msg) => msg.id !== newMessage.id));
     }
   };
@@ -145,14 +141,19 @@ const AdminChat = () => {
                     <div key={msg.id} className="mb-3">
                       {msg.user_message && (
                         <div className="flex justify-start">
-                          <div className="p-2 bg-gray-200 rounded-lg max-w-xs">{msg.user_message}</div>
+                          <div className="p-2 bg-gray-200 rounded-lg max-w-xs">
+                            {msg.user_message}
+                          </div>
                         </div>
                       )}
                       {msg.admin_reply && (
                         <div className="flex justify-end">
-                          <div className="p-2 bg-blue-500 text-white rounded-lg max-w-xs">{msg.admin_reply}</div>
+                          <div className="p-2 bg-blue-500 text-white rounded-lg max-w-xs">
+                            {msg.admin_reply}
+                          </div>
                         </div>
                       )}
+                      <p className="text-xs text-gray-500 text-right">{new Date(msg.created_at).toLocaleString()}</p>
                     </div>
                   ))
                 )}
