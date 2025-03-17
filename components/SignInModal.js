@@ -84,7 +84,7 @@ export default function SignIn({ onClose }) {
                 toast.success('Check your email to confirm your account!');
               } else {
                 const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
-                  redirectTo: 'http://localhost:3000/reset-password',
+                  redirectTo: 'https://online-shopping-steel-eta.vercel.app/reset-password',
                 });
                 if (error) throw error;
                 toast.success('Check your email for reset instructions!');
