@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import moment from 'moment';
 import AdminLayout from '../../components/AdminLayout';
 import withAdminAuth from '../../components/withAdminAuth';
 
@@ -153,7 +154,7 @@ const AdminChat = () => {
                           </div>
                         </div>
                       )}
-                      <p className="text-xs text-gray-500 text-right">{new Date(msg.created_at).toLocaleString()}</p>
+                      <p className="text-xs text-gray-500 text-right">{moment(msg.created_at).format('MMMM Do YYYY, h:mm a')}</p>
                     </div>
                   ))
                 )}
