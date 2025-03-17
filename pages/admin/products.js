@@ -10,6 +10,7 @@ const ManageProducts = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
+    brand: "",
     description: "",
     specification: "",
     stock: "",
@@ -109,6 +110,7 @@ const ManageProducts = () => {
         // Update existing product
         const { error: updateError } = await supabase.from("products").update({
           name: newProduct.name,
+          brand: newProduct.brand,
           description: newProduct.description,
           specification: newProduct.specification,
           stock: newProduct.stock,
@@ -125,6 +127,7 @@ const ManageProducts = () => {
         const { error: insertError } = await supabase.from("products").insert([
           {
             name: newProduct.name,
+            brand: newProduct.brand,
             description: newProduct.description,
             specification: newProduct.specification,
             stock: newProduct.stock,
@@ -170,6 +173,7 @@ const ManageProducts = () => {
     setEditingProduct(product);
     setNewProduct({
       name: product.name,
+      brand: product.brand,
       description: product.description,
       specification: product.specification,
       price: product.price,
@@ -182,7 +186,7 @@ const ManageProducts = () => {
 
   // Reset form
   const resetForm = () => {
-    setNewProduct({ name: "", description: "", specification: "", price: "", image_urls: [], category_id: "" });
+    setNewProduct({ name: "", brand: "", description: "", specification: "", price: "", image_urls: [], category_id: "" });
     setFiles([]);
     setPreviews([]);
     setEditingProduct(null);
@@ -198,6 +202,16 @@ const ManageProducts = () => {
           type="text"
           name="name"
           placeholder="Product Name"
+          value={newProduct.name}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
+
+        <input
+          type="text"
+          name="brand"
+          placeholder="Product Brand"
           value={newProduct.name}
           onChange={handleChange}
           required
