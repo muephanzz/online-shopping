@@ -3,6 +3,7 @@ import { supabase } from "../../lib/supabaseClient";
 import AdminLayout from "../../components/AdminLayout";
 import withAdminAuth from '../../components/withAdminAuth';
 import { Loader2 } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
@@ -93,8 +94,8 @@ const ManageProducts = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!newProduct.name || !newProduct.price || !newProduct.category_id) {
-      return alert("Please fill in all fields!");
+    if (!newProduct.name || !newProduct.brand || !newProduct.stock || !newProduct.price || !newProduct.category_id) {
+      toast.error("Please fill in all fields!");
     }
 
     setUploading(true);
@@ -121,7 +122,7 @@ const ManageProducts = () => {
 
         if (updateError) throw new Error(updateError.message);
 
-        alert("Product updated successfully!");
+        toast.success("Product updated successfully!");
       } else {
         // Add new product
         const { error: insertError } = await supabase.from("products").insert([
@@ -139,14 +140,15 @@ const ManageProducts = () => {
 
         if (insertError) throw new Error(insertError.message);
 
-        alert("Product added successfully!");
+        toast.success("Product added successfully!");
+        t
       }
 
       fetchProducts();
       resetForm();
     } catch (error) {
       console.error("Error saving product:", error);
-      alert("Operation failed: " + error.message);
+      toast.error("Operation failed: " + error.message);
     }
 
     setUploading(false);
@@ -161,9 +163,10 @@ const ManageProducts = () => {
 
     if (error) {
       console.error("Error deleting product:", error.message);
-      alert("Error deleting product: " + error.message);
+      toast.error("Error deleting product: " + error.message);
     } else {
-      alert("Product deleted successfully!");
+      toast.success("Product deleted successfully!");
+      
       fetchProducts();
     }
   };
@@ -212,7 +215,7 @@ const ManageProducts = () => {
           type="text"
           name="brand"
           placeholder="Product Brand"
-          value={newProduct.name}
+          value={newProduct.brand}
           onChange={handleChange}
           required
           className="border p-2 w-full rounded"
@@ -263,7 +266,7 @@ const ManageProducts = () => {
         <input
           type="number"
           name="stock"
-          min={0}
+          min={1}
           placeholder="In stock"
           value={newProduct.stock}
           onChange={handleChange}
@@ -293,9 +296,10 @@ const ManageProducts = () => {
         <ul className="mt-8 space-y-4">
           {products.map((product) => (
             <li key={product.product_id} className="border p-4 rounded-lg">
-              <h2 className="text-xl font-semibold">{product.name}</h2>
-              <p className="mt-2 mb-4">{product.description}</p>
-              <p>{product.specification}</p>
+              <h2 className="text-green-600 text-xl font-semibold"><strong>Product Name:</strong> {product.name}</h2>
+              <p className="text-green-600 mt-4"><strong>Brand:</strong> {product.brand || "Not Specified" }</p>
+              <p className="mt-2 mb-4"><strong>Description</strong><br></br>{product.description}</p>
+              <p><strong>Specification</strong><br></br>{product.specification}</p>
               <p className="text-green-600 my-4">Ksh {product.price}</p>
               <p className="text-green-600"><strong>In Stock:</strong> {product.stock}</p>
               <div className="flex gap-2 mt-3">
