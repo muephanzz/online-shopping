@@ -61,7 +61,7 @@ export default function Navbar() {
 
 
   return (
-    <nav className="bg-white shadow-md p-4 fixed w-full top-0 z-50">
+    <nav className="bg-gray-900 shadow-md p-4 fixed w-full top-0 z-50">
       <div className="w-full mx-auto flex justify-between items-center">
       
       {!isMobile && (
@@ -70,10 +70,9 @@ export default function Navbar() {
 
         <Logo />
 
-        {/* Show SearchBar on all devices */}
+        {/* Show SearchBar on all devices */}      
         <SearchBar />
-
-        {/* Desktop components */}
+    
         {!isMobile && (
           <>
             <DesktopMenu />

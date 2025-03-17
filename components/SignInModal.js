@@ -30,18 +30,8 @@ export default function SignIn({ onClose }) {
   }, []);
 
   return (
-    <div className="fixed top-18 right-0 z-50">
-      <div ref={modalRef} className="bg-white shadow-lg rounded-lg p-5 w-80 relative">
-        {/* Close Button */}
-        <button onClick={onClose} className="absolute top-2 right-2 text-gray-600 hover:text-gray-800">
-          <X size={20} />
-        </button>
-
-        {/* Title */}
-        <h2 className="text-lg font-semibold text-center text-blue-600">
-          {view === 'signIn' ? 'Sign In' : view === 'signUp' ? 'Create Account' : 'Reset Password'}
-        </h2>
-
+    <div className="px-2 sm:p-0 lg:p-0 sm:w-1/2 w-full lg:w-1/4 fixed top-20 right-0 z-50">
+      <div ref={modalRef} className=" fixed bg-purple-300 shadow-lg rounded-lg px-5 pb-5 pt-1 w-full relative">
         {/* Google Auth Button */}
         {view !== 'forgotPassword' && (
           <button
@@ -57,11 +47,16 @@ export default function SignIn({ onClose }) {
                 setLoading(false);
               }
             }}
-            className="w-full flex items-center justify-center bg-gray-100 py-2 mt-3 rounded-md text-gray-700 hover:bg-gray-200"
+            className="w-full mt-2 flex items-center justify-center bg-gray-100 py-2 mt-3 rounded-md text-gray-700 hover:bg-gray-200"
           >
             <FcGoogle className="mr-2" size={20} /> Continue with Google
           </button>
         )}
+
+        {/* Title */}
+          <h2 className="text-lg font-semibold text-center text-blue-600">
+          {view === 'signIn' ? 'Sign In' : view === 'signUp' ? 'Create Account' : 'Reset Password'}
+        </h2>
 
         {/* Authentication Form */}
         <form

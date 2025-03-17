@@ -58,12 +58,12 @@ export default function Home() {
   }, [currentPage]);
 
   return (
-    <div className="relative pb-2 mt-20">  
+    <div className="pb-2 mt-20">  
       {/* Slideshow */}
-      <div className="mb-12">
+      <div className="hidden">
         <Slider {...sliderSettings}>
           {slides.map((image, index) => (
-            <div key={index} className="relative w-full h-[30px] md:h-[50px]">
+            <div key={index} className="w-full h-[15px] md:h-[200px]">
               <Image
                 src={image}
                 alt={`Slide ${index + 1}`}
@@ -80,7 +80,7 @@ export default function Home() {
         <p className="text-center">Loading...</p>
       ) : (
         <>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="mt-28 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
               <ProductCard key={product.product_id} product={product} />
             ))}
@@ -95,7 +95,6 @@ export default function Home() {
           />
         </>
       )}
-
       <div>
         <Footer />
       </div>

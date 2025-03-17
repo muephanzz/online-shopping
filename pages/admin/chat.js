@@ -85,15 +85,33 @@ const AdminChat = () => {
 
   const handleSendReply = async () => {
     if (!reply.trim() || !selectedUser) return;
-
-    const { error } = await supabase
-      .from('messages')
-      .insert({ user_id: selectedUser, admin_reply: reply, created_at: new Date().toISOString() });
-
-    if (error) return console.error('Error sending reply:', error);
+  
+    // Create a new message object
+    const newMessage = {
+      id: Date.now(), // Temporary ID until Supabase assigns one
+      user_id: selectedUser,
+      admin_reply: reply,
+      created_at: new Date().toISOString(),
+    };
+  
+    // Optimistically update state
+    setMessages((prev) => [...prev, newMessage]);
     setReply('');
+  
+    // Insert message into Supabase
+    const { error } = await supabase.from('messages').insert({
+      user_id: selectedUser,
+      admin_reply: reply,
+      created_at: new Date().toISOString(),
+    });
+  
+    if (error) {
+      console.error('Error sending reply:', error);
+      // Revert state update if error occurs
+      setMessages((prev) => prev.filter((msg) => msg.id !== newMessage.id));
+    }
   };
-
+  
   return (
     <AdminLayout>
       <h1 className="text-3xl font-bold mb-4">Manage Chat</h1>

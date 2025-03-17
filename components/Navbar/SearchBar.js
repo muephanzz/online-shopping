@@ -15,7 +15,7 @@ export default function SearchBar() {
   };
 
   return (
-    
+    <div className='w-full pr-4'>
     <form onSubmit={handleSubmit} className="relative w-full mx-2">
       <input
         type="text"
@@ -26,5 +26,6 @@ export default function SearchBar() {
       />
       <Search className="absolute left-3 top-2.5 text-gray-500" size={20} />
     </form>
+    </div>
   );
 }

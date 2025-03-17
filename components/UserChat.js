@@ -107,8 +107,8 @@ const UserChat = () => {
       {/* Draggable Chat Icon */}
       <motion.div
         drag
-        dragConstraints={{ left: -200, right: 200, top: -200, bottom: 200 }}
-        className="fixed bottom-16 right-6 bg-blue-500 text-white p-3 rounded-full cursor-pointer shadow-lg"
+        dragConstraints={{ left: -6, right: 6, top: -6, bottom: 6 }}
+        className="fixed bottom-20 right-6 bg-blue-500 text-white p-3 rounded-full cursor-pointer shadow-lg"
         onClick={() => setIsOpen(!isOpen)}
       >
         <MessageSquare size={28} />
@@ -121,7 +121,7 @@ const UserChat = () => {
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
-          className="fixed bottom-20 right-6 w-72 bg-white border shadow-lg rounded-lg"
+          className="fixed bottom-20 right-0 w-72 bg-white border shadow-lg rounded-lg"
         >
           <div className="p-3 border-b bg-blue-500 text-white flex justify-between">
             <span>Chat with an agent</span>
