@@ -8,11 +8,12 @@ import toast from "react-hot-toast";
 export default function UserMenu({ user, setUser, onSignIn }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
   const menuRef = useRef(null);
   const router = useRouter();
 
   // Fetch user role from Supabase
-  useEffect(() => {
+  {/* useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -24,7 +25,7 @@ export default function UserMenu({ user, setUser, onSignIn }) {
     };
 
     checkAdmin();
-  }, []);
+  }, []); */}
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -66,26 +67,18 @@ export default function UserMenu({ user, setUser, onSignIn }) {
         <>
           <button onClick={() => setDropdownOpen(!dropdownOpen)}>
             <User2 className="w-8 h-8 text-gray-700 cursor-pointer transition-transform transform hover:scale-110" />
-          </button>
-
-          <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
-            Update Profile
-          </Link>
-
-          <Link href="/order-tracking" className="block px-4 py-2 hover:bg-gray-100">
-            Track Order
-          </Link>          
+          </button>         
 
           <div
             className={`absolute right-0 mt-2 w-52 bg-white shadow-lg rounded-lg py-2 transition-all duration-300 ${
               dropdownOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
             }`}
           >
-            <p className="px-4 text-gray-700 font-medium">
+           {/*  <p className="px-4 text-gray-700 font-medium">
               {user?.user_metadata?.first_name
                 ? `Hi, ${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
                 : user?.email || "User"}
-            </p>
+            </p> */}
             {isAdmin && (
               <>
                 <Link href="/admin" className="block px-4 py-2 hover:bg-gray-100">
@@ -105,6 +98,14 @@ export default function UserMenu({ user, setUser, onSignIn }) {
             <Link href="/orders/completed" className="block px-4 py-2 hover:bg-gray-100">
               Completed Orders
             </Link>
+
+            <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
+              Update Profile
+            </Link>
+
+          <Link href="/orders/order-tracking" className="block px-4 py-2 hover:bg-gray-100">
+            Track Order
+          </Link> 
             <button
               onClick={handleLogout}
               className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
