@@ -1,15 +1,14 @@
 'use client';
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { supabase } from "../../lib/supabaseClient";
+import toast from "react-hot-toast";
 
 export default function UploadReview() {
   const router = useRouter();
   const { id } = router.query;
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const [fullName, setFullName] = useState(""); // New state for full name
   const [images, setImages] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -22,8 +21,8 @@ export default function UploadReview() {
         if (error) throw error;
 
         if (!session || !session.user) {
-          alert("Please log in to leave a review.");
-          router.push("/auth/login");
+          toast.error("Please log in to leave a review.");
+          router.push("/");
           return;
         }
 
@@ -72,8 +71,8 @@ export default function UploadReview() {
   };
 
   const handleSubmit = async () => {
-    if (!comment || !fullName) {
-      alert("Please enter a comment and your full name.");
+    if (!comment) {
+      toast.error("Please enter a comment.");
       return;
     }
 
@@ -87,42 +86,24 @@ export default function UploadReview() {
           rating,
           comment,
           media_urls: images,
-          full_name: fullName, // Add full name to the database
         },
       ]);
 
       if (error) throw error;
 
-      alert("Review submitted successfully!");
+      toast.success("Review submitted successfully!");
       router.push(`/products/${id}`);
     } catch (error) {
-      alert("Failed to submit review.");
+      toast.error("Failed to submit review.");
       console.error("Error submitting review:", error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!purchased) {
-    return (
-      <div className="not-purchased">
-        <p>You must buy this product to leave a review.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="review-container">
       <h1 className="title">Leave a Review</h1>
-
-      <label className="label">Full Name:</label>
-      <input
-        type="text"
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-        placeholder="Enter your full name"
-        className="input-field"
-      />
 
       <label className="label">Rating:</label>
       <select

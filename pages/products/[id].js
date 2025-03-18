@@ -34,7 +34,7 @@ export default function ProductDetails() {
         setLoading(true);
         const [{ data: productData, error: productError }, { data: reviewsData, error: reviewsError }, { data: recommendedData, error: recommendedError }] = await Promise.all([
           supabase.from("products").select("*").eq("product_id", id).single(),
-          supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, user_id, full_name").eq("product_id", id),
+          supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, user_id").eq("product_id", id),
           supabase.from("products").select("*").neq("product_id", id).limit(4) // Fetch recommended products excluding current
         ]);
 
@@ -250,22 +250,34 @@ export default function ProductDetails() {
     <div key={review.review_id} className="mb-6 border-b pb-4">
       {/* User Info */}
       <div className="flex items-center gap-3">
-        <img
+        <Image
           src={review.avatar_url || "https://www.gravatar.com/avatar/?d=mp" } // Default avatar
           alt="User Avatar"
           className="w-10 h-10 rounded-full border"
         />
         <p className="inline font-semibold text-gray-800">
-          {review.full_name} 
+          {user?.user_metadata?.first_name
+              ? `Hi, ${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
+              : user?.email || "User"}
           <span>
             {Array.from({ length: review.rating }, (_, i) => (
               <span key={i} className="text-yellow-500 text-lg">⭐</span>
             ))}
           </span>
           <span className="text-gray-500 text-sm ml-2">
-            {new Date(review.created_at).toLocaleDateString()}
+            {moment(review.created_at).format('MMMM Do YYYY, h:mm a')}
           </span>
         </p>
+        
+        <div className="flex m-4 w-full relative justify-center items-center">
+        <Image
+          src={review.media_urls || "No media uploaded" }
+          width={300} 
+          height={300} 
+          alt="uploaded Media"
+          className="w-10 h-10 "
+          />
+        </div>
       </div>
 
       {/* Review Comment */}

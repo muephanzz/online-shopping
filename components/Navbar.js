@@ -65,10 +65,11 @@ export default function Navbar() {
       <div className="w-full mx-auto flex justify-between items-center">
       
       {!isMobile && (
+        <>
         <MobileMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      )}
-
         <Logo />
+        </>
+      )}
 
         {/* Show SearchBar on all devices */}      
         <SearchBar />

@@ -13,25 +13,18 @@ export default function UserMenu({ user, setUser, onSignIn }) {
 
   // Fetch user role from Supabase
   useEffect(() => {
-    const fetchUserRole = async () => {
-      if (!user) return;
+    const checkAdmin = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
 
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("user_id", user.id)
-        .single();
-
-      if (error) {
-        console.error("Error fetching role:", error.message);
-        return;
+      if (user.user_metadata?.role === 'admin') {
+        setIsAdmin(true);
       }
 
-      setIsAdmin(data?.role === "admin");
+      setLoading(false);
     };
 
-    fetchUserRole();
-  }, [user]);
+    checkAdmin();
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -75,6 +68,14 @@ export default function UserMenu({ user, setUser, onSignIn }) {
             <User2 className="w-8 h-8 text-gray-700 cursor-pointer transition-transform transform hover:scale-110" />
           </button>
 
+          <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
+            Update Profile
+          </Link>
+
+          <Link href="/order-tracking" className="block px-4 py-2 hover:bg-gray-100">
+            Track Order
+          </Link>          
+
           <div
             className={`absolute right-0 mt-2 w-52 bg-white shadow-lg rounded-lg py-2 transition-all duration-300 ${
               dropdownOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
@@ -82,13 +83,24 @@ export default function UserMenu({ user, setUser, onSignIn }) {
           >
             <p className="px-4 text-gray-700 font-medium">
               {user?.user_metadata?.first_name
-                ? `${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
+                ? `Hi, ${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
                 : user?.email || "User"}
             </p>
             {isAdmin && (
-              <Link href="/admin" className="block px-4 py-2 hover:bg-gray-100">
-                Admin Panel
-              </Link>
+              <>
+                <Link href="/admin" className="block px-4 py-2 hover:bg-gray-100">
+                  Admin Panel
+                </Link>
+                <Link href="/admin/chats" className="block px-4 py-2 hover:bg-gray-100">
+                  Manage Chats
+                </Link>
+                <Link href="/admin/orders" className="block px-4 py-2 hover:bg-gray-100">
+                  Manage Orders
+                </Link>
+                <Link href="/admin/products" className="block px-4 py-2 hover:bg-gray-100">
+                  Manage Products
+                </Link>
+              </>
             )}
             <Link href="/orders/completed" className="block px-4 py-2 hover:bg-gray-100">
               Completed Orders

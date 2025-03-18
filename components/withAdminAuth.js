@@ -1,4 +1,3 @@
-// components/withAdminAuth.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabaseClient';
@@ -14,7 +13,7 @@ const withAdminAuth = (WrappedComponent) => {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (!user) {
-          router.push('/auth/signin');
+          router.push('/');
           return;
         }
 

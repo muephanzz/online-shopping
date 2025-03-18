@@ -21,11 +21,6 @@ const ReviewForm = ({ productId, userId }) => {
       .eq("user_id", userId)
       .eq("product_id", productId)
       .single();
-
-    if (error || !data) {
-      alert("You must purchase this product to leave a review!");
-      router.push(`/product/${productId}`);
-    }
   };
 
   // ✅ Step 2: Handle file change
