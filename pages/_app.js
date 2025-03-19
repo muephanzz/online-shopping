@@ -34,8 +34,8 @@ function MyApp({ Component, pageProps }) {
   return (
     <QueryClientProvider client={queryClient}>
       <Navbar user={user} setUser={setUser} />
-      <Toaster position="top-right" />
-      <ToastContainer position="top-right" />
+      <Toaster position="top-right"  autoClose={800}/>
+      <ToastContainer position="top-right" autoClose={800} />
       <Component {...pageProps} />
       <BottomNav />
     </QueryClientProvider>

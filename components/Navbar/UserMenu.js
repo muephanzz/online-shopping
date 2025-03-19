@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { CarFront, CarTaxiFront, ChartBar, ListOrdered, LogOut, ShoppingBasket, User2 } from "lucide-react";
+import { AmpersandIcon, CarFront, CarTaxiFront, ChartBar, ListOrdered, LogOut, ShoppingBasket, User2, UserMinus } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { AuthAdminApi } from "@supabase/supabase-js";
 
 export default function UserMenu({ user, setUser, onSignIn }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -70,11 +71,11 @@ export default function UserMenu({ user, setUser, onSignIn }) {
           </button>         
 
           <div
-            className={`absolute right-0 mt-2 w-52 bg-white shadow-lg rounded-lg py-2 transition-all duration-300 ${
+            className={`absolute right-0 mt-4 w-52 bg-white shadow-lg rounded-lg py-2 transition-all duration-300 ${
               dropdownOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
             }`}
           >
-            <p className="px-4 text-gray-700 font-medium">
+            <p className="px-4 border-b text-gray-700 font-medium">
               {user?.user_metadata?.first_name
                 ? `Hi, ${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
                 : user?.email || "User"}
@@ -82,35 +83,35 @@ export default function UserMenu({ user, setUser, onSignIn }) {
             {isAdmin && (
               <>
                 <Link href="/admin" className="block px-4 py-2 hover:bg-gray-100">
-                  Admin Panel
+                  <UserMinus size={24} className="inline"/> Admin Panel
                 </Link>
                 <Link href="/admin/chats" className="block px-4 py-2 hover:bg-gray-100">
-                  <ChartBar size={24} /> Manage Chats
+                  <ChartBar size={24} className="inline"/> Manage Chats
                 </Link>
                 <Link href="/admin/orders" className="block px-4 py-2 hover:bg-gray-100">
-                  <CarFront size={24} /> Manage Orders
+                  <CarFront size={24} className="inline"/> Manage Orders
                 </Link>
                 <Link href="/admin/products" className="block px-4 py-2 hover:bg-gray-100">
-                  <ShoppingBasket size={24} /> Manage Products
+                  <ShoppingBasket size={24} className="inline"/> Manage Products
                 </Link>
               </>
             )}
             <Link href="/orders/completed" className="block px-4 py-2 hover:bg-gray-100">
-              <ListOrdered size={24} /> Completed Orders
+              <ListOrdered size={24} className="inline"/> Completed Orders
             </Link>
 
             <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
-              <User2 size={24} /> Update Profile
+              <User2 size={24} className="inline"/> Update Profile
             </Link>
 
           <Link href="/orders/order-tracking" className="block px-4 py-2 hover:bg-gray-100">
-            <CarTaxiFront size={24} /> Track Order
+            <CarTaxiFront size={24} className="inline"/> Track Order
           </Link> 
             <button
               onClick={handleLogout}
               className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
             >
-              <LogOut size={24} /> Logout
+              <LogOut size={24} className="inline"/> Logout
             </button>
           </div>
         </>

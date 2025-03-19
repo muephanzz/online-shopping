@@ -1,7 +1,7 @@
 "use client"; // Ensures compatibility with App Router
 
 import { useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, X } from 'lucide-react';
+import { Eye, EyeOff, Menu, X } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/navigation';
@@ -30,8 +30,13 @@ export default function SignIn({ onClose }) {
   }, []);
 
   return (
-    <div className="px-2 sm:p-0 lg:p-0 sm:w-1/2 w-full lg:w-1/4 fixed top-20 right-0 z-50">
+    <div className="px-2 sm:p-0 lg:p-0 sm:w-1/2 md:w-full lg:w-1/4 fixed top-20 right-0 z-50">
       <div ref={modalRef} className=" fixed bg-purple-300 shadow-lg rounded-lg px-5 pb-5 pt-1 w-full relative">
+        <button
+          onClick={onClose} >
+          <X className='absolute rounded-md bg-white right-6 top-2' />
+        </button>
+        
         {/* Google Auth Button */}
         {view !== 'forgotPassword' && (
           <button

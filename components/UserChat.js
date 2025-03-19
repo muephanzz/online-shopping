@@ -146,6 +146,7 @@ const UserChat = () => {
                     </div>
                   )}
 
+
                   {msg.admin_reply && (
                     <div className="flex justify-start">
                       <div className="p-2 bg-blue-500 text-white rounded-lg max-w-xs">

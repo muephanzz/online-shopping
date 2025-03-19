@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import { useRouter } from "next/router";
 
 const CompletedOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     fetchCompletedOrders();
@@ -55,18 +57,21 @@ const CompletedOrders = () => {
 
               <h3 className="mt-4 font-semibold">Items:</h3>
               <ul>
-                {(() => {
-                  try {
-                    const items = JSON.parse(order.items);
-                    return items.map((item, index) => (
-                      <li key={index}>
-                        {item.name} - ${item.price}
-                      </li>
-                    ));
-                  } catch {
-                    return <li>Unable to load items.</li>;
-                  }
-                })()}
+                {order.items && order.items.length > 0 ? (
+                  order.items.map((item, index) => (
+                    <li key={index} className="flex justify-between items-center border-b py-2">
+                      <span>{item.name} - ${item.price}</span>
+                      <button
+                        onClick={() => router.push(`/upload-review/${item.product_id}`)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+                      >
+                        Write a Review
+                      </button>
+                    </li>
+                  ))
+                ) : (
+                  <li>Unable to load items.</li>
+                )}
               </ul>
 
               <p><strong>Shipping Address:</strong> {order.shipping_address}</p>

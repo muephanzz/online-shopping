@@ -75,18 +75,15 @@ const ManageOrders = () => {
               {/* Display Order Items */}
               <h3 className="mt-4 font-semibold">Items:</h3>
               <ul>
-                {(() => {
-                  try {
-                    const items = JSON.parse(order.items);
-                    return items.map((item, index) => (
-                      <li key={index}>
-                        {item.name} - ${item.price}
-                      </li>
-                    ));
-                  } catch {
-                    return <li>Unable to load items.</li>;
-                  }
-                })()}
+                {order.items && order.items.length > 0 ? (
+                  order.items.map((item, index) => (
+                    <li key={index} className="flex justify-between items-center border-b py-2">
+                      <span>{item.name} - ${item.price}</span>
+                    </li>
+                  ))
+                ) : (
+                  <li>Unable to load items.</li>
+                )}
               </ul>
 
               {/* Status Update Controls */}
