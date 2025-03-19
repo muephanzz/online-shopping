@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User2 } from "lucide-react";
+import { CarFront, CarTaxiFront, ChartBar, ListOrdered, LogOut, ShoppingBasket, User2 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -13,7 +13,7 @@ export default function UserMenu({ user, setUser, onSignIn }) {
   const router = useRouter();
 
   // Fetch user role from Supabase
-  {/* useEffect(() => {
+  useEffect(() => {
     const checkAdmin = async () => {
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -25,7 +25,7 @@ export default function UserMenu({ user, setUser, onSignIn }) {
     };
 
     checkAdmin();
-  }, []); */}
+  }, []); 
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -74,43 +74,43 @@ export default function UserMenu({ user, setUser, onSignIn }) {
               dropdownOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
             }`}
           >
-           {/*  <p className="px-4 text-gray-700 font-medium">
+            <p className="px-4 text-gray-700 font-medium">
               {user?.user_metadata?.first_name
                 ? `Hi, ${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
                 : user?.email || "User"}
-            </p> */}
+            </p> 
             {isAdmin && (
               <>
                 <Link href="/admin" className="block px-4 py-2 hover:bg-gray-100">
                   Admin Panel
                 </Link>
                 <Link href="/admin/chats" className="block px-4 py-2 hover:bg-gray-100">
-                  Manage Chats
+                  <ChartBar size={24} /> Manage Chats
                 </Link>
                 <Link href="/admin/orders" className="block px-4 py-2 hover:bg-gray-100">
-                  Manage Orders
+                  <CarFront size={24} /> Manage Orders
                 </Link>
                 <Link href="/admin/products" className="block px-4 py-2 hover:bg-gray-100">
-                  Manage Products
+                  <ShoppingBasket size={24} /> Manage Products
                 </Link>
               </>
             )}
             <Link href="/orders/completed" className="block px-4 py-2 hover:bg-gray-100">
-              Completed Orders
+              <ListOrdered size={24} /> Completed Orders
             </Link>
 
             <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
-              Update Profile
+              <User2 size={24} /> Update Profile
             </Link>
 
           <Link href="/orders/order-tracking" className="block px-4 py-2 hover:bg-gray-100">
-            Track Order
+            <CarTaxiFront size={24} /> Track Order
           </Link> 
             <button
               onClick={handleLogout}
               className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
             >
-              Logout
+              <LogOut size={24} /> Logout
             </button>
           </div>
         </>
