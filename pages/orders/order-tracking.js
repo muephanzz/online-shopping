@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
+import toast from "react-hot-toast";
 
 export default function OrderTracking() {
   const [orderId, setOrderId] = useState("");
@@ -16,13 +17,12 @@ export default function OrderTracking() {
     setLoading(true);
     setError("");
     setOrderId("");
-    setOrder(null);
+    setOrder(null); // Ensure the order state resets
   
     if (!orderId.trim()) {
-      setError('Order number cannot be empty!');
-      setLoading(false); // Stop loading if the field is empty
-      setTimeout(() => setError(''), 5000);
-      return; // Exit early to prevent the query
+      toast.error("Order number cannot be empty!");
+      setLoading(false);
+      return;
     }
   
     const { data, error } = await supabase
@@ -32,7 +32,7 @@ export default function OrderTracking() {
       .single();
   
     if (error || !data) {
-      setError("No order found with this id");
+      toast.error(`No order found for "${orderId}". Please check the order number and try again.`);
     } else {
       setOrder(data);
     }
@@ -53,15 +53,14 @@ export default function OrderTracking() {
         .eq("order_id", order.order_id);
 
       if (error) {
-        setError("Failed to cancel the order.");
+        toast.error("Failed to cancel the order.");
       } else {
         setOrder((prevOrder) => ({ ...prevOrder, status: "cancelled" }));
       }
 
       setUpdating(false);
     } else {
-      setError("Order cannot be cancelled after processing. Call 0798229783 for help");
-      setTimeout(() => setError(''), 5000);
+      toast.error("Order cannot be cancelled after processing. Please contact us through the chat for help");
     }
   };
 
