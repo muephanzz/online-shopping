@@ -35,7 +35,7 @@ export default function ProductDetails() {
         setLoading(true);
         const [{ data: productData, error: productError }, { data: reviewsData, error: reviewsError }, { data: recommendedData, error: recommendedError }] = await Promise.all([
           supabase.from("products").select("*").eq("product_id", id).single(),
-          supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, user_id").eq("product_id", id),
+          supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, username, user_id, profiles(avatar_url)").eq("product_id", id),
           supabase.from("products").select("*").neq("product_id", id).limit(4) // Fetch recommended products excluding current
         ]);
 
@@ -237,7 +237,7 @@ export default function ProductDetails() {
 
   {activeTab === "reviews" && (
     <div id="reviews" className="mt-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Customer Reviews</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Customer Reviews ({reviews.length})</h2>
       <select onChange={(e) => setSortOrder(e.target.value)} value={sortOrder} className="mb-4 p-2 border rounded-md">
         <option value="newest">Newest First</option>
         <option value="oldest">Oldest First</option>
@@ -247,41 +247,31 @@ export default function ProductDetails() {
       {reviews.length === 0 ? (
   <p className="text-gray-500">No reviews yet. Be the first to review!</p>
   ) : (
-  reviews.map((review) => (
-    <div key={review.review_id} className="mb-6 border-b pb-4">
-      {/* User Info */}
-      <div className="flex items-center gap-3">
-        <Image
-          src={review.avatar_url || "https://www.gravatar.com/avatar/?d=mp" } // Default avatar
-          alt="User Avatar"
-          className="w-10 h-10 rounded-full border"
-        />
-        <p className="inline font-semibold text-gray-800">
-        
+    reviews.map((review) => (
+      <div key={review.review_id} className="mb-6 border-b pb-4">
+<div className="flex items-center gap-3">
+          <Image
+            src={review.profiles?.avatar_url || "https://www.gravatar.com/avatar/?d=mp"} 
+            alt="User Avatar"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full border"
+          />        <h2>{review.username}</h2>
+                    <span className="text-gray-500 text-sm ml-2">
+            {moment(review.created_at).format('MMMM Do YYYY, h:mm a')}
+          </span>        
+          </div>
+                  
+          <div className="ml-12 text-gray-600">
           <span>
             {Array.from({ length: review.rating }, (_, i) => (
               <span key={i} className="text-yellow-500 text-lg">⭐</span>
             ))}
           </span>
-          <span className="text-gray-500 text-sm ml-2">
-            {moment(review.created_at).format('MMMM Do YYYY, h:mm a')}
-          </span>
-        </p>
-        
-        <div className="flex m-4 w-full relative justify-center items-center">
-        <Image
-          src={review.media_urls || "No media uploaded" }
-          width={300} 
-          height={300} 
-          alt="uploaded Media"
-          className="w-10 h-10 "
-          />
-        </div>
-      </div>
 
       {/* Review Comment */}
-      <p className="ml-12 text-gray-600 mt-2">{review.comment}</p>
-    </div>
+      <p>{review.comment}</p>
+      </div>    </div>
   ))
 )}
 

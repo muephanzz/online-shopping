@@ -96,17 +96,18 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                 </Link>
               </>
             )}
-            <Link href="/orders/completed" className="block px-4 py-2 hover:bg-gray-100">
-              <ListOrdered size={24} className="inline"/> Completed Orders
-            </Link>
-
-            <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
-              <User2 size={24} className="inline"/> Update Profile
-            </Link>
+          <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
+            <User2 size={24} className="inline"/> Update Profile
+          </Link>
 
           <Link href="/orders/order-tracking" className="block px-4 py-2 hover:bg-gray-100">
             <CarTaxiFront size={24} className="inline"/> Track Order
           </Link> 
+
+          <Link href="/orders/completed" className="block px-4 py-2 hover:bg-gray-100">
+            <ListOrdered size={24} className="inline"/> Completed Orders
+          </Link>
+
             <button
               onClick={handleLogout}
               className="w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"

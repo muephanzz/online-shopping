@@ -13,6 +13,7 @@ export default function UploadReview() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [purchased, setPurchased] = useState(false);
+  const [userName, setUserName] = useState("Loading...");
 
   useEffect(() => {
     async function checkUserPurchase() {
@@ -27,6 +28,7 @@ export default function UploadReview() {
         }
 
         setUser(session.user);
+        fetchUserName(session.user.id); // Fetch username when user is set
 
         // Check if user purchased the product
         const { data, error: orderError } = await supabase
@@ -38,7 +40,6 @@ export default function UploadReview() {
           .single();
 
         if (orderError) throw orderError;
-
         if (data) setPurchased(true);
       } catch (err) {
         console.error("Error checking purchase:", err.message);
@@ -48,6 +49,23 @@ export default function UploadReview() {
     if (id) checkUserPurchase();
   }, [id]);
 
+  // ✅ Fetch User's Name from Supabase Auth Metadata
+  const fetchUserName = async (userId) => {
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) throw error;
+
+      const userMetadata = data?.user?.user_metadata;
+      if (userMetadata) {
+        const fullName = `${userMetadata.first_name || ""} ${userMetadata.last_name || ""}`.trim();
+        setUserName(fullName || "Anonymous"); // Fallback to "Anonymous" if no name is set
+      }
+    } catch (error) {
+      console.error("Error fetching user name:", error.message);
+      setUserName("Anonymous"); // Set default in case of error
+    }
+  };
+
   const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
     const uploadedImages = [];
@@ -55,9 +73,8 @@ export default function UploadReview() {
     for (const file of files) {
       const filePath = `reviews/${Date.now()}-${file.name}`;
       const { data, error } = await supabase.storage
-      .from("review-media") // Correct bucket name
-      .upload(filePath, file);
-    
+        .from("review-media") // Correct bucket name
+        .upload(filePath, file);
 
       if (error) {
         alert("Failed to upload image.");
@@ -86,6 +103,7 @@ export default function UploadReview() {
           rating,
           comment,
           media_urls: images,
+          username: userName, // ✅ Ensuring username is inserted correctly
         },
       ]);
 

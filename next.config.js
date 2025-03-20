@@ -7,11 +7,12 @@ const nextConfig = {
     ignoreBuildErrors: true, // Ignore TypeScript errors during build
   },
   images: {
+    domains: ["www.gravatar.com", "znjrafazpveysjguzxri.supabase.co"], // Add Supabase storage domain
     remotePatterns: [
       {
         protocol: "https",
         hostname: "znjrafazpveysjguzxri.supabase.co",
-        pathname: "/storage/v1/object/public/**",
+        pathname: "/storage/v1/object/public/**", // Allow all public storage
       },
     ],
   },
