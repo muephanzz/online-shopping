@@ -13,6 +13,7 @@ const nextConfig = {
         protocol: "https",
         hostname: "znjrafazpveysjguzxri.supabase.co",
         pathname: "/storage/v1/object/public/**", // Allow all public storage
+        pathname: "/storage/v1/object/public/avatars/**",
       },
     ],
   },
