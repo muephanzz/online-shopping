@@ -5,6 +5,7 @@ import { supabase } from "../../lib/supabaseClient";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import ProductCard from "../../components/ProductCard";
+import moment from 'moment';
 
 export default function ProductDetails() {
   const router = useRouter();
@@ -256,9 +257,7 @@ export default function ProductDetails() {
           className="w-10 h-10 rounded-full border"
         />
         <p className="inline font-semibold text-gray-800">
-          {user?.user_metadata?.first_name
-              ? `Hi, ${user.user_metadata.first_name} ${user.user_metadata.last_name || ""}`
-              : user?.email || "User"}
+        
           <span>
             {Array.from({ length: review.rating }, (_, i) => (
               <span key={i} className="text-yellow-500 text-lg">⭐</span>
