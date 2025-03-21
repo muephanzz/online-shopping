@@ -52,15 +52,6 @@ export default function BottomNav() {
     fetchCartCount();
   }, [user]);
 
-  const handleLogOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-    } catch (error) {
-      console.error("Logout error:", error.message);
-    }
-  };
-
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -95,16 +86,24 @@ export default function BottomNav() {
           </button>
 
           {menuOpen && (
-            <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-lg p-2 w-44 transition-all duration-300">
-              {categories.map((category) => (
-                <Link 
-                  key={category.id} 
-                  href={`/products?category_id=${category.id}`}
-                  className="block px-4 py-2 text-gray-700 hover:bg-orange-500 hover:text-white rounded-md transition"
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
+              <div className="bg-white shadow-lg rounded-lg p-4 w-3/4 max-w-sm transition-all duration-300">
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
                 >
-                  {category.category}
-                </Link>
-              ))}
+                  ✕
+                </button>
+                {categories.map((category) => (
+                  <Link 
+                    key={category.id} 
+                    href={`/products?category_id=${category.id}`}
+                    className="block px-4 py-2 text-gray-700 hover:bg-orange-500 hover:text-white rounded-md transition"
+                  >
+                    {category.category}
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
         </div>
