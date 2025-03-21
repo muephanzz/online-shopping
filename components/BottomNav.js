@@ -97,7 +97,7 @@ export default function BottomNav() {
 
       {/* Categories Dropdown */}
       {menuOpen && (
-        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-lg p-4 w-64">
+        <div className="absolute bottom-20 left-1/3 transform -translate-x-1/2 bg-white shadow-lg rounded-lg p-4 w-64">
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-800 font-semibold">Categories</span>
             <button onClick={() => setMenuOpen(false)} className="text-gray-500 hover:text-gray-700">
@@ -122,7 +122,7 @@ export default function BottomNav() {
 
       {/* User Menu Dropdown */}
       {userMenuOpen && (
-        <div className="absolute bottom-16 right-4 bg-white shadow-lg rounded-lg p-4 w-56">
+        <div className="absolute bottom-16 right-0 bg-white shadow-lg rounded-lg p-4 w-56">
           <div className="flex justify-between items-center mb-2">
             <span className="text-gray-800 font-semibold">Account</span>
             <button onClick={() => setUserMenuOpen(false)} className="text-gray-500 hover:text-gray-700">
