@@ -26,8 +26,13 @@ export default function Cart() {
           .eq("user_id", session.user.id);
     
         if (cartError) return console.error("Error fetching cart:", cartError.message);
+        
+        console.log("Fetched cart data:", cartData); // Debugging line
     
-        // Fetch product details separately
+        if (!cartData || cartData.length === 0) {
+          console.warn("Cart is empty or not returning data.");
+        }
+        
         const productIds = cartData.map(item => item.product_id);
         const { data: productsData, error: productsError } = await supabase
           .from("products")
@@ -36,7 +41,6 @@ export default function Cart() {
     
         if (productsError) return console.error("Error fetching products:", productsError.message);
     
-        // Merge cart data with product stock info
         const cartWithStock = cartData.map(item => ({
           ...item,
           stock: productsData.find(p => p.product_id === item.product_id)?.stock || 0
@@ -46,7 +50,7 @@ export default function Cart() {
       }
       setLoading(false);
     };
-    
+       
 
     const fetchWishlist = async () => {
       const { data, error } = await supabase

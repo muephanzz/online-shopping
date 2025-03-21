@@ -1,9 +1,8 @@
 "use client";
 import { Home, Heart, Menu, ShoppingCart, User, XCircle, Tag } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import CartIcon from "./Navbar/CartIcon";
 import UserMenu from "./Navbar/UserMenu";
 import SignInModal from "./SignInModal";
 import { supabase } from "../lib/supabaseClient";
@@ -87,7 +86,15 @@ export default function BottomNav() {
         </Link>
 
         <button
-          onClick={() => setUserMenuOpen(!userMenuOpen)}
+          onClick={() => {
+            if (user) {
+              setUserMenuOpen(!userMenuOpen);
+              setShowSignIn(false); // Close sign-in modal if open
+            } else {
+              setShowSignIn(true);
+              setUserMenuOpen(false); // Close user menu if open
+            }
+          }}
           className={`flex flex-col items-center ${userMenuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
         >
           <User size={24} />
@@ -120,19 +127,23 @@ export default function BottomNav() {
         </div>
       )}
 
-      {/* User Menu Dropdown */}
-      {userMenuOpen && (
-        <div className="absolute bottom-16 right-0 bg-white shadow-lg rounded-lg p-4 w-56">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-800 font-semibold">Account</span>
+      {/* User Menu (only if logged in) */}
+      {userMenuOpen && user && (
+        <div className="fixed top-4 right-4 bg-white shadow-xl rounded-lg p-6 w-64 z-50 transition-transform transform animate-slide-in">
+          {/* Header Section */}
+          <div className="flex justify-between items-center mb-4">
+            <span className="text-gray-900 font-semibold text-lg">Account</span>
             <button onClick={() => setUserMenuOpen(false)} className="text-gray-500 hover:text-gray-700">
-              <XCircle size={20} />
+              <XCircle size={24} />
             </button>
           </div>
-          <UserMenu user={user} setUser={setUser} onSignIn={() => setShowSignIn(true)} />
+
+          {/* User Menu Component */}
+          <UserMenu user={user} setUser={setUser} />
         </div>
       )}
 
+      {/* Sign-In Modal (only if not logged in) */}
       {showSignIn && <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />}
     </nav>
   );

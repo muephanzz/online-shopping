@@ -2,33 +2,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-  font-family: "Inter", sans-serif; /* Use a default font temporarily */
-}
-
-.scrollbar {
-  max-height: 89vh;
-  overflow-y: auto;
-  border: 1px solid rgb(75, 138, 75);
-}
-
-/* Custom Scrollbar Styling */
-.scrollbar::-webkit-scrollbar {
-  width: 10px;
-}
-
-/* Track */
-.scrollbar::-webkit-scrollbar-track {
-  background: #e2e2e2;
-}
-
-/* Handle */
-.scrollbar::-webkit-scrollbar-thumb {
-  background: #888;
-}
-
-/* Handle on hover */
-.scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
