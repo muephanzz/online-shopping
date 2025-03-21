@@ -19,7 +19,6 @@ export default function BottomNav() {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    // Detect mobile devices
     setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
   }, []);
 
@@ -57,13 +56,11 @@ export default function BottomNav() {
     try {
       await supabase.auth.signOut();
       setUser(null);
-      router.push("/");
     } catch (error) {
       console.error("Logout error:", error.message);
     }
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -76,13 +73,11 @@ export default function BottomNav() {
     };
   }, []);
 
-  // Hide if not on a mobile device
   if (!isMobile) return null;
 
   return (
     <nav className="shadow-md fixed bottom-0 left-0 w-full bg-white z-50">
       <div className="flex justify-around items-center py-3 shadow-md">
-        {/* Home */}
         <Link href="/">
           <button className={`flex flex-col items-center ${pathname === "/" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-black"}`}>
             <Home size={24} />
@@ -90,7 +85,6 @@ export default function BottomNav() {
           </button>
         </Link>
 
-        {/* Categories Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -115,25 +109,19 @@ export default function BottomNav() {
           )}
         </div>
 
-        {/* Wishlist */}
         <Link href="/wishlist">
           <button className={`flex flex-col items-center ${pathname === "/wishlist" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-black"}`}>
             <Heart size={24} />
             <span className="text-xs mt-1">Wishlist</span>
           </button>
         </Link>
-            
-        {/* Cart */}
+        
         <button className="relative">
           <CartIcon cartCount={cartCount} />
           <span className="text-xs mt-1">Cart</span>
         </button>
 
-        {/* Profile */}
-        <button>
-          <UserMenu user={user} onLogout={handleLogOut} onSignIn={() => setShowSignIn(true)} />
-          <span className="text-xs mt-1">Profile</span>
-        </button>
+        <UserMenu user={user} setUser={setUser} onSignIn={() => setShowSignIn(true)} />
       </div>
 
       {showSignIn && <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />}

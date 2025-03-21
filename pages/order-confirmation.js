@@ -1,4 +1,3 @@
-// pages/order-confirmation.js
 export default function OrderConfirmation() {
     return (
       <div className="mt-30 text-center">
