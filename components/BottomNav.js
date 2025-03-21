@@ -1,5 +1,5 @@
 "use client";
-import { Home, Heart, Menu, User } from "lucide-react";
+import { Home, Heart, Menu, ShoppingCart, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -18,7 +18,6 @@ export default function BottomNav() {
   const [showSignIn, setShowSignIn] = useState(false);
   const pathname = usePathname();
   const dropdownRef = useRef(null);
-  const userMenuRef = useRef(null);
 
   useEffect(() => {
     setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
@@ -54,21 +53,6 @@ export default function BottomNav() {
     fetchCartCount();
   }, [user]);
 
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setMenuOpen(false);
-      }
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
-        setUserMenuOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   if (!isMobile) return null;
 
   return (
@@ -81,30 +65,13 @@ export default function BottomNav() {
           </button>
         </Link>
 
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className={`flex flex-col items-center ${menuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
-          >
-            <Menu size={24} />
-            <span className="text-xs mt-1">Categories</span>
-          </button>
-
-          {menuOpen && (
-            <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-lg p-4 w-48 z-40">
-              {categories.map((category) => (
-                <Link 
-                  key={category.id} 
-                  href={`/products?category_id=${category.id}`}
-                  className="block px-4 py-2 text-gray-700 hover:bg-orange-500 hover:text-white rounded-md transition"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {category.category}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
+        <button
+          onClick={() => setMenuOpen(true)}
+          className={`flex flex-col items-center ${menuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
+        >
+          <Menu size={24} />
+          <span className="text-xs mt-1">Categories</span>
+        </button>
 
         <Link href="/wishlist">
           <button className={`flex flex-col items-center ${pathname === "/wishlist" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-black"}`}>
@@ -112,35 +79,60 @@ export default function BottomNav() {
             <span className="text-xs mt-1">Wishlist</span>
           </button>
         </Link>
-        
-        <button className="relative">
-          <CartIcon cartCount={cartCount} />
-          <span className="text-xs mt-1">Cart</span>
-        </button>
 
-        <div className="relative" ref={userMenuRef}>
-          <button
-            onClick={() => setUserMenuOpen(!userMenuOpen)}
-            className={`flex flex-col items-center ${userMenuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
-          >
-            <User size={24} />
-            <span className="text-xs mt-1">Account</span>
+        <Link href="/cart">
+          <button className={`flex flex-col items-center ${pathname === "/cart" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-black"}`}>
+            <ShoppingCart size={24} />
+            <span className="text-xs mt-1">Cart ({cartCount})</span>
           </button>
+        </Link>
 
-          {userMenuOpen && (
-            <div className="absolute bottom-12 right-0 bg-white shadow-lg rounded-lg p-4 w-40 z-40">
-              {user ? (
-                <>
-                  <Link href="/profile" className="block px-4 py-2 text-gray-700 hover:bg-orange-500 hover:text-white rounded-md transition">Profile</Link>
-                  <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-500 hover:text-white rounded-md transition" onClick={() => { supabase.auth.signOut(); setUser(null); }}>Logout</button>
-                </>
-              ) : (
-                <button className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-orange-500 hover:text-white rounded-md transition" onClick={() => setShowSignIn(true)}>Sign In</button>
-              )}
-            </div>
-          )}
-        </div>
+        <button
+          onClick={() => setUserMenuOpen(!userMenuOpen)}
+          className={`flex flex-col items-center ${userMenuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
+        >
+          <User size={24} />
+          <span className="text-xs mt-1">Account</span>
+        </button>
       </div>
+
+      {menuOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
+          <div className="bg-white shadow-lg rounded-lg p-6 w-full h-full overflow-auto">
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+            >
+              ✕
+            </button>
+            <div className="flex flex-col items-center space-y-4">
+              {categories.map((category) => (
+                <Link 
+                  key={category.id} 
+                  href={`/products?category_id=${category.id}`}
+                  className="block px-4 py-3 text-gray-700 text-lg font-medium hover:bg-orange-500 hover:text-white rounded-md transition w-full text-center"
+                >
+                  {category.category}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {userMenuOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
+          <div className="bg-white shadow-lg rounded-lg p-6 w-3/4 max-w-sm">
+            <button
+              onClick={() => setUserMenuOpen(false)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+            >
+              ✕
+            </button>
+            <UserMenu user={user} setUser={setUser} onSignIn={() => setShowSignIn(true)} />
+          </div>
+        </div>
+      )}
 
       {showSignIn && <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />}
     </nav>
