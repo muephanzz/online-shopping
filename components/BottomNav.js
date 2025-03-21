@@ -1,5 +1,5 @@
 "use client";
-import { Home, Heart, Menu, ShoppingCart, User } from "lucide-react";
+import { Home, Heart, Menu, ShoppingCart, User, XCircle, Tag } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -17,7 +17,6 @@ export default function BottomNav() {
   const [categories, setCategories] = useState([]);
   const [showSignIn, setShowSignIn] = useState(false);
   const pathname = usePathname();
-  const dropdownRef = useRef(null);
 
   useEffect(() => {
     setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
@@ -66,7 +65,7 @@ export default function BottomNav() {
         </Link>
 
         <button
-          onClick={() => setMenuOpen(true)}
+          onClick={() => setMenuOpen(!menuOpen)}
           className={`flex flex-col items-center ${menuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
         >
           <Menu size={24} />
@@ -96,41 +95,41 @@ export default function BottomNav() {
         </button>
       </div>
 
+      {/* Categories Dropdown */}
       {menuOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
-          <div className="bg-white shadow-lg rounded-lg p-6 w-full h-full overflow-auto">
-            <button
-              onClick={() => setMenuOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
-            >
-              ✕
+        <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 bg-white shadow-lg rounded-lg p-4 w-64">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-800 font-semibold">Categories</span>
+            <button onClick={() => setMenuOpen(false)} className="text-gray-500 hover:text-gray-700">
+              <XCircle size={20} />
             </button>
-            <div className="flex flex-col items-center space-y-4">
-              {categories.map((category) => (
-                <Link 
-                  key={category.id} 
-                  href={`/products?category_id=${category.id}`}
-                  className="block px-4 py-3 text-gray-700 text-lg font-medium hover:bg-orange-500 hover:text-white rounded-md transition w-full text-center"
-                >
-                  {category.category}
-                </Link>
-              ))}
-            </div>
+          </div>
+          <div className="flex flex-col space-y-2">
+            {categories.map((category) => (
+              <Link 
+                key={category.id} 
+                href={`/products?category_id=${category.id}`}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center px-4 py-2 text-gray-700 text-md font-medium hover:bg-orange-500 hover:text-white rounded-md transition"
+              >
+                <Tag size={18} className="mr-2" />
+                {category.category}
+              </Link>
+            ))}
           </div>
         </div>
       )}
 
+      {/* User Menu Dropdown */}
       {userMenuOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-40">
-          <div className="bg-white shadow-lg rounded-lg p-6 w-3/4 max-w-sm">
-            <button
-              onClick={() => setUserMenuOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
-            >
-              ✕
+        <div className="absolute bottom-16 right-4 bg-white shadow-lg rounded-lg p-4 w-56">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-gray-800 font-semibold">Account</span>
+            <button onClick={() => setUserMenuOpen(false)} className="text-gray-500 hover:text-gray-700">
+              <XCircle size={20} />
             </button>
-            <UserMenu user={user} setUser={setUser} onSignIn={() => setShowSignIn(true)} />
           </div>
+          <UserMenu user={user} setUser={setUser} onSignIn={() => setShowSignIn(true)} />
         </div>
       )}
 
