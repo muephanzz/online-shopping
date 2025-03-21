@@ -44,9 +44,9 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                     >
-                        <Menu.Items className="absolute sm:left-4 right-0 mt-2 w-56 bg-white border rounded-md shadow-lg">
+                        <Menu.Items className="absolute right-0 mt-2 w-56 bg-white border rounded-md shadow-lg">
                             <div className="px-4 py-2 bg-gray-100 font-medium">
-                                {user?.user_metadata?.first_name || user?.email || "User"}
+                               Hello, {user?.user_metadata?.first_name || user?.email || "User"}
                             </div>
                             <Menu.Item>
                                 {({ active }) => (
@@ -57,14 +57,14 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                             </Menu.Item>
                             <Menu.Item>
                                 {({ active }) => (
-                                    <Link href="/orders" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
+                                    <Link href="/orders/order-tracking" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
                                         <Package className="inline-block mr-2" /> Order Tracking
                                     </Link>
                                 )}
                             </Menu.Item>
                             <Menu.Item>
                                 {({ active }) => (
-                                    <Link href="/completed-orders" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
+                                    <Link href="/orders/completed-orders" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
                                         <CheckCircle className="inline-block mr-2" /> Completed Orders
                                     </Link>
                                 )}

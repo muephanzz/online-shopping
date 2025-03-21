@@ -211,7 +211,7 @@ export default function ProductDetails() {
   </div>
 
   {activeTab === "specifications" && (
-    <table className="w-full border-collapse border border-gray-300 text-sm md:text-base rounded-lg">
+    <table className="w-full mb-20 border-collapse border border-gray-300 text-sm md:text-base rounded-lg">
       <tbody>
         {product.specification.split("\n").filter(line => line.includes(":"))
           .map((line, index) => {
@@ -228,7 +228,7 @@ export default function ProductDetails() {
 )}
 
   {activeTab === "recommended" && (
-    <div id="recommended" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+    <div id="recommended" className="grid grid-cols-1 mb-20 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
       {recommended.map((product) => (
         <ProductCard key={product.product_id} product={product} />
       ))}
@@ -245,11 +245,11 @@ export default function ProductDetails() {
         <option value="lowest">Lowest Rated</option>
       </select>
       {reviews.length === 0 ? (
-  <p className="text-gray-500">No reviews yet. Be the first to review!</p>
+  <p className="text-gray-500 mb-20">No reviews yet. Be the first to review!</p>
   ) : (
     reviews.map((review) => (
       <div key={review.review_id} className="mb-6 border-b pb-4">
-<div className="flex items-center gap-3">
+    <div className="flex mb-20 items-center gap-3">
           <Image
             src={review.profiles?.avatar_url || "https://www.gravatar.com/avatar/?d=mp"} 
             alt="User Avatar"

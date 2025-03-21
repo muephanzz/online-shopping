@@ -12,56 +12,57 @@ export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [wishlist, setWishlist] = useState([]);
+  const [userId, setUserId] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchCart = async () => {
+    const fetchUserData = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) return console.error("Error fetching session:", error.message);
-    
+
       if (session?.user) {
-        const { data: cartData, error: cartError } = await supabase
-          .from("cart")
-          .select("*")
-          .eq("user_id", session.user.id);
-    
-        if (cartError) return console.error("Error fetching cart:", cartError.message);
-        
-        console.log("Fetched cart data:", cartData); // Debugging line
-    
-        if (!cartData || cartData.length === 0) {
-          console.warn("Cart is empty or not returning data.");
-        }
-        
-        const productIds = cartData.map(item => item.product_id);
-        const { data: productsData, error: productsError } = await supabase
-          .from("products")
-          .select("product_id, stock")
-          .in("product_id", productIds);
-    
-        if (productsError) return console.error("Error fetching products:", productsError.message);
-    
-        const cartWithStock = cartData.map(item => ({
-          ...item,
-          stock: productsData.find(p => p.product_id === item.product_id)?.stock || 0
-        }));
-    
-        setCartItems(cartWithStock);
+        setUserId(session.user.id);
+        fetchCart(session.user.id);
+        fetchWishlist(session.user.id);
       }
+    };
+
+    const fetchCart = async (userId) => {
+      const { data: cartData, error: cartError } = await supabase
+        .from("cart")
+        .select("*")
+        .eq("user_id", userId);
+
+      if (cartError) return console.error("Error fetching cart:", cartError.message);
+      
+      const productIds = cartData.map(item => item.product_id);
+      const { data: productsData, error: productsError } = await supabase
+        .from("products")
+        .select("product_id, stock")
+        .in("product_id", productIds);
+
+      if (productsError) return console.error("Error fetching products:", productsError.message);
+
+      const cartWithStock = cartData.map(item => ({
+        ...item,
+        stock: productsData.find(p => p.product_id === item.product_id)?.stock || 0
+      }));
+
+      setCartItems(cartWithStock);
       setLoading(false);
     };
-       
 
-    const fetchWishlist = async () => {
+    const fetchWishlist = async (userId) => {
       const { data, error } = await supabase
         .from("wishlist")
-        .select("product_id");
+        .select("product_id")
+        .eq("user_id", userId);
+
       if (error) console.error("Error fetching wishlist:", error.message);
       setWishlist(data?.map((item) => item.product_id) || []);
     };
 
-    fetchCart();
-    fetchWishlist();
+    fetchUserData();
   }, []);
 
   const handleRemoveItem = async (cart_id) => {
@@ -106,7 +107,7 @@ export default function Cart() {
     }
 
     const { error } = await supabase.from("wishlist").insert({
-      user_id: item.user_id,
+      user_id: userId,
       product_id: item.product_id,
     });
 
@@ -131,28 +132,6 @@ export default function Cart() {
     );
   }
 
-  if (cartItems.length === 0) {
-    return (
-      <div className="mt-28 text-center">
-        <Image
-          width={500}
-          height={500}
-          unoptimized
-          src="/cart.jpg"
-          alt="Empty Cart"
-          className="mx-auto w-60 mb-4"
-        />
-        <p className="text-lg text-gray-600">Oooops! Your cart is empty.</p>
-        <button
-          onClick={() => router.push("/")}
-          className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          Explore Trending Products
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="mt-28 p-4 max-w-5xl mx-auto bg-white shadow-lg rounded-lg">
       <h1 className="text-3xl font-semibold mb-8 text-gray-800">Your Cart</h1>
@@ -161,7 +140,7 @@ export default function Cart() {
         {cartItems.map((item) => (
           <div
             key={item.cart_id}
-            className="flex flex-col md:flex-row items-center justify-between border-b pb-4"
+            className="flex flex-col md:flex-row items-center justify-between border-b pb-4 gap-4"
           >
             <Image
               width={500}
@@ -172,58 +151,30 @@ export default function Cart() {
               className="w-24 h-24 object-cover rounded-lg"
             />
 
-            <div className="text-left flex-1 px-4">
+            <div className="flex-1 px-4 text-left">
               <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
               <p className="text-blue-600 font-bold">Ksh {(item.price * item.quantity).toFixed(2)}</p>
-              <p className="text-sm text-red-500">In Stock: {item?.stock || 0 }</p>
+              <p className="text-sm text-red-500">In Stock: {item?.stock || 0}</p>
               <div className="flex items-center space-x-4 mt-2">
-                <button
-                  onClick={() => updateQuantity(item.cart_id, item.quantity - 1, item?.stock)}
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                  disabled={item.quantity <= 1}
-                >
-                  -
-                </button>
+                <button onClick={() => updateQuantity(item.cart_id, item.quantity - 1, item?.stock)} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" disabled={item.quantity <= 1}>-</button>
                 <span>{item.quantity}</span>
-                <button
-                  onClick={() => updateQuantity(item.cart_id, item.quantity + 1, item?.stock)}
-                  className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                  disabled={item.quantity >= (item?.stock || 0)}
-                >
-                  +
-                </button>
+                <button onClick={() => updateQuantity(item.cart_id, item.quantity + 1, item?.stock)} className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300" disabled={item.quantity >= (item?.stock || 0)}>+</button>
               </div>
             </div>
 
             <div className="flex space-x-3">
-              <button
-                onClick={() => addToWishlist(item)}
-                className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
-              >
-                <Heart className="w-5 h-5 mr-2" /> Wishlist
-              </button>
-              <button
-                onClick={() => handleRemoveItem(item.cart_id)}
-                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-              > Remove
-              </button>
+              <button onClick={() => addToWishlist(item)} className="flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"><Heart className="w-5 h-5 mr-2" /> Wishlist</button>
+              <button onClick={() => handleRemoveItem(item.cart_id)} className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"> Remove</button>
             </div>
           </div>
         ))}
       </div>
 
-      <Link href="/wishlist">
-        <button className="flex flex-col items-center text-gray-600 hover:text-black">
-          <Heart size={24} />
-          <span className="text-xs mt-1">Wishlist</span>
-        </button>
-      </Link>
-
       <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
 
       <button
         onClick={() => router.push({ pathname: "/orders/checkout", query: { total: subtotal.toFixed(2) } })}
-        className={`mt-6 px-6 py-3 text-white rounded-lg w-full transition ${
+        className={`mt-6 mb-20 px-6 py-3 text-white rounded-lg w-full transition ${
           outOfStockItems ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
         }`}
         disabled={outOfStockItems}
