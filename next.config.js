@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone", // ✅ Moved this to the top level
   eslint: {
     ignoreDuringBuilds: true, // Ignore ESLint errors during build
   },
@@ -8,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true, // Ignore TypeScript errors during build
   },
   images: {
-    domains: ["www.gravatar.com", "znjrafazpveysjguzxri.supabase.co"], // ✅ Correct image domains
+    domains: ["www.gravatar.com", "znjrafazpveysjguzxri.supabase.co"], // Add Supabase storage domain
     remotePatterns: [
       {
         protocol: "https",
