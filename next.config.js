@@ -11,9 +11,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        output: "standalone",
         hostname: "znjrafazpveysjguzxri.supabase.co",
-        pathname: "/storage/v1/object/public/**", // Allow all public storage
-        pathname: "/storage/v1/object/public/avatars/**",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },
