@@ -16,8 +16,9 @@ const UserChat = () => {
   const [message, setMessage] = useState("");
   const [user, setUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState(false);
   const messagesEndRef = useRef(null);
-  const chatRef = useRef(null); // Ref for click outside
+  const chatRef = useRef(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -28,7 +29,6 @@ const UserChat = () => {
     fetchUser();
   }, []);
 
-  // Click outside to close chat box
   useEffect(() => {
     function handleClickOutside(event) {
       if (chatRef.current && !chatRef.current.contains(event.target)) {
@@ -57,7 +57,10 @@ const UserChat = () => {
 
     fetchMessages();
 
-    // Real-time updates
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
     const channel = supabase
       .channel("realtime-messages")
       .on(
@@ -66,6 +69,18 @@ const UserChat = () => {
         (payload) => {
           if (payload.new.user_id === user.id) {
             setMessages((prev) => [...prev, payload.new]);
+
+            if (!isOpen) {
+              new Notification("New Message", {
+                body: payload.new.user_message,
+                icon: "/chat-icon.png",
+              });
+
+              const audio = new Audio("/notification.mp3");
+              audio.play().catch((error) => console.error("Audio error:", error));
+
+              setNewMessage(true);
+            }
           }
         }
       )
@@ -74,21 +89,19 @@ const UserChat = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [user, isOpen]);
 
   const sendMessage = async () => {
     if (!message.trim() || !user) return;
 
-    // Optimistic update (adds the message immediately)
     const newMessage = {
-      id: Math.random(), // Temporary ID
+      id: Math.random(),
       user_id: user.id,
       user_message: message,
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, newMessage]);
 
-    // Save message to Supabase
     const { error } = await supabase
       .from("messages")
       .insert({ user_id: user.id, user_message: message });
@@ -105,14 +118,22 @@ const UserChat = () => {
 
   return (
     <div>
-      {/* Draggable Chat Icon */}
+      {/* Draggable Chat Icon - Preserved Size & Position */}
       <motion.div
         drag
         dragConstraints={{ left: -6, right: 6, top: -6, bottom: 6 }}
         className="fixed bottom-20 right-6 bg-blue-500 text-white p-3 rounded-full cursor-pointer shadow-lg"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen(!isOpen);
+          setNewMessage(false);
+        }}
       >
         <MessageSquare size={28} />
+        {newMessage && (
+          <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+            !
+          </span>
+        )}
       </motion.div>
 
       {/* Chat Box */}
@@ -145,7 +166,6 @@ const UserChat = () => {
                       </div>
                     </div>
                   )}
-
 
                   {msg.admin_reply && (
                     <div className="flex justify-start">
