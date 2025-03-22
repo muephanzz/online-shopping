@@ -4,6 +4,7 @@ import { Menu, X, Home, Tag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
+import Logo from "./Logo";
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -57,13 +58,14 @@ export default function MobileMenu() {
       >
         <button
           onClick={() => setMenuOpen(false)}
-          className="absolute top-4 right-4 hover:text-black hover:bg-white transition-all"
+          className="absolute right-4 hover:text-black hover:bg-white transition-all"
         >
-          <X className="text-black" size={24} />
+        <X className="absolute top-6 right-1 text-black" size={24} />
         </button>
+        <h1 className="absolute top-4 right-24 text-2xl font-bold text-blue-600">Ephantronics</h1>
 
         {/* Scrollable Menu Content */}
-        <nav className="mt-16 p-6 space-y-4 overflow-y-auto max-h-[80vh]">
+        <nav className="mt-12 p-6 space-y-4 overflow-y-auto max-h-[80vh]">
           <Link
             href="/"
             className="flex items-center space-x-3 p-4 text-gray-700 hover:bg-gray-200 transition-all text-lg"
