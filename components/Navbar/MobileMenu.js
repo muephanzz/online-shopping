@@ -62,10 +62,10 @@ export default function MobileMenu() {
         >
         <X className="absolute top-6 right-1 text-black" size={24} />
         </button>
-        <h1 className="absolute top-4 right-24 text-2xl font-bold text-blue-600">Ephantronics</h1>
+        <h1 className="flex items-center space-x-3 p-4 top-4 right-24 text-2xl font-bold text-blue-600">Ephantronics</h1>
 
         {/* Scrollable Menu Content */}
-        <nav className="mt-12 p-6 space-y-4 overflow-y-auto max-h-[80vh]">
+        <nav className="p-6 space-y-4 overflow-y-auto max-h-[80vh]">
           <Link
             href="/"
             className="flex items-center space-x-3 p-4 text-gray-700 hover:bg-gray-200 transition-all text-lg"
