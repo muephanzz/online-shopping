@@ -17,9 +17,7 @@ export default function BottomNav() {
   const [loadingUser, setLoadingUser] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const pathname = usePathname();
-
   const [isAdmin, setIsAdmin] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
       if (user?.user_metadata?.role === "admin") {
@@ -171,7 +169,7 @@ export default function BottomNav() {
 
     {isAdmin && (
       <Link href="/admin" className="block px-4 py-">
-          <ShoppingBasket className="inline-block mr-2" /> Admin Panel
+          Admin Panel
       </Link>
     )}
 
