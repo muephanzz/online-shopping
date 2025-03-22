@@ -1,19 +1,40 @@
 "use client";
 import { useState } from "react";
-import { Menu, X, Home, ShoppingCart, User, LogOut } from "lucide-react";
+import { Menu, X, Home, ShoppingCart, User, Tag } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function MobileMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleMenu = () => setMenuOpen(!menuOpen);
   const closeMenu = () => setMenuOpen(false);
 
+    const router = useRouter();
+    const [categories, setCategories] = useState([]);
+  
+    useEffect(() => {
+      const fetchCategories = async () => {
+        const { data, error } = await supabase.from('categories').select('*');
+        if (error) console.error('Error fetching categories:', error);
+        else setCategories(data);
+      };
+      fetchCategories();
+    }, []);
+
   return (
     <div className="md:hidden">
       {/* Menu Button */}
       <button
         onClick={toggleMenu}
-        className="top-4 text-black p-2 rounded-full hover:bg-gray-200 transition-all duration-300"
+        className="top-4 text-white p-2 rounded-full hover:bg-white hover:text-black transition-all duration-300"
       >
         {menuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -34,9 +55,9 @@ export default function MobileMenu() {
       >
         <button
           onClick={closeMenu}
-          className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
+          className="absolute top-4 right-4 hover:text-black hover:bg-white transition-all"
         >
-          <X size={24} />
+          <X className="text-black" size={24} />
         </button>
 
         <nav className="mt-16 p-6 space-y-4">
@@ -48,32 +69,22 @@ export default function MobileMenu() {
             <Home size={24} />
             <span>Home</span>
           </Link>
-          <Link
-            href="/products"
-            className="flex items-center space-x-3 p-4 text-gray-700 hover:bg-gray-200 transition-all text-lg"
-            onClick={closeMenu}
-          >
-            <ShoppingCart size={24} />
-            <span>Products</span>
-          </Link>
-          <Link
-            href="/account"
-            className="flex items-center space-x-3 p-4 text-gray-700 hover:bg-gray-200 transition-all text-lg"
-            onClick={closeMenu}
-          >
-            <User size={24} />
-            <span>Account</span>
-          </Link>
-          <button
-            className="flex items-center space-x-3 p-4 text-red-600 hover:bg-red-100 transition-all text-lg"
-            onClick={() => {
-              closeMenu();
-              alert("Logging out...");
-            }}
-          >
-            <LogOut size={24} />
-            <span>Logout</span>
-          </button>
+
+          {categories.map((category) => {
+            const isActive = router.query.category_id == category.id;
+            return (
+              <Link
+                key={category.id}
+                href={`/products?category_id=${category.id}`}
+                className={`flex items-center space-x-3 p-4 text-gray-700 hover:bg-gray-200 transition-all text-lg ${
+                  isActive ? "text-blue-600 font-bold border-b-2 border-blue-600" : "text-gray-700"
+                }`}
+              >
+              <Tag size={18} className="mr-3" />
+                {category.category}
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </div>

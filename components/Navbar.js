@@ -49,17 +49,6 @@ export default function Navbar() {
     checkMobile();
   }, []);
 
-  const handleLogOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setUser(null);
-      router.push("/");
-    } catch (error) {
-      console.error("Logout error:", error.message);
-    }
-  };
-
-
   return (
     <nav className="bg-gray-900 shadow-md p-4 fixed w-full top-0 z-50">
       <div className="w-full mx-auto flex justify-between items-center">

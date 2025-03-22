@@ -31,9 +31,9 @@ export default function UserMenu({ user, setUser, onSignIn }) {
         <div className="relative">
             {user ? (
                 <Menu as="div" className="relative inline-block text-left">
-                    <Menu.Button className="flex items-center p-2 rounded-full hover:bg-gray-100 transition">
-                        <User2 className="h-6 w-6 text-gray-700" />
-                        <ChevronDown className="h-4 w-4 text-gray-500 ml-1" />
+                    <Menu.Button className="flex items-center p-2 text-white rounded-full hover:bg-white hover:text-black transition">
+                        <User2 className="h-6 w-6" />
+                        <ChevronDown className="h-4 w-4 ml-1" />
                     </Menu.Button>
                     <Transition
                         as={Fragment}
@@ -44,9 +44,9 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                     >
-                        <Menu.Items className="absolute right-0 mt-2 w-56 bg-white border rounded-md shadow-lg">
-                            <div className="px-4 py-2 bg-gray-100 font-medium">
-                               Hello, {user?.user_metadata?.first_name || user?.email || "User"}
+                        <Menu.Items className="absolute right-0 mt-3 w-56 bg-white border rounded-md shadow-lg">
+                            <div className="px-4 py-2 text-white bg-gray-500 rounded-md font-medium">
+                               Hello, <span className="font-bold text-orange-500">{user.user_metadata?.first_name || user.email || "User"}</span>
                             </div>
                             <Menu.Item>
                                 {({ active }) => (
@@ -64,7 +64,7 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                             </Menu.Item>
                             <Menu.Item>
                                 {({ active }) => (
-                                    <Link href="/orders/completed-orders" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
+                                    <Link href="/orders/completed" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
                                         <CheckCircle className="inline-block mr-2" /> Completed Orders
                                     </Link>
                                 )}
@@ -89,8 +89,8 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                     </Transition>
                 </Menu>
             ) : (
-                <button onClick={onSignIn} className="p-2 rounded-full hover:bg-gray-100 transition">
-                    <LogIn className="h-6 w-6 text-gray-600 hover:text-black" />
+                <button onClick={onSignIn} className="bg-green-600 text-white rounded-md w-16 hover:bg-white hover:text-black transition">
+                   Sign In
                 </button>
             )}
         </div>

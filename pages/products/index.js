@@ -69,13 +69,13 @@ export default function ProductsPage() {
   if (!category_id) return <p>Please select a category.</p>;
 
   return (
-    <div className="p-6 mt-28">
-      <h1 className="text-3xl font-bold mb-6">Products in {categoryName} Category</h1>
+    <div className="p-6 mt-20">
+      <h1 className="sm:text-3xl text-2xl font-bold mb-6">Products in {categoryName} Category</h1>
 
       {products.length === 0 ? (
         <p className="text-gray-600">No products found in this category.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

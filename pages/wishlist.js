@@ -99,9 +99,9 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="mt-28 mb-20 p-6 max-w-5xl mx-auto bg-white shadow-lg rounded-lg">
+    <div className="mt-20 mb-20 p-6 max-w-5xl mx-auto bg-white shadow-lg rounded-lg">
       <h1 className="text-3xl font-semibold mb-6 text-gray-800">Your Wishlist</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="border rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300">
         {wishlist.map((item) => {
           const imageUrl = Array.isArray(item.products.image_urls) && item.products.image_urls.length > 0
             ? item.products.image_urls[0]
@@ -110,11 +110,11 @@ export default function Wishlist() {
           return (
             <div key={item.id} className="bg-gray-100 p-4 rounded-lg shadow-sm">
               <Image
-                width={200}
-                height={200}
+                width={500}
+                height={500}
                 src={imageUrl}
                 alt={item.products.name}
-                className="w-full h-48 object-cover rounded-md"
+                className="w-full h-46 rounded-md"
               />
               <div className="mt-4">
                 <h3 className="text-lg font-medium text-gray-800">{item.products.name}</h3>
