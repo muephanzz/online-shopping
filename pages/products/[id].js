@@ -228,7 +228,7 @@ export default function ProductDetails() {
 )}
 
   {activeTab === "recommended" && (
-    <div id="recommended" className="grid grid-cols-1 mb-20 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+    <div id="recommended" className="relative grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {recommended.map((product) => (
         <ProductCard key={product.product_id} product={product} />
       ))}
