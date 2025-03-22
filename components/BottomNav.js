@@ -3,9 +3,8 @@ import { Home, Heart, Menu, ShoppingCart, User, XCircle, Tag } from "lucide-reac
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import UserMenu from "./Navbar/UserMenu";
-import SignInModal from "./SignInModal";
 import { supabase } from "../lib/supabaseClient";
+import SignInModal from "./SignInModal";
 
 export default function BottomNav() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -15,6 +14,8 @@ export default function BottomNav() {
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const [showSignIn, setShowSignIn] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -23,17 +24,21 @@ export default function BottomNav() {
 
   useEffect(() => {
     const fetchUser = async () => {
+      setLoadingUser(true);
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
+      setLoadingUser(false);
     };
     fetchUser();
   }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
+      setLoadingCategories(true);
       const { data, error } = await supabase.from("categories").select("*");
       if (error) console.error("Error fetching categories:", error);
       else setCategories(data);
+      setLoadingCategories(false);
     };
     fetchCategories();
   }, []);
@@ -89,10 +94,10 @@ export default function BottomNav() {
           onClick={() => {
             if (user) {
               setUserMenuOpen(!userMenuOpen);
-              setShowSignIn(false); // Close sign-in modal if open
+              setShowSignIn(false);
             } else {
               setShowSignIn(true);
-              setUserMenuOpen(false); // Close user menu if open
+              setUserMenuOpen(false);
             }
           }}
           className={`flex flex-col items-center ${userMenuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
@@ -102,48 +107,40 @@ export default function BottomNav() {
         </button>
       </div>
 
-      {/* Categories Dropdown */}
+      {/* Full-screen Categories Menu */}
       {menuOpen && (
-        <div className="absolute bottom-20 left-1/3 transform -translate-x-1/2 bg-white shadow-lg rounded-lg p-4 w-64">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-gray-800 font-semibold">Categories</span>
-            <button onClick={() => setMenuOpen(false)} className="text-gray-500 hover:text-gray-700">
-              <XCircle size={20} />
-            </button>
-          </div>
-          <div className="flex flex-col space-y-2">
-            {categories.map((category) => (
-              <Link 
-                key={category.id} 
-                href={`/products?category_id=${category.id}`}
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center px-4 py-2 text-gray-700 text-md font-medium hover:bg-orange-500 hover:text-white rounded-md transition"
-              >
-                <Tag size={18} className="mr-2" />
-                {category.category}
+        <div className="fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
+          <button onClick={() => setMenuOpen(false)} className="text-gray-500 hover:text-gray-700 mb-4">
+            <XCircle size={24} /> Close
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Categories</h2>
+          {loadingCategories ? (
+            <p>Loading...</p>
+          ) : (
+            categories.map((category) => (
+              <Link key={category.id} href={`/products?category_id=${category.id}`} onClick={() => setMenuOpen(false)} className="block py-2 text-lg">
+                <Tag size={18} className="mr-2" /> {category.category}
               </Link>
-            ))}
-          </div>
+            ))
+          )}
         </div>
       )}
 
-      {/* User Menu (only if logged in) */}
+      {/* Full-screen User Menu */}
       {userMenuOpen && user && (
-        <div className="fixed top-4 right-4 bg-white shadow-xl rounded-lg p-6 w-64 z-50 transition-transform transform animate-slide-in">
-          {/* Header Section */}
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-gray-900 font-semibold text-lg">Account</span>
-            <button onClick={() => setUserMenuOpen(false)} className="text-gray-500 hover:text-gray-700">
-              <XCircle size={24} />
-            </button>
-          </div>
-
-          {/* User Menu Component */}
-          <UserMenu user={user} setUser={setUser} />
+        <div className="fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
+          <button onClick={() => setUserMenuOpen(false)} className="text-gray-500 hover:text-gray-700 mb-4">
+            <XCircle size={24} /> Close
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Hello, {user.user_metadata?.first_name || user.email || "User"}</h2>
+          <Link href="/contacts" className="block py-2 text-lg">Contacts</Link>
+          <Link href="/orders/order-tracking" className="block py-2 text-lg">Order Tracking</Link>
+          <Link href="/orders/completed-orders" className="block py-2 text-lg">Completed Orders</Link>
+          <button onClick={async () => { await supabase.auth.signOut(); setUser(null); setUserMenuOpen(false); }} className="block py-2 text-lg text-red-500">Logout</button>
         </div>
       )}
 
-      {/* Sign-In Modal (only if not logged in) */}
+      {/* Sign-In Modal */}
       {showSignIn && <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />}
     </nav>
   );
