@@ -133,9 +133,9 @@ export default function BottomNav() {
             <XCircle size={24} /> Close
           </button>
           <h2 className="text-xl font-semibold mb-4">Hello, {user.user_metadata?.first_name || user.email || "User"}</h2>
-          <Link href="/contacts" className="block py-2 text-lg">Contacts</Link>
-          <Link href="/orders/order-tracking" className="block py-2 text-lg">Order Tracking</Link>
-          <Link href="/orders/completed-orders" className="block py-2 text-lg">Completed Orders</Link>
+          <Link onClick={() => setMenuOpen(false)} href="/contacts" className="block py-2 text-lg">Contacts</Link>
+          <Link onClick={() => setMenuOpen(false)} href="/orders/order-tracking" className="block py-2 text-lg">Order Tracking</Link>
+          <Link onClick={() => setMenuOpen(false)} href="/orders/completed" className="block py-2 text-lg">Completed Orders</Link>
           <button onClick={async () => { await supabase.auth.signOut(); setUser(null); setUserMenuOpen(false); }} className="block py-2 text-lg text-red-500">Logout</button>
         </div>
       )}
