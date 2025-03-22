@@ -18,6 +18,15 @@ export default function BottomNav() {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const pathname = usePathname();
 
+  const [isAdmin, setIsAdmin] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+      if (user?.user_metadata?.role === "admin") {
+          setIsAdmin(true);
+      }
+  }, [user]);
+
   useEffect(() => {
     setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
   }, []);
@@ -159,6 +168,12 @@ export default function BottomNav() {
     <h2 className="text-2xl font-bold text-gray-800 mb-6">
       Hello, <span className="text-orange-600">{user.user_metadata?.first_name || user.email || "User"}</span>
     </h2>
+
+    {isAdmin && (
+      <Link href="/admin" className="block px-4 py-">
+          <ShoppingBasket className="inline-block mr-2" /> Admin Panel
+      </Link>
+    )}
 
     {/* Menu Items */}
     <nav className="space-y-3">
