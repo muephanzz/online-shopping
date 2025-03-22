@@ -249,7 +249,7 @@ export default function ProductDetails() {
   ) : (
     reviews.map((review) => (
       <div key={review.review_id} className="mb-6 border-b pb-4">
-    <div className="flex mb-20 items-center gap-3">
+    <div className="flex items-center gap-3">
           <Image
             src={review.profiles?.avatar_url || "https://www.gravatar.com/avatar/?d=mp"} 
             alt="User Avatar"
@@ -270,7 +270,7 @@ export default function ProductDetails() {
           </span>
 
       {/* Review Comment */}
-      <p>{review.comment}</p>
+      <p className="mb-20">{review.comment}</p>
       </div>    </div>
   ))
 )}

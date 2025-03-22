@@ -28,7 +28,7 @@ export default function MobileMenu() {
 
       {/* Sidebar Menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-full bg-white shadow-lg transform ${
+        className={`fixed top-0 right-0 h-full w-1/2 bg-white shadow-lg transform ${
           menuOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 z-50 flex flex-col`}
       >
