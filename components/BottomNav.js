@@ -168,13 +168,18 @@ export default function BottomNav() {
     </h2>
 
     {isAdmin && (
-      <Link href="/admin" className="space-y-3 flex items-center py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-md shadow-md hover:bg-orange-500 hover:text-white transition">
+      <Link href="/admin">
+        <button 
+            onClick={() => setUserMenuOpen(false)} 
+            className="flex items-center py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-md shadow-md hover:bg-orange-500 hover:text-white transition"
+          >
+          </button>
           Admin Panel
       </Link>
     )}
 
     {/* Menu Items */}
-    <nav className="space-y-3">
+    <nav className="space-y-3 w-full">
       {[
         { href: "/contacts", label: "Contacts" },
         { href: "/orders/order-tracking", label: "Order Tracking" },
