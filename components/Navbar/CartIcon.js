@@ -3,7 +3,7 @@ import { ShoppingCart } from 'lucide-react';
 
 export default function CartIcon({ cartCount }) {
   return (
-    <div className="relative text-white hover:bg-white hover:text-black rounded-full p-2">
+    <div className="relative text-white hover:bg-white hover:text-black rounded-full">
       <Link href="/cart">
         <ShoppingCart className="flex flex-col items-center" />
       </Link>

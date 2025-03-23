@@ -168,14 +168,10 @@ export default function BottomNav() {
     </h2>
 
     {isAdmin && (
-      <Link href="/admin">
-        <button 
-            onClick={() => setUserMenuOpen(false)} 
-            className="flex items-center py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-md shadow-md hover:bg-orange-500 hover:text-white transition"
-          >
-          </button>
-          Admin Panel
-      </Link>
+      <button className="block w-full text-left py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
+        onClick={() => setUserMenuOpen(false)} >
+        <Link href="/admin">Admin Panel</Link>
+      </button>
     )}
 
     {/* Menu Items */}
@@ -188,7 +184,7 @@ export default function BottomNav() {
         <Link key={href} href={href}>
           <button 
             onClick={() => setUserMenuOpen(false)} 
-            className="flex items-center py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-md shadow-md hover:bg-orange-500 hover:text-white transition"
+            className="block w-full text-left py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
           >
             {label}
           </button>

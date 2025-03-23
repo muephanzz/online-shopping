@@ -48,6 +48,15 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                             <div className="px-4 py-2 text-white bg-gray-500 rounded-md font-medium">
                                Hello, <span className="font-bold text-orange-500">{user.user_metadata?.first_name || user.email || "User"}</span>
                             </div>
+                            {isAdmin && (
+                                <Menu.Item>
+                                    {({ active }) => (
+                                        <Link href="/admin" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
+                                            <ShoppingBasket className="inline-block mr-2" /> Admin Panel
+                                        </Link>
+                                    )}
+                                </Menu.Item>
+                            )}
                             <Menu.Item>
                                 {({ active }) => (
                                     <Link href="/profile" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
@@ -69,15 +78,6 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                                     </Link>
                                 )}
                             </Menu.Item>
-                            {isAdmin && (
-                                <Menu.Item>
-                                    {({ active }) => (
-                                        <Link href="/admin" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
-                                            <ShoppingBasket className="inline-block mr-2" /> Admin Panel
-                                        </Link>
-                                    )}
-                                </Menu.Item>
-                            )}
                             <Menu.Item>
                                 {({ active }) => (
                                     <button onClick={handleLogout} className={`block w-full text-left px-4 py-2 text-red-500 ${active ? "bg-red-50" : ""}`}>
