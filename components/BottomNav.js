@@ -168,7 +168,7 @@ export default function BottomNav() {
     </h2>
 
     {isAdmin && (
-      <Link href="/admin" className="block px-4 py-">
+      <Link href="/admin" className="space-y-3 flex items-center py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-md shadow-md hover:bg-orange-500 hover:text-white transition">
           Admin Panel
       </Link>
     )}
@@ -183,7 +183,7 @@ export default function BottomNav() {
         <Link key={href} href={href}>
           <button 
             onClick={() => setUserMenuOpen(false)} 
-            className="block w-full text-left py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-lg shadow hover:bg-orange-500 hover:text-white transition duration-200"
+            className="flex items-center py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-md shadow-md hover:bg-orange-500 hover:text-white transition"
           >
             {label}
           </button>
