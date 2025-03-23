@@ -151,35 +151,28 @@ const UserChat = () => {
           </div>
 
           <div className="p-3 h-64 overflow-y-auto flex flex-col">
-            {messages.length === 0 ? (
-              <p className="text-gray-500">No messages yet.</p>
-            ) : (
-              messages.map((msg) => (
-                <div key={msg.id} className="mb-2">
-                  {msg.user_message && (
-                    <div className="flex justify-end">
-                      <div className="p-2 bg-gray-200 rounded-lg max-w-xs">
-                        {msg.user_message}
-                        <p className="text-xs text-gray-500 text-right mt-1">
-                          {moment(msg.created_at).format('MMMM Do YYYY, h:mm a')}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {msg.admin_reply && (
-                    <div className="flex justify-start">
-                      <div className="p-2 bg-blue-500 text-white rounded-lg max-w-xs">
-                        {msg.admin_reply}
-                        <p className="text-xs text-white text-left mt-1">
-                          {moment(msg.created_at).format('MMMM Do YYYY, h:mm a')}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))
-            )}
+          {messages.length === 0 ? (
+  <p className="text-gray-500">No messages yet.</p>
+) : (
+  messages
+    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)) // Ensure correct order
+    .map((msg, index) => (
+      <div key={msg.id || index} className="mb-2">
+        <div className={`flex ${msg.admin_reply ? "justify-start" : "justify-end"}`}>
+          <div
+            className={`p-2 rounded-lg max-w-xs ${
+              msg.admin_reply ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
+            }`}
+          >
+            {msg.admin_reply || msg.user_message}
+            <p className={`text-xs mt-1 ${msg.admin_reply ? "text-white" : "text-gray-500"} text-right`}>
+              {moment(msg.created_at).format("MMMM Do YYYY, h:mm a")}
+            </p>
+          </div>
+        </div>
+      </div>
+    ))
+)}
             <div ref={messagesEndRef} />
           </div>
 
