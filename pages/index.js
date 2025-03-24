@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import Image from "next/image";
+import PaymentForm from "../components/PaymentForm";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -87,6 +88,8 @@ export default function Home() {
           </div>
 
           <UserChat />
+
+          <PaymentForm />
 
           <Pagination
             currentPage={currentPage}
