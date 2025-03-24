@@ -84,7 +84,6 @@ export default function ProductDetails() {
             product_id: product.product_id,
             name: product.name,
             price: product.price,
-            color: product.color,
             image_url: mainImage,
             quantity,
             user_id: session.user.id,
