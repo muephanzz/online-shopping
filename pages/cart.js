@@ -87,6 +87,8 @@ export default function Cart() {
 
   const handleRemoveItem = async (cart_id) => {
     const { error } = await supabase.from("cart").delete().eq("cart_id", cart_id);
+    const confirmation = window.confirm("Are you sure you want to remove this product?");
+    if (!confirmation) return;
 
     if (error) {
       toast.error("Failed to remove item.");
@@ -145,58 +147,74 @@ export default function Cart() {
       <h1 className="text-3xl font-semibold mb-8 text-gray-800">Your Cart</h1>
 
       <div className="space-y-6">
-        {cartItems.map((item) => (
-          <div
-            key={item.cart_id}
-            className="flex items-center justify-between border-b pb-4 gap-4"
-          >
-            <input
-              type="checkbox"
-              checked={!!selectedItems[item.cart_id]}
-              onChange={() => toggleSelection(item.cart_id)}
-              className="w-5 h-5"
-            />
+  {cartItems.map((item) => (
+    <div
+      key={item.cart_id}
+      className="flex flex-co sm:flex-row items-center sm:justify-between border-b pb-4 gap-4"
+    >
+      {/* Checkbox */}
+      <input
+        type="checkbox"
+        checked={!!selectedItems[item.cart_id]}
+        onChange={() => toggleSelection(item.cart_id)}
+        className="w-5 h-5"
+      />
 
-            <Image
-              width={500}
-              height={500}
-              unoptimized
-              src={item.image_url}
-              alt={item.name}
-              className="w-24 h-24 object-cover rounded-lg"
-            />
+      {/* Product Image */}
+      <Image
+        width={500}
+        height={500}
+        unoptimized
+        src={item.image_url}
+        alt={item.name}
+        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+      />
 
-            <div className="flex-1 px-4 text-left">
-              <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
-              <p className="text-blue-600 font-bold">Ksh {(item.price * item.quantity).toFixed(2)}</p>
-            </div>
-
-            {/* Quantity Update Buttons */}
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
-                className="px-3 py-1 bg-gray-300 text-gray-700 rounded-lg"
-              >
-                −
-              </button>
-              <span className="px-3 py-1 bg-gray-100 rounded-lg">{item.quantity}</span>
-              <button
-                onClick={() => updateQuantity(item.cart_id, item.quantity + 1)}
-                className="px-3 py-1 bg-gray-300 text-gray-700 rounded-lg"
-              >
-                +
-              </button>
-            </div>
-
-            <button onClick={() => addToWishlist(item)} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-green-700 transition">
-              <Heart />
-            </button>
-            <button onClick={() => handleRemoveItem(item.cart_id)} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-              <Trash2 />
-            </button>
-          </div>
-        ))}
+      {/* Product Info */}
+      <div className="flex-1 px-4 text-center sm:text-left">
+        <h3 className="text-sm sm:text-lg font-medium text-gray-800">{item.name}</h3>
+        <p className="text-blue-600 font-bold text-sm sm:text-base">
+          Ksh {(item.price * item.quantity).toFixed(2)}
+        </p>
       </div>
+
+      {/* Quantity Update Buttons */}
+      <div className=" items-center space-x-2">
+        <button
+          onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
+          className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-300 text-gray-700 rounded-lg"
+        >
+          −
+        </button>
+        <span className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-100 rounded-lg">
+          {item.quantity}
+        </span>
+        <button
+          onClick={() => updateQuantity(item.cart_id, item.quantity + 1)}
+          className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-300 text-gray-700 rounded-lg"
+        >
+          +
+        </button>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex-row space-x-2">
+        <button
+          onClick={() => addToWishlist(item)}
+          className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-500 text-white rounded-lg hover:bg-green-700 transition"
+        >
+          <Heart />
+        </button>
+        <button
+          onClick={() => handleRemoveItem(item.cart_id)}
+          className="px-3 py-1 sm:px-4 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+        >
+          <Trash2 />
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
 
       <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
 
