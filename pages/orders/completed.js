@@ -59,8 +59,13 @@ const CompletedOrders = () => {
               <ul>
                 {order.items && order.items.length > 0 ? (
                   order.items.map((item, index) => (
-                    <li key={index} className="flex justify-between items-center border-b py-2">
-                      <span>{item.name} - ${item.price}</span>
+                    <li key={index} className="flex items-center gap-4 border-b pb-4">
+                    <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
+                    <div className="flex-1">
+                      <h3 className="text-lg font-medium">{item.name}</h3>
+                      <p className="text-gray-700">Quantity: {item.quantity}</p>
+                      <p className="text-blue-600 font-bold">Ksh {item.price.toFixed(2)}</p>
+                    </div>
                       <button
                         onClick={() => router.push(`/upload-review/${item.product_id}`)}
                         className="bg-blue-500 text-white px-3 py-1 rounded text-sm"

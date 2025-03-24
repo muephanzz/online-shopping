@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 export default function OrderTracking() {
   const [orders, setOrders] = useState([]);
@@ -161,8 +162,8 @@ export default function OrderTracking() {
   <div className="mt-6 p-4 border rounded-lg bg-gray-50">
     <h2 className="text-lg font-bold mb-2">Order Details</h2>
     <p><strong>Order Number:</strong> {order.order_id}</p>
-    <p><strong>Status:</strong> {order.status}</p>
-    <p><strong>Total:</strong> ${order.total}</p>
+    <p><strong>Status:</strong> {order.status.toUpperCase()}</p>
+    <p><strong>Total:</strong> Ksh {order.total}</p>
     <p><strong>Shipping Address:</strong> {order.shipping_address}</p>
 
     {/* Items */}
@@ -170,7 +171,14 @@ export default function OrderTracking() {
     <ul>
       {order.items && order.items.length > 0 ? (
         order.items.map((item, index) => (
-          <li key={index} className="border-b py-2">{item.name} - ${item.price}</li>
+          <div key={index} className="flex items-center gap-4 border-b pb-4">
+          <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
+          <div className="flex-1">
+            <h3 className="text-lg font-medium">{item.name || "Name"}</h3>
+            <p className="text-gray-700">Quantity: {item.quantity}</p>
+            <p className="text-blue-600 font-bold">Ksh {item.price || "price"}</p>
+          </div>
+        </div>
         ))
       ) : (
         <li>Unable to load items.</li>

@@ -6,7 +6,6 @@ import Image from "next/image";
 import OrderSummary from "../components/OrderSummary";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Link from "next/link";
 
 export default function Cart() {
   const [cartItems, setCartItems] = useState([]);

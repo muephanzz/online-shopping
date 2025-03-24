@@ -60,11 +60,7 @@ export default function ProductDetails() {
     fetchData();
   }, [id]);
 
-  const handleAddToCart = async () => {
-    if (!product || quantity < 1) return toast.error("Please select a valid quantity.");
-
-    setAdding(true);
-
+  const handleAddToCart = async (item) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return toast.error("Please log in to add items to the cart.");
@@ -76,8 +72,9 @@ export default function ProductDetails() {
         .eq("product_id", product.product_id)
         .single();
 
+
       if (existingCartItem) {
-        await supabase.from("cart").update({ quantity: existingCartItem.quantity + quantity }).eq("cart_id", existingCartItem.cart_id);
+        console.log(existingCartItem)
       } else {
         await supabase.from("cart").insert([
           {
@@ -85,12 +82,11 @@ export default function ProductDetails() {
             name: product.name,
             price: product.price,
             image_url: mainImage,
-            quantity,
             user_id: session.user.id,
           },
         ]);
       }
-
+      
       toast.success("Item added to cart!");
     } catch (err) {
       console.error("Error adding to cart:", err.message);
@@ -100,6 +96,7 @@ export default function ProductDetails() {
       setChecking(false);
     }
   };
+  
 
   if (loading) return <p className="text-center">Loading product...</p>;
   if (!product) return <p className="text-center">Product not found!</p>;
@@ -112,18 +109,18 @@ export default function ProductDetails() {
         </Link>
       </div>
 
-          <div className="flex flex-col lg:flex-row gap-8">
-          
-          <div className="border-b lg:outline pb-2 lg:w-1/2 flex flex-col sm:item-center gap-4">
-            <div className="flex m-4 w-full relative justify-center items-center">
-              <Image 
-                src={mainImage} 
-                width={300} 
-                height={300} 
-                alt={product.name} 
-                className="lg:w-80 md:h-80"
-              />
-            </div>
+      <div className="flex flex-col lg:flex-row gap-8">
+      
+      <div className="border-b lg:outline pb-2 lg:w-1/2 flex flex-col sm:item-center gap-4">
+        <div className="flex m-4 w-full relative justify-center items-center">
+          <Image 
+            src={mainImage} 
+            width={300} 
+            height={300} 
+            alt={product.name} 
+            className="lg:w-80 md:h-80"
+          />
+        </div>
         
       {/* Thumbnails Section */}
         <div className="flex z-40 lg:absolute lg:flex-col sm:px-14 gap-4">
@@ -151,31 +148,47 @@ export default function ProductDetails() {
           </span>
         ))}
       </div>
-
     </div>
 
+    <div className="flex lg:w-1/2 flex-col gap-4">
+      <h1 className="text-2xl font-bold">{product.name}</h1>
+      <p className="text-gray-600">{product.description || "No description available."}</p>
+      <p className="text-xl text-blue-600 font-semibold">Ksh {product.price}</p>
+      <div className="flex gap-4">
+      <button
+        onClick={handleAddToCart}
+        disabled={adding}
+        className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
+      >
+        {adding ? "Adding..." : "Add to Cart"}
+      </button>
 
-        <div className="flex lg:w-1/2 flex-col gap-4">
-          <h1 className="text-2xl font-bold">{product.name}</h1>
-          <p className="text-gray-600">{product.description || "No description available."}</p>
-          <p className="text-xl text-blue-600 font-semibold">Ksh {product.price}</p>
-          <div className="flex gap-4">
-          <button
-            onClick={handleAddToCart}
-            disabled={adding}
-            className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
-          >
-            {adding ? "Adding..." : "Add to Cart"}
-          </button>
-          <button
-            onClick={() => router.push({ pathname: "/orders/checkout", query: { price: product?.price } })}
-            disabled={checking}
-            className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
-          >
-            {checking? "Checking..." : "Buy Now"}
-          </button>
-          </div>
-        </div>
+      <button
+        onClick={() => {
+          if (!product) {
+            toast.error("Product details are missing!");
+            return;
+          }
+
+            const item = {
+              image_url: mainImage,
+              name: product.name,
+              price: product.price,
+              quantity: 1, // Default to 1 or use selected quantity
+            };
+
+            localStorage.setItem("checkoutItems", JSON.stringify([item]));
+
+            router.push("/orders/checkout");
+          }}
+          disabled={checking}
+          className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
+        >
+          {checking ? "Checking..." : "Buy Now"}
+        </button>
+
+      </div>
+    </div>
       </div>
 
   <div className="flex gap-6 mt-8 mb-6 border-b pb-2 text-lg font-semibold">

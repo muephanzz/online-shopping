@@ -222,8 +222,8 @@ const ManageProducts = () => {
         </button>
       </form>
 
-            {/* Product List */}
-            {loading ? (
+      {/* Product List */}
+      {loading ? (
         <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
       ) : (
         <ul className="mt-8 space-y-4">
@@ -237,9 +237,14 @@ const ManageProducts = () => {
                 <p><strong>Specification:</strong> {product.specification}</p>
                 <p><strong>Price:</strong> Ksh {product.price}</p>
                 <p><strong>In Stock:</strong> {product.stock}</p>
-                <div className="flex gap-2 mt-3">
+                <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
                   {product.image_urls.map((url, index) => (
-                    <img key={index} src={url} alt="Product" className="w-24 h-24 object-cover rounded-lg border" />
+                    <img
+                      key={index}
+                      src={url}
+                      alt="Product"
+                      className="w-24 h-24 object-cover rounded-lg border flex-shrink-0"
+                    />
                   ))}
                 </div>
                 <button onClick={() => handleEdit(product)} className="text-white bg-blue-500 px-4 py-2 rounded">Edit</button>

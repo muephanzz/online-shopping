@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import AdminLayout from "../../components/AdminLayout";
 import withAdminAuth from "../../components/withAdminAuth";
+import Image from "next/image";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -41,6 +42,8 @@ const ManageOrders = () => {
   // Delete an order
   const handleDelete = async (order_id) => {
     const { error } = await supabase.from("orders").delete().eq("order_id", order_id);
+    const confirmation = window.confirm("Are you sure you want to delete this product?");
+    if (!confirmation) return;
 
     if (error) alert("Error deleting order: " + error.message);
     else fetchOrders();
@@ -63,10 +66,10 @@ const ManageOrders = () => {
                 <strong>User ID:</strong> {order.user_id}
               </p>
               <p>
-                <strong>Status:</strong> {order.status}
+                <strong>Status:</strong> {order.status.toUpperCase()}
               </p>
               <p>
-                <strong>Total:</strong> ${order.total}
+                <strong>Total:</strong> Ksh {order.total}
               </p>
               <p>
                 <strong>Shipping Address:</strong> {order.shipping_address}
@@ -77,22 +80,29 @@ const ManageOrders = () => {
               <ul>
                 {order.items && order.items.length > 0 ? (
                   order.items.map((item, index) => (
-                    <li key={index} className="flex justify-between items-center border-b py-2">
-                      <span>{item.name} - ${item.price}</span>
+                    <li key={index} className="flex items-center gap-4 border-b pb-4">
+                      <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
+                      <div className="flex-1">
+                        <h3 className="text-lg font-medium">{item.name}</h3>
+                        <p className="text-gray-700">Quantity: {item.quantity}</p>
+                        <p className="text-blue-600 font-bold">Ksh {item.price}</p>
+                      </div>
                     </li>
-                  ))
+                  ))                      
                 ) : (
                   <li>Unable to load items.</li>
                 )}
               </ul>
 
               {/* Status Update Controls */}
-              <div className="mt-4">
+              <div className="mt-4 flex flex-wrap gap-2">
                 {statusSteps.map((status) => (
                   <button
                     key={status}
                     onClick={() => handleStatusUpdate(order.order_id, status)}
-                    className={`p-2 rounded mr-2 ${order.status === status ? 'bg-gray-300' : 'bg-blue-500 text-white'}`}
+                    className={`p-2 rounded text-sm sm:text-base transition duration-300 ease-in-out 
+                      ${order.status === status ? 'bg-gray-300' : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'}
+                    `}
                     disabled={order.status === status}
                   >
                     Mark as {status.charAt(0).toUpperCase() + status.slice(1)}
