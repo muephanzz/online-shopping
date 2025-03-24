@@ -60,7 +60,11 @@ export default function ProductDetails() {
     fetchData();
   }, [id]);
 
-  const handleAddToCart = async (item) => {
+  const handleAddToCart = async () => {
+    if (!product || quantity < 1) return toast.error("Please select a valid quantity.");
+
+    setAdding(true);
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.user) return toast.error("Please log in to add items to the cart.");
@@ -72,9 +76,8 @@ export default function ProductDetails() {
         .eq("product_id", product.product_id)
         .single();
 
-
       if (existingCartItem) {
-        console.log(existingCartItem)
+        await supabase.from("cart").update({ quantity: existingCartItem.quantity + quantity }).eq("cart_id", existingCartItem.cart_id);
       } else {
         await supabase.from("cart").insert([
           {
@@ -82,11 +85,12 @@ export default function ProductDetails() {
             name: product.name,
             price: product.price,
             image_url: mainImage,
+            quantity,
             user_id: session.user.id,
           },
         ]);
       }
-      
+
       toast.success("Item added to cart!");
     } catch (err) {
       console.error("Error adding to cart:", err.message);
@@ -96,7 +100,6 @@ export default function ProductDetails() {
       setChecking(false);
     }
   };
-  
 
   if (loading) return <p className="text-center">Loading product...</p>;
   if (!product) return <p className="text-center">Product not found!</p>;

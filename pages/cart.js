@@ -87,9 +87,8 @@ export default function Cart() {
 
   const handleRemoveItem = async (cart_id) => {
     const { error } = await supabase.from("cart").delete().eq("cart_id", cart_id);
-    const confirmation = window.confirm("Are you sure you want to remove this product?");
+    const confirmation = window.confirm("Are you sure you want to delete this product?");
     if (!confirmation) return;
-
     if (error) {
       toast.error("Failed to remove item.");
     } else {
@@ -179,7 +178,7 @@ export default function Cart() {
       </div>
 
       {/* Quantity Update Buttons */}
-      <div className=" items-center space-x-2">
+      <div className="flex-1 px-4 text-center sm:text-left">
         <button
           onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
           className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-300 text-gray-700 rounded-lg"
@@ -198,8 +197,7 @@ export default function Cart() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex-row space-x-2">
-        <button
+      <div className="flex-1 px-4 text-center sm:text-left">        <button
           onClick={() => addToWishlist(item)}
           className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-500 text-white rounded-lg hover:bg-green-700 transition"
         >
