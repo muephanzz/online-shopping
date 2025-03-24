@@ -127,11 +127,14 @@ export default function Cart() {
     }
   };
 
+const quantity = cartItems
+    .filter((item) => item.quantity, 0);
+
   const subtotal = cartItems
     .filter((item) => selectedItems[item.cart_id])
     .reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const shippingFee = Object.keys(selectedItems).length > 0 ? 119 : 0;
+  const shippingFee = Object.keys(selectedItems).length > 0 ? 0 : 0;
 
   if (loading) {
     return (
@@ -173,9 +176,10 @@ export default function Cart() {
       <div className="flex-1 px-4 text-center sm:text-left">
         <h3 className="text-sm sm:text-lg font-medium text-gray-800">{item.name}</h3>
         <p className="text-blue-600 font-bold text-sm sm:text-base">
-          Ksh {(item.price * item.quantity).toFixed(2)}
+          {item.quantity}*{item.price}
         </p>
-      </div>
+        <h2>Ksh {item.price * item.quantity}</h2>
+     </div>
 
       {/* Quantity Update Buttons */}
       <div className="flex-1 px-4 text-center sm:text-left">
@@ -214,8 +218,8 @@ export default function Cart() {
   ))}
 </div>
 
-      <OrderSummary subtotal={subtotal} shippingFee={shippingFee} />
-
+      
+      <OrderSummary quantity={quantity} subtotal={subtotal} shippingFee={shippingFee} />
       <button
         onClick={() => {
           const selectedProducts = cartItems

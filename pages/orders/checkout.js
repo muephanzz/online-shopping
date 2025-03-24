@@ -18,41 +18,56 @@ export default function Checkout() {
 
     // Calculate total payable amount
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    setAmount(total+119);
+    setAmount(total);
   }, []);
 
   async function handleMpesaPayment(e) {
     e.preventDefault();
     setMessage("Processing payment...");
     setLoading(true);
-
+  
     try {
+      // Ensure user is authenticated
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData?.user) throw new Error("User not authenticated");
+  
+      // Call M-Pesa API
+      const user = supabase.auth.getUser();
+
       const response = await fetch("/api/mpesa", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.session.access_token}`,
+        },
         body: JSON.stringify({ amount, phone }),
       });
-
+      
+  
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "M-Pesa Payment Failed");
-
+  
       setMessage("Payment successful! Saving order...");
+      
+      const userId = userData.user.id; // Correctly fetch authenticated user      
 
-      // Save order details to Supabase
-      const { data: session } = await supabase.auth.getSession();
-      if (!session?.user) throw new Error("User not authenticated");
+        // Insert order into Supabase
+        const { error } = await supabase.from("orders").insert({
+          user_id: session.user.id,  // Use the authenticated user ID
+          total_amount: amount,
+          shipping_address: shippingAddress,
+          status: "pending",
+          items: JSON.stringify(checkoutItems), // Ensure JSONB format
+        });
 
-      const { error } = await supabase.from("orders").insert({
-        user_id: session.user.id,
-        total_amount: amount,
-        shipping_address: shippingAddress,
-        status: "pending",
-        items: checkoutItems,
-      });
-
-      if (error) throw new Error("Failed to save order");
-
+        if (error) {
+          console.error("Supabase Insert Error:", error);
+          throw new Error("Failed to save order: " + error.message);
+        }
+     
       setMessage("Order placed successfully!");
+  
+      // Clear checkout data
       localStorage.removeItem("checkoutItems");
       router.push("/orders/success");
     } catch (error) {
@@ -61,6 +76,7 @@ export default function Checkout() {
       setLoading(false);
     }
   }
+  
 
   return (
     <div className="min-h-screen pb-20 pt-20 flex items-center justify-center bg-gray-100">
