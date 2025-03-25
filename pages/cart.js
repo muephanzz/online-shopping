@@ -127,7 +127,7 @@ export default function Cart() {
     }
   };
 
-const quantity = cartItems
+  const quantity = cartItems
     .filter((item) => item.quantity, 0);
 
   const subtotal = cartItems

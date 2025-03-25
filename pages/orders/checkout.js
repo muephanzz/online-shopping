@@ -76,7 +76,6 @@ export default function Checkout() {
       setLoading(false);
     }
   }
-  
 
   return (
     <div className="min-h-screen pb-20 pt-20 flex items-center justify-center bg-gray-100">
@@ -102,14 +101,16 @@ export default function Checkout() {
             <input type="number" value={amount} readOnly className="w-full px-4 py-2 border rounded-lg" />
           </div>
           <div>
-            <label>Shipping Address</label>
-            <textarea
+
+          <label>Shipping Address</label>
+            <select 
               value={shippingAddress}
               onChange={(e) => setShippingAddress(e.target.value)}
-              required
               className="w-full px-4 py-2 border rounded-lg"
-              placeholder="Enter your delivery address"
-            />
+            >
+              <option>Murang'a University</option>
+              <option>Karatina University</option>
+            </select>
           </div>
           <div>
             <label>Your Phone Number</label>

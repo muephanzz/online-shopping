@@ -11,6 +11,8 @@ const ManageProducts = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
+    phone: "",
+    state: "",
     brand: "",
     description: "",
     specification: "",
@@ -88,7 +90,7 @@ const ManageProducts = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!newProduct.name || !newProduct.brand || !newProduct.stock || !newProduct.price || !newProduct.category_id) {
+    if (!newProduct.name || !newProduct.brand || !newProduct.state || !newProduct.stock || !newProduct.price || !newProduct.category_id) {
       toast.error("Please fill in all fields!");
     }
 
@@ -103,7 +105,9 @@ const ManageProducts = () => {
       if (editingProduct) {
         const { error: updateError } = await supabase.from("products").update({
           name: newProduct.name,
+          phone: newProduct.phone,
           brand: newProduct.brand,
+          state: newProduct.state,
           description: newProduct.description,
           specification: newProduct.specification,
           stock: newProduct.stock,
@@ -118,8 +122,10 @@ const ManageProducts = () => {
       } else {
         const { error: insertError } = await supabase.from("products").insert([
           {
+            phone: newProduct.phone,
             name: newProduct.name,
             brand: newProduct.brand,
+            state: newProduct.state,
             description: newProduct.description,
             specification: newProduct.specification,
             stock: newProduct.stock,
@@ -162,8 +168,10 @@ const ManageProducts = () => {
   const handleEdit = (product) => {
     setEditingProduct(product);
     setNewProduct({
+      phone: product.phone,
       name: product.name,
       brand: product.brand,
+      state: product.state,
       description: product.description,
       specification: product.specification,
       stock: product.stock,
@@ -177,7 +185,7 @@ const ManageProducts = () => {
   };
 
   const resetForm = () => {
-    setNewProduct({ name: "", brand: "", description: "", specification: "", stock: "", price: "", image_urls: [], category_id: "" });
+    setNewProduct({ name: "", brand: "", state: "", phone: "", description: "", specification: "", stock: "", price: "", image_urls: [], category_id: "" });
     setFiles([]);
     setPreviews([]);
     setEditingProduct(null);
@@ -199,11 +207,26 @@ const ManageProducts = () => {
           ))}
         </select>
 
+        <select 
+          name="state"
+          className="border p-2 w-full rounded"
+          onChange={handleChange}
+          value={newProduct.state} 
+          required
+        >
+          <option value="">Select State</option>
+          <option value="Brand New">Brand New</option>
+          <option value="Refurbished">Refurbished</option>
+        </select>
+
+
         <textarea name="description" placeholder="Description" value={newProduct.description} onChange={handleChange} required className="border p-2 w-full rounded" />
 
         <textarea name="specification" placeholder="Specification" value={newProduct.specification} onChange={handleChange} required className="border p-2 w-full rounded" />
 
         <input type="number" name="stock" min={1} placeholder="Stock" value={newProduct.stock} onChange={handleChange} required className="border p-2 w-full rounded" />
+
+        <input type="phone" name="phone" max={10}  placeholder="Seller's Phone Number" value={newProduct.phone} onChange={handleChange} required className="border p-2 w-full rounded" />
 
         <input type="number" name="price" min={1} placeholder="Price" value={newProduct.price} onChange={handleChange} required className="border p-2 w-full rounded" />
 
@@ -232,8 +255,12 @@ const ManageProducts = () => {
           ) : (
             products.map((product) => (
               <li key={product.product_id} className="border p-4 rounded-lg">
-                <h2 className="text-xl font-semibold">{product.name}</h2>
+                <h2 className="text-xl font-semibold"><strong>Product Name:</strong> {product.name}</h2>
                 <p><strong>Brand:</strong> {product.brand}</p>
+                <p><strong>Category:</strong> {product.categories?.category}</p>
+                <p><strong>State:</strong> {product.state}</p>
+                <p><strong>Seller's Phone Numbers:</strong> {product.phone}</p>
+                <p><strong>Description:</strong> {product.description}</p>
                 <p><strong>Specification:</strong> {product.specification}</p>
                 <p><strong>Price:</strong> Ksh {product.price}</p>
                 <p><strong>In Stock:</strong> {product.stock}</p>
@@ -247,7 +274,7 @@ const ManageProducts = () => {
                     />
                   ))}
                 </div>
-                <button onClick={() => handleEdit(product)} className="text-white bg-blue-500 px-4 py-2 rounded">Edit</button>
+                <button onClick={() => handleEdit(product)} className="text-white bg-blue-500 mt-2 px-4 py-2 rounded">Edit</button>
                 <button onClick={() => handleDelete(product.product_id)} className="text-white bg-red-500 px-4 py-2 rounded ml-2">Delete</button>
               </li>
             ))
