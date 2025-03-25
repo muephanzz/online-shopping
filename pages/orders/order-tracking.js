@@ -93,7 +93,7 @@ export default function OrderTracking() {
       toast.error("Order cannot be cancelled after processing.");
     }
   };
-
+  
   return (
     <div className="max-w-3xl mt-20 mx-auto p-6 bg-white shadow-md rounded-lg">
       <h1 className="text-3xl font-bold mb-6 text-center">Order Management</h1>

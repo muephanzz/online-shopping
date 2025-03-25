@@ -1,4 +1,3 @@
-// pages/admin/orders.js
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import AdminLayout from "../../components/AdminLayout";
@@ -8,7 +7,7 @@ import Image from "next/image";
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const orderItems = typeof orders.items === "string" ? JSON.parse(orders.items) : orders.items;
   const statusSteps = ["pending", "paid", "processing", "shipped", "completed", "cancelled"];
 
   useEffect(() => {
@@ -41,21 +40,24 @@ const ManageOrders = () => {
 
   // Delete an order
   const handleDelete = async (order_id) => {
-    const { error } = await supabase.from("orders").delete().eq("order_id", order_id);
-    const confirmation = window.confirm("Are you sure you want to delete this product?");
+    const confirmation = window.confirm("Are you sure you want to delete this order?");
     if (!confirmation) return;
-
+  
+    const { error } = await supabase.from("orders").delete().eq("order_id", order_id);
     if (error) alert("Error deleting order: " + error.message);
     else fetchOrders();
   };
+  
 
   return (
     <AdminLayout>
       <h1 className="text-3xl font-bold mb-6">Manage Orders</h1>
 
       {loading ? (
-        <p>Loading orders...</p>
-      ) : (
+        <div className="flex justify-center items-center">
+          <p className="text-blue-500">Loading orders...</p>
+        </div>
+      ) : ( 
         <ul className="space-y-4">
           {orders.map((order) => (
             <li key={order.order_id} className="border p-4 rounded-lg">
@@ -78,21 +80,21 @@ const ManageOrders = () => {
               {/* Display Order Items */}
               <h3 className="mt-4 font-semibold">Items:</h3>
               <ul>
-                {order.items && order.items.length > 0 ? (
-                  order.items.map((item, index) => (
-                    <li key={index} className="flex items-center gap-4 border-b pb-4">
-                      <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
-                      <div className="flex-1">
-                        <h3 className="text-lg font-medium">{item.name}</h3>
-                        <p className="text-gray-700">Quantity: {item.quantity}</p>
-                        <p className="text-blue-600 font-bold">Ksh {item.price}</p>
-                      </div>
-                    </li>
-                  ))                      
-                ) : (
-                  <li>Unable to load items.</li>
-                )}
-              </ul>
+              {orderItems && orderItems.length > 0 ? (
+                orderItems.map((item, index) => (
+                  <li key={index} className="flex items-center gap-4 border-b pb-4">
+                    <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
+                    <div className="flex-1">
+                      <h3 className="text-lg font-medium">{item.name}</h3>
+                      <p className="text-gray-700">Quantity: {item.quantity}</p>
+                      <p className="text-blue-600 font-bold">Ksh {item.price}</p>
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <li>No items found.</li>
+              )}
+            </ul>
 
               {/* Status Update Controls */}
               <div className="mt-4 flex flex-wrap gap-2">
