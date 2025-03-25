@@ -64,7 +64,7 @@ const CompletedOrders = () => {
                     <div className="flex-1">
                       <h3 className="text-lg font-medium">{item.name}</h3>
                       <p className="text-gray-700">Quantity: {item.quantity}</p>
-                      <p className="text-blue-600 font-bold">Ksh {item.price.toFixed(2)}</p>
+                      <p className="text-blue-600 font-bold">Ksh {item.price}</p>
                     </div>
                       <button
                         onClick={() => router.push(`/upload-review/${item.product_id}`)}

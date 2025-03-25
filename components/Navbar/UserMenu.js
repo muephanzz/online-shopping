@@ -9,6 +9,36 @@ import { User2, LogOut, ShoppingBasket, ChevronDown, LogIn, Package, User, Check
 export default function UserMenu({ user, setUser, onSignIn }) {
     const [isAdmin, setIsAdmin] = useState(false);
     const router = useRouter();
+    const [profile, setProfile] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    setLoading(true);
+
+    // Fetch current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      console.error("Error fetching user or user not logged in:", userError);
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (error) console.error("Error fetching profile:", error);
+    else setProfile(data || {});
+
+    setLoading(false);
+  };
 
     useEffect(() => {
         if (user?.user_metadata?.role === "admin") {
@@ -43,11 +73,13 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                         leave="transition ease-in duration-75"
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
-                    >
+                    > 
                         <Menu.Items className="absolute right-0 mt-3 w-56 bg-white border rounded-md shadow-lg">
+                        {profile && (
                             <div className="px-4 py-2 text-white bg-gray-500 rounded-md font-medium">
-                               Hello, <span className="font-bold text-orange-500">{user.user_metadata?.first_name || user.email || "User"}</span>
+                               Hello, <span className="font-bold text-orange-500">{profile.first_name}</span>
                             </div>
+                            )}
                             {isAdmin && (
                                 <Menu.Item>
                                     {({ active }) => (

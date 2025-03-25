@@ -9,7 +9,7 @@ export async function middleware(req) {
 
   // Redirect if not signed in
   if (!user) {
-    return NextResponse.redirect(new URL('/auth/signin', req.url));
+    return NextResponse.redirect(new URL('/', req.url));
   }
 
   // Redirect if not an admin
