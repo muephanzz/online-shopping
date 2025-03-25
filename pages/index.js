@@ -80,7 +80,7 @@ export default function Home() {
         <p className="text-center">Loading...</p>
       ) : (
         <>
-          <div className="relative mt-28 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="relative p-2 mt-28 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products.map((product) => (
               <ProductCard key={product.product_id} product={product} />
             ))}

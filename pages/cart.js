@@ -201,7 +201,8 @@ export default function Cart() {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex-1 px-4 text-center sm:text-left">        <button
+      <div className="flex-1 px-4 text-center sm:text-left">        
+        <button
           onClick={() => addToWishlist(item)}
           className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-500 text-white rounded-lg hover:bg-green-700 transition"
         >
