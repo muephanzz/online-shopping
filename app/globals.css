@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --font-inter: "Inter", sans-serif;
+  --font-mono: "Roboto Mono", monospace;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+  

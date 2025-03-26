@@ -1,6 +1,7 @@
+"use client";
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { Loader2, Trash2, Heart } from "lucide-react";
 import Image from "next/image";
 import OrderSummary from "../components/OrderSummary";

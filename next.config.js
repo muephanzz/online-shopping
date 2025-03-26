@@ -7,8 +7,17 @@ const nextConfig = {
     ignoreBuildErrors: true, // Ignore TypeScript errors during build
   },
   images: {
-    domains: ["www.gravatar.com", "znjrafazpveysjguzxri.supabase.co"],
-  },  
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "www.gravatar.com",
+      },
+      {
+        protocol: "https",
+        hostname: "znjrafazpveysjguzxri.supabase.co",
+      },
+    ],
+  },
   env: {
     MPESA_CONSUMER_KEY: process.env.MPESA_CONSUMER_KEY,
     MPESA_CONSUMER_SECRET: process.env.MPESA_CONSUMER_SECRET,

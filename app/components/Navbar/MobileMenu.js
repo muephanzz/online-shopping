@@ -4,7 +4,7 @@ import { Menu, X, Home, Tag } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/router';
 import { createClient } from '@supabase/supabase-js';
-import Logo from "./Logo";
+
 
 // Initialize Supabase client
 const supabase = createClient(

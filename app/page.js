@@ -1,9 +1,10 @@
+"use client";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
-import ProductCard from "../components/ProductCard";
-import Pagination from "../components/Pagination";
-import Footer from "../components/Footer";
-import UserChat from '../components/UserChat';
+import { supabase } from "./lib/supabaseClient";
+import ProductCard from "./components/ProductCard";
+import Pagination from "./components/Pagination";
+import Footer from "./components/Footer";
+import UserChat from './components/UserChat';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -68,6 +69,7 @@ export default function Home() {
                 src={image}
                 alt={`Slide ${index + 1}`}
                 layout="fill"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"                 
                 objectFit="cover"
                 priority
               />

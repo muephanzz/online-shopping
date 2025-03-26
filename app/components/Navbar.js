@@ -1,6 +1,6 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
 import { supabase } from "../lib/supabaseClient";
 import SignInModal from "./SignInModal";
 import Logo from "./Navbar/Logo";
@@ -16,7 +16,6 @@ export default function Navbar() {
   const [cartCount, setCartCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
-  const router = useRouter();
 
   // Fetch authenticated user
   useEffect(() => {
