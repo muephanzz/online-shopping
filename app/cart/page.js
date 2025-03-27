@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Heart } from "lucide-react";
+import { Loader2, Trash2, Heart, LucideLoaderPinwheel, LoaderCircleIcon } from "lucide-react";
 import Image from "next/image";
 import OrderSummary from "../components/OrderSummary";
 import { toast } from "react-toastify";
@@ -88,7 +88,7 @@ export default function Cart() {
 
   const handleRemoveItem = async (cart_id) => {
     const { error } = await supabase.from("cart").delete().eq("cart_id", cart_id);
-    const confirmation = window.confirm("Are you sure you want to delete this product?");
+    const confirmation = window.confirm("Are you sure you want to remove this product?");
     if (!confirmation) return;
     if (error) {
       toast.error("Failed to remove item.");

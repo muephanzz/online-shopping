@@ -7,15 +7,10 @@ const nextConfig = {
     ignoreBuildErrors: true, // Ignore TypeScript errors during build
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "www.gravatar.com",
-      },
-      {
-        protocol: "https",
-        hostname: "znjrafazpveysjguzxri.supabase.co",
-      },
+    domains: [
+      "example.com", // Add the domain where your product images are hosted
+      "znjrafazpveysjguzxri.supabase.co", // Supabase storage
+      "www.gravatar.com", // Gravatar images
     ],
   },
   env: {

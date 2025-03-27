@@ -2,13 +2,12 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabaseClient";
 import ProductCard from "./components/ProductCard";
+import { Loader2 } from "lucide-react";
 import Pagination from "./components/Pagination";
 import Footer from "./components/Footer";
 import UserChat from './components/UserChat';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
-import Image from "next/image";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -16,23 +15,6 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
   const [totalPages, setTotalPages] = useState(1);
-
-  // Local slideshow images stored in the public folder
-  const slides = [
-    "/home1.webp",
-    "/home2.webp",
-  ];
-
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 4000,
-    arrows: false,
-  };
 
   useEffect(() => {
     async function fetchProducts() {
@@ -60,26 +42,10 @@ export default function Home() {
 
   return (
     <div className="pb-2 mt-20">  
-      {/* Slideshow */}
-      <div className="hidden">
-        <Slider {...sliderSettings}>
-          {slides.map((image, index) => (
-            <div key={index} className="relative w-full h-[15px] md:h-[200px]">
-              <Image
-                src={image}
-                alt={`Slide ${index + 1}`}
-                layout="fill"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"                 
-                objectFit="cover"
-                priority
-              />
-            </div>
-          ))}
-        </Slider>
-      </div>
-
       {loading ? (
-        <p className="text-center">Loading...</p>
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+      </div>
       ) : (
         <>
           <div className="relative p-2 mt-28 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

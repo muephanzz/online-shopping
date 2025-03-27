@@ -1,6 +1,7 @@
+"use client";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
-import { useRouter } from "next/router";
+import { supabase } from "../../lib/supabaseClient";
+import { useRouter } from "next/navigation"; // ✅ Correct import for App Router
 import toast from "react-hot-toast";
 
 const EditProfile = () => {
@@ -19,7 +20,10 @@ const EditProfile = () => {
 
   const fetchProfile = async () => {
     setLoading(true);
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
     if (userError || !user) {
       console.error("Error fetching user:", userError);
@@ -79,7 +83,7 @@ const EditProfile = () => {
       console.error("Error updating profile:", error);
     } else {
       toast.success("Profile updated successfully!");
-      router.push("/profile");
+      router.push("/profile/see-profile"); // ✅ Redirects correctly in App Router
     }
 
     setLoading(false);

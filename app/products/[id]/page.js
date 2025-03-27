@@ -1,15 +1,16 @@
+"use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import ProductCard from "../../components/ProductCard";
-import moment from 'moment';
+import moment from "moment";
 
 export default function ProductDetails() {
+  const { id } = useParams(); // ✅ Use useParams() instead of useRouter()
   const router = useRouter();
-  const { id } = router.query;
 
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -28,6 +29,10 @@ export default function ProductDetails() {
   }, []);
 
   useEffect(() => {
+    setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+  }, []);
+
+  useEffect(() => {
     if (!id) return;
 
     const fetchData = async () => {
@@ -36,7 +41,7 @@ export default function ProductDetails() {
         const [{ data: productData, error: productError }, { data: reviewsData, error: reviewsError }, { data: recommendedData, error: recommendedError }] = await Promise.all([
           supabase.from("products").select("*").eq("product_id", id).single(),
           supabase.from("reviews").select("review_id, rating, comment, media_urls, created_at, username, user_id, profiles(avatar_url)").eq("product_id", id),
-          supabase.from("products").select("*").neq("product_id", id).limit(4) // Fetch recommended products excluding current
+          supabase.from("products").select("*").neq("product_id", id).limit(4),
         ]);
 
         if (productError) throw productError;
@@ -194,36 +199,11 @@ export default function ProductDetails() {
     </div>
       </div>
 
-  <div className="flex gap-6 mt-8 mb-6 border-b pb-2 text-lg font-semibold">
-  <p
-  onClick={() => setActiveTab("specifications")}
-  className={`cursor-pointer transition duration-300 ${
-    activeTab === "specifications"
-      ? "text-orange-600 border-b-2 border-orange-600"
-      : "text-gray-600 hover:text-orange-500"
-  }`}
->
-  Specifications
-  </p> 
-
-    <p
-      onClick={() => setActiveTab("recommended")}
-      className={`cursor-pointer transition duration-300 ${
-        activeTab === "recommended" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"
-      }`}
-    >
-      Recommended
-    </p>
-
-    <p
-      onClick={() => setActiveTab("reviews")}
-      className={`cursor-pointer transition duration-300 ${
-        activeTab === "reviews" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"
-      }`}
-    >
-      Reviews
-    </p>
-  </div>
+    <div className="flex gap-6 mt-8 mb-6 border-b pb-2 text-lg font-semibold">
+      <p onClick={() => setActiveTab("specifications")} className={`cursor-pointer transition duration-300 ${activeTab === "specifications" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Specifications</p>
+      <p onClick={() => setActiveTab("recommended")} className={`cursor-pointer transition duration-300 ${activeTab === "recommended" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Recommended</p>
+      <p onClick={() => setActiveTab("reviews")} className={`cursor-pointer transition duration-300 ${activeTab === "reviews" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Reviews</p>
+    </div>
 
   {activeTab === "specifications" && (
     <table className="w-full mb-20 border-collapse border border-gray-300 text-sm md:text-base rounded-lg">

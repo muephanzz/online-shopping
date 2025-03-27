@@ -10,7 +10,7 @@ export default function ProductCard({ product }) {
       <div className="border relative rounded-lg shadow-md p-2 sm:p-4 hover:shadow-lg transition duration-300">
           <h4 className="absolute top-0 left-0 bg-gray-500 text-white rounded px-2">{product.state}</h4>
           {product.price <= 200 && (
-            <h4 className="absolute left-0 top-5 text-red-600 font-bold animate-shake">
+            <h4 className="absolute left-0 top-5 text-red-600 font-bold animate-pulse">
               {discount}% discount
             </h4>
           )}

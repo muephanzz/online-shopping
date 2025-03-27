@@ -1,7 +1,9 @@
+"use client";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
-import { useRouter } from "next/router";
+import { supabase } from "../../lib/supabaseClient";
+import { useRouter } from "next/navigation"; // ✅ Correct import for App Router
 import Link from "next/link";
+
 const Profiles = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,7 +17,10 @@ const Profiles = () => {
     setLoading(true);
 
     // Fetch current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
     if (userError || !user) {
       console.error("Error fetching user or user not logged in:", userError);
@@ -36,7 +41,7 @@ const Profiles = () => {
   };
 
   const handleEditProfile = () => {
-    router.push("/edit-profile"); // Redirect to profile edit page
+    router.push("/profile/edit-profile"); // Redirect to profile edit page
   };
 
   return (
@@ -51,8 +56,12 @@ const Profiles = () => {
               height={100}
               className="rounded-full border-4 border-gray-300 mx-auto"
             />
-            <h2 className="text-2xl font-semibold mt-4">{profile.first_name || "First Name"}</h2>
-            <h2 className="text-2xl font-semibold mt-2">{profile.last_name || "Last Name"}</h2>
+            <h2 className="text-2xl font-semibold mt-4">
+              {profile.first_name || "First Name"}
+            </h2>
+            <h2 className="text-2xl font-semibold mt-2">
+              {profile.last_name || "Last Name"}
+            </h2>
             <p className="text-gray-500">{profile.email || "Email"}</p>
 
             <div className="mt-6">
@@ -62,10 +71,8 @@ const Profiles = () => {
               >
                 Edit Profile
               </button>
-              <Link href="/">
-                <button
-                  className="px-4 ml-10 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
-                >
+              <Link href="/" className="ml-4">
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
                   Back to Products
                 </button>
               </Link>

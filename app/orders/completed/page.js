@@ -1,6 +1,8 @@
+"use client";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation"; // ✅ Correct import for App Router
+import Image from "next/image";
 
 const CompletedOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -15,7 +17,10 @@ const CompletedOrders = () => {
     setLoading(true);
 
     // Fetch current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
     if (userError || !user) {
       console.error("Error fetching user or user not logged in:", userError);
@@ -43,31 +48,46 @@ const CompletedOrders = () => {
 
       {loading && <p>Loading your completed orders...</p>}
 
-      {!loading && orders.length === 0 && (
-        <p>No completed orders found.</p>
-      )}
+      {!loading && orders.length === 0 && <p>No completed orders found.</p>}
 
       {!loading && orders.length > 0 && (
         <ul className="space-y-6">
           {orders.map((order) => (
             <li key={order.order_id} className="border p-4 rounded-lg">
-              <p><strong>Order Number:</strong> {order.order_id}</p>
-              <p><strong>Status:</strong> {order.status}</p>
-              <p><strong>Total:</strong> ${order.total}</p>
+              <p>
+                <strong>Order Number:</strong> {order.order_id}
+              </p>
+              <p>
+                <strong>Status:</strong> {order.status}
+              </p>
+              <p>
+                <strong>Total:</strong> ${order.total}
+              </p>
 
               <h3 className="mt-4 font-semibold">Items:</h3>
               <ul>
                 {order.items && order.items.length > 0 ? (
                   order.items.map((item, index) => (
-                    <li key={index} className="flex items-center gap-4 border-b pb-4">
-                    <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
-                    <div className="flex-1">
-                      <h3 className="text-lg font-medium">{item.name}</h3>
-                      <p className="text-gray-700">Quantity: {item.quantity}</p>
-                      <p className="text-blue-600 font-bold">Ksh {item.price}</p>
-                    </div>
+                    <li
+                      key={index}
+                      className="flex items-center gap-4 border-b pb-4"
+                    >
+                      <Image
+                        src={item.image_url}
+                        width={80}
+                        height={80}
+                        className="rounded-lg"
+                        alt={item.name}
+                      />
+                      <div className="flex-1">
+                        <h3 className="text-lg font-medium">{item.name}</h3>
+                        <p className="text-gray-700">Quantity: {item.quantity}</p>
+                        <p className="text-blue-600 font-bold">Ksh {item.price}</p>
+                      </div>
                       <button
-                        onClick={() => router.push(`/upload-review/${item.product_id}`)}
+                        onClick={() =>
+                          router.push(`/upload-review/${item.product_id}`)
+                        }
                         className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
                       >
                         Write a Review
@@ -79,7 +99,9 @@ const CompletedOrders = () => {
                 )}
               </ul>
 
-              <p><strong>Shipping Address:</strong> {order.shipping_address}</p>
+              <p>
+                <strong>Shipping Address:</strong> {order.shipping_address}
+              </p>
             </li>
           ))}
         </ul>

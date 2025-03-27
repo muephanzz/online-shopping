@@ -92,7 +92,7 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                             )}
                             <Menu.Item>
                                 {({ active }) => (
-                                    <Link href="/profile" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
+                                    <Link href="/profile/see-profile" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
                                         <User className="inline-block mr-2" /> Profile
                                     </Link>
                                 )}
