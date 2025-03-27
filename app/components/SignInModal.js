@@ -1,7 +1,7 @@
-"use client"; // Ensures compatibility with App Router
+"use client";
 
 import { useState, useRef, useEffect } from 'react';
-import { Eye, EyeOff, Menu, X } from 'lucide-react';
+import { Eye, EyeOff, X } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { supabase } from '../lib/supabaseClient';
 import { useRouter } from 'next/navigation';

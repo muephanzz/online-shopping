@@ -114,100 +114,100 @@ export default function BottomNav() {
         </button>
       </div>
 
-{/* Full-screen Categories Menu */}
-{menuOpen && (
-  <div className="fixed inset-0 bg-gray-100 z-50 p-6 overflow-y-auto">
-    {/* Close Button */}
-    <button
-      onClick={() => setMenuOpen(false)}
-      className="absolute right-4 flex items-center text-gray-500 hover:text-gray-700 mb-4"
-    >
-      <XCircle size={24} className="mr-2" /> <span className="text-lg font-medium">Close</span>
-    </button>
+    {/* Full-screen Categories Menu */}
+    {menuOpen && (
+      <div className="fixed inset-0 bg-gray-100 z-50 p-6 overflow-y-auto">
+        {/* Close Button */}
+        <button
+          onClick={() => setMenuOpen(false)}
+          className="absolute right-4 flex items-center text-gray-500 hover:text-gray-700 mb-4"
+        >
+          <XCircle size={24} className="mr-2" /> <span className="text-lg font-medium">Close</span>
+        </button>
 
-    {/* Title */}
-    <h2 className="text-2xl font-bold text-gray-800 mb-6">Categories</h2>
+        {/* Title */}
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Categories</h2>
 
-    {/* Loading Effect */}
-    {loadingCategories ? (
-      <div className="flex justify-center items-center">
-        <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    ) : (
-      <div className="space-y-3">
-        {categories.map((category) => (
-          <Link
-            key={category.id}
-            href={`/products?category_id=${category.id}`}
-            onClick={() => setMenuOpen(false)}
-            className="flex items-center py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-md shadow-md hover:bg-orange-500 hover:text-white transition"
-          >
-            <Tag size={18} className="mr-3" />
-            {category.category}
-          </Link>
-        ))}
+        {/* Loading Effect */}
+        {loadingCategories ? (
+          <div className="flex justify-center items-center">
+            <div className="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/products?category_id=${category.id}`}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-md shadow-md hover:bg-orange-500 hover:text-white transition"
+              >
+                <Tag size={18} className="mr-3" />
+                {category.category}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     )}
-  </div>
-)}
 
 
-{userMenuOpen && user && (
-  <div className="fixed inset-0 bg-gray-100 z-50 p-6 overflow-y-auto animate-fadeIn">
-    {/* Close Button */}
-    <button 
-      onClick={() => setUserMenuOpen(false)} 
-      className="absolute right-4 flex items-center text-gray-500 hover:text-gray-700 mb-6 transition"
-    >
-      <XCircle size={24} className="mr-2" /> <span className="text-lg font-medium">Close</span>
-    </button>
+    {userMenuOpen && user && (
+      <div className="fixed inset-0 bg-gray-100 z-50 p-6 overflow-y-auto animate-fadeIn">
+        {/* Close Button */}
+        <button 
+          onClick={() => setUserMenuOpen(false)} 
+          className="absolute right-4 flex items-center text-gray-500 hover:text-gray-700 mb-6 transition"
+        >
+          <XCircle size={24} className="mr-2" /> <span className="text-lg font-medium">Close</span>
+        </button>
 
-    {/* Greeting */}
-    <h2 className="text-2xl font-bold text-gray-800 mb-6">
-      Hello, <span className="text-orange-600">{user.user_metadata?.first_name || user.email || "User"}</span>
-    </h2>
+        {/* Greeting */}
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+          Hello, <span className="text-orange-600">{user.user_metadata?.first_name || user.email || "User"}</span>
+        </h2>
 
-    {isAdmin && (
-      <button className="block w-full text-left py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
-        onClick={() => setUserMenuOpen(false)} >
-        <Link href="/admin">Admin Panel</Link>
-      </button>
-    )}
-
-    {/* Menu Items */}
-    <nav className="space-y-3 w-full">
-      {[
-        { href: "/contacts", label: "Contacts" },
-        { href: "/orders/order-tracking", label: "Order Tracking" },
-        { href: "/orders/completed", label: "Completed Orders" },
-      ].map(({ href, label }) => (
-        <Link key={href} href={href}>
-          <button 
-            onClick={() => setUserMenuOpen(false)} 
-            className="block w-full text-left py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
-          >
-            {label}
+        {isAdmin && (
+          <button className="block w-full text-left py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
+            onClick={() => setUserMenuOpen(false)} >
+            <Link href="/admin">Admin Panel</Link>
           </button>
-        </Link>
-      ))}
+        )}
 
-      {/* Logout Button */}
-      <button
-        onClick={async () => {
-          await supabase.auth.signOut();
-          setUser(null);
-          setUserMenuOpen(false);
-        }}
-        className="block w-full text-center text-left py-3 px-4 bg-red-500 text-white text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
-      >
-        Logout
-      </button>
-    </nav>
-  </div>
-)}
+        {/* Menu Items */}
+        <nav className="space-y-3 w-full">
+          {[
+            { href: "/contacts", label: "Contacts" },
+            { href: "/orders/order-tracking", label: "Order Tracking" },
+            { href: "/orders/completed", label: "Completed Orders" },
+          ].map(({ href, label }) => (
+            <Link key={href} href={href}>
+              <button 
+                onClick={() => setUserMenuOpen(false)} 
+                className="block w-full text-left py-3 px-4 bg-white text-gray-700 text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
+              >
+                {label}
+              </button>
+            </Link>
+          ))}
 
-      {/* Sign-In Modal */}
-      {showSignIn && <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />}
-    </nav>
-  );
-}
+          {/* Logout Button */}
+          <button
+            onClick={async () => {
+              await supabase.auth.signOut();
+              setUser(null);
+              setUserMenuOpen(false);
+            }}
+            className="block w-full text-center text-left py-3 px-4 bg-red-500 text-white text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
+          >
+            Logout
+          </button>
+        </nav>
+      </div>
+    )}
+
+          {/* Sign-In Modal */}
+          {showSignIn && <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />}
+        </nav>
+      );
+    }

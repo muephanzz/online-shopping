@@ -1,6 +1,6 @@
 import { Inter, Roboto_Mono } from "next/font/google";
 import ClientWrapper from "./components/ClientWrapper";
-import "./globals.css";
+import "./styles/globals.css";
 
 const inter = Inter({
   subsets: ["latin"],

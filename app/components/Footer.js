@@ -1,24 +1,10 @@
-"use client";
 import Link from 'next/link';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { FaCcVisa, FaCcMastercard, FaPaypal } from 'react-icons/fa';
-import { useEffect, useState } from "react";
 
 export default function Footer() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    // Detect mobile devices (Android, iPhone, iPad, iPod)
-    const checkMobile = () => {
-      setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
-    };
-    checkMobile();
-  }, []);
-
-  if (isMobile) return null;
-
   return (
-    <footer className="bg-gray-900 text-white p-8 mt-12">
+    <footer className="bg-gray-900 text-white p-8 mt-12 mb-20 sm:mb-0">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
 
         {/* About Section */}
