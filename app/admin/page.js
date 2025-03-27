@@ -1,3 +1,4 @@
+"use client";
 import withAdminAuth from "../components/withAdminAuth";
 import AdminLayout from "../components/AdminLayout";
 import Link from "next/link";
