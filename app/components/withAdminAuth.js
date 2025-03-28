@@ -22,7 +22,7 @@ const withAdminAuth = (WrappedComponent) => {
         if (user.user_metadata?.role === 'admin') {
           setIsAdmin(true);
         } else {
-          router.push('/access-denied');
+          router.push('/admin/access-denied');
         }
 
         setLoading(false);

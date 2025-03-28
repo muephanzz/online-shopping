@@ -1,7 +1,4 @@
 import axios from "axios";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const { MPESA_CONSUMER_KEY, MPESA_CONSUMER_SECRET } = process.env;
 

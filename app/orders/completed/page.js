@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
-import { useRouter } from "next/navigation"; // ✅ Correct import for App Router
-import Image from "next/image";
+import { useRouter } from "next/navigation";
+import Items from "../../components/ProductCard";
 
 const CompletedOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -68,22 +68,8 @@ const CompletedOrders = () => {
               <ul>
                 {order.items && order.items.length > 0 ? (
                   order.items.map((item, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center gap-4 border-b pb-4"
-                    >
-                      <Image
-                        src={item.image_url}
-                        width={80}
-                        height={80}
-                        className="rounded-lg"
-                        alt={item.name}
-                      />
-                      <div className="flex-1">
-                        <h3 className="text-lg font-medium">{item.name}</h3>
-                        <p className="text-gray-700">Quantity: {item.quantity}</p>
-                        <p className="text-blue-600 font-bold">Ksh {item.price}</p>
-                      </div>
+                    <li>
+                      <Items item={item} key={index} />
                       <button
                         onClick={() =>
                           router.push(`/upload-review/${item.product_id}`)

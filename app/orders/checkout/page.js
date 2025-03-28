@@ -32,45 +32,25 @@ export default function Checkout() {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData?.user) throw new Error("User not authenticated");
   
-      // Call M-Pesa API
-      const user = supabase.auth.getUser();
-
+      const user = userData.user;
+  
+      // Call M-Pesa API with user data
       const response = await fetch("/api/mpesa", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.session.access_token}`,
-        },
-        body: JSON.stringify({ amount, phone }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount,
+          phone,
+          user_id: user.id,
+          checkoutItems,
+          shipping_address: shippingAddress,
+        }),
       });
-      
   
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "M-Pesa Payment Failed");
   
-      setMessage("Payment successful! Saving order...");
-      
-      const userId = userData.user.id; // Correctly fetch authenticated user      
-
-        // Insert order into Supabase
-        const { error } = await supabase.from("orders").insert({
-          user_id: session.user.id,  // Use the authenticated user ID
-          total_amount: amount,
-          shipping_address: shippingAddress,
-          status: "pending",
-          items: JSON.stringify(checkoutItems), // Ensure JSONB format
-        });
-
-        if (error) {
-          console.error("Supabase Insert Error:", error);
-          throw new Error("Failed to save order: " + error.message);
-        }
-     
-      setMessage("Order placed successfully!");
-  
-      // Clear checkout data
-      localStorage.removeItem("checkoutItems");
-      router.push("/orders/success");
+      setMessage("Payment request sent. Check your phone to complete the payment.");
     } catch (error) {
       setMessage("Error: " + error.message);
     } finally {
@@ -102,8 +82,7 @@ export default function Checkout() {
             <input type="number" value={amount} readOnly className="w-full px-4 py-2 border rounded-lg" />
           </div>
           <div>
-
-          <label>Shipping Address</label>
+            <label>Shipping Address</label>
             <select 
               value={shippingAddress}
               onChange={(e) => setShippingAddress(e.target.value)}

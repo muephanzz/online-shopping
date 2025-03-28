@@ -20,7 +20,7 @@ export async function middleware(req) {
     .single();
 
   if (error || !data?.is_admin) {
-    return NextResponse.redirect(new URL('/', req.url));
+    return NextResponse.redirect(new URL('/admin/access-denied', req.url));
   }
 
   return res;

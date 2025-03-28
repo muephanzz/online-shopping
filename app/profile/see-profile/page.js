@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
-import { useRouter } from "next/navigation"; // ✅ Correct import for App Router
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Profiles = () => {
   const [profile, setProfile] = useState(null);
@@ -71,11 +70,6 @@ const Profiles = () => {
               >
                 Edit Profile
               </button>
-              <Link href="/" className="ml-4">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300">
-                  Back to Products
-                </button>
-              </Link>
             </div>
           </>
         ) : (

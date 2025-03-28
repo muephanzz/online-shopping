@@ -25,7 +25,7 @@ export default function DesktopMenu() {
   }, []);
 
   return (
-    <nav className="absolute shadow-md hidden md:flex space-x-6 mt-28 w-full text-lg">
+    <nav className="absolute shadow-md hidden md:flex space-x-6 mt-28 w-full text-lg space-x-4 overflow-x-auto">
       <Link
         href="/"
         className="hover:text-blue-500 transition duration-300 text-gray-700"

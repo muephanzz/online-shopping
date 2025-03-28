@@ -2,9 +2,10 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { Loader2, Trash2, ShoppingCart } from "lucide-react";
-import Image from "next/image";
+import ProductCard from "../components/ProductCard";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
+
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
@@ -87,7 +88,6 @@ export default function Wishlist() {
   if (wishlist.length === 0) {
     return (
       <div className="mt-28 text-center">
-        <Image width={300} height={300} src="/wishlist.jpg" alt="Wishlist Empty" className="mx-auto w-60 mb-4" />
         <p className="text-lg text-gray-600">Your wishlist is empty.</p>
         <button
           onClick={() => router.push("/")}
@@ -110,16 +110,8 @@ export default function Wishlist() {
 
           return (
             <div key={item.id} className="bg-gray-100 p-4 rounded-lg shadow-sm">
-              <Image
-                width={500}
-                height={500}
-                src={imageUrl}
-                alt={item.products.name}
-                className="w-full h-46 rounded-md"
-              />
               <div className="mt-4">
-                <h3 className="text-lg font-medium text-gray-800">{item.products.name}</h3>
-                <p className="text-blue-600 font-bold">Ksh {item.products.price.toFixed(2)}</p>
+                <ProductCard />
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => addToCart(item.products)}
