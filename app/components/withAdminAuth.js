@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '../lib/supabaseClient';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "../lib/supabaseClient";
 
 const withAdminAuth = (WrappedComponent) => {
   return function AdminComponent(props) {
@@ -11,20 +11,27 @@ const withAdminAuth = (WrappedComponent) => {
 
     useEffect(() => {
       const checkAdmin = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
+        setLoading(true);
+
+        // Get current user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
         
-        if (!user) {
-          router.push('/');
+        if (userError || !user) {
+          console.error("Error fetching user:", userError);
+          router.push("/");
           return;
         }
 
-        // Check for admin role in user metadata
-        if (user.user_metadata?.role === 'admin') {
-          setIsAdmin(true);
-        } else {
-          router.push('/admin/access-denied');
+        // Fetch is_admin from auth.users using an RPC function
+        const { data: isAdminData, error: adminError } = await supabase.rpc("check_is_admin", { uid: user.id });
+
+        if (adminError) {
+          console.error("Error checking admin status:", adminError);
+          setLoading(false);
+          return;
         }
 
+        setIsAdmin(isAdminData);
         setLoading(false);
       };
 

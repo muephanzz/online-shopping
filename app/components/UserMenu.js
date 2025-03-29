@@ -9,43 +9,44 @@ import { User2, LogOut, ShoppingBasket, ChevronDown, LogIn, Package, User, Check
 
 export default function UserMenu({ user, setUser, onSignIn }) {
     const [isAdmin, setIsAdmin] = useState(false);
+    const [userName, setUserName] = useState("User");
     const router = useRouter();
-    const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const fetchProfile = async () => {
-    setLoading(true);
-
-    // Fetch current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      console.error("Error fetching user or user not logged in:", userError);
-      setLoading(false);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (error) console.error("Error fetching profile:", error);
-    else setProfile(data || {});
-
-    setLoading(false);
-  };
-
     useEffect(() => {
-        if (user?.user_metadata?.role === "admin") {
-            setIsAdmin(true);
+        fetchUserData();
+    }, []);
+
+    const fetchUserData = async () => {
+        setLoading(true);
+
+        // Fetch current authenticated user
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+        if (userError || !user) {
+            console.error("Error fetching user or user not logged in:", userError);
+            setLoading(false);
+            return;
         }
-    }, [user]);
+
+        // ✅ Fetch `is_admin` from `auth.users` using an RPC function
+        const { data: isAdminData, error: adminError } = await supabase.rpc("check_is_admin", { uid: user.id });
+
+        // ✅ Fetch first_name from `profiles`
+        const { data: profileData, error: profileError } = await supabase
+            .from("profiles")
+            .select("first_name")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+        if (adminError) console.error("Error checking admin status:", adminError);
+        setIsAdmin(isAdminData || false);
+
+        if (profileError) console.error("Error fetching profile data:", profileError);
+        setUserName(profileData?.first_name || "User");
+
+        setLoading(false);
+    };
 
     const handleLogout = async () => {
         const { error } = await supabase.auth.signOut();
@@ -76,11 +77,9 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                         leaveTo="transform opacity-0 scale-95"
                     > 
                         <Menu.Items className="absolute right-0 mt-3 w-56 bg-white border rounded-md shadow-lg">
-                        {profile && (
                             <div className="px-4 py-2 text-white bg-gray-500 rounded-md font-medium">
-                               Hello, <span className="font-bold text-orange-500">{profile.first_name}</span>
+                                Hello, <span className="font-bold text-orange-500">{userName}</span>
                             </div>
-                            )}
                             {isAdmin && (
                                 <Menu.Item>
                                     {({ active }) => (

@@ -29,7 +29,7 @@ export default async function handler(req, res) {
     // Insert order into Supabase
     const { error } = await supabase.from("orders").insert({
       user_id,
-      total_amount: amountPaid,
+      total: amountPaid,
       shipping_address,
       status: "paid",
       items: JSON.stringify(checkoutItems), // Ensure JSONB format

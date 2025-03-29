@@ -12,14 +12,11 @@ export async function middleware(req) {
     return NextResponse.redirect(new URL('/', req.url));
   }
 
-  // Redirect if not an admin
-  const { data, error } = await supabase
-    .from('users')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single();
+  // Check if user is admin
+  const { data: isAdmin, error } = await supabase
+    .rpc('check_is_admin', { uid: user.id });
 
-  if (error || !data?.is_admin) {
+  if (error || !isAdmin) {
     return NextResponse.redirect(new URL('/admin/access-denied', req.url));
   }
 
@@ -27,5 +24,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'], // Protect admin routes
+  matcher: ['/admin/:path*'], // Protect all admin routes
 };

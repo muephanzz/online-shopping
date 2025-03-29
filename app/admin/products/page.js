@@ -5,7 +5,6 @@ import AdminLayout from "../../components/AdminLayout";
 import withAdminAuth from '../../components/withAdminAuth';
 import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
-import ProductsForm from "../../components/ProductsForm";
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
@@ -26,6 +25,7 @@ const ManageProducts = () => {
   const [loading, setLoading] = useState(false);
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -46,6 +46,109 @@ const ManageProducts = () => {
     const { data, error } = await supabase.from("categories").select("*");
     if (error) console.error("Error fetching categories:", error);
     else setCategories(data);
+  };
+
+  const handleChange = (e) => {
+    setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    setFiles(selectedFiles);
+
+    const filePreviews = selectedFiles.map((file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      return new Promise((resolve) => {
+        reader.onloadend = () => resolve(reader.result);
+      });
+    });
+
+    Promise.all(filePreviews).then((results) => setPreviews(results));
+  };
+
+  const uploadImages = async () => {
+    const imageUrls = await Promise.all(
+      files.map(async (file) => {
+        const fileName = `${Date.now()}-${file.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("products")
+          .upload(`images/${fileName}`, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+
+        if (uploadError) throw new Error(uploadError.message);
+
+        const { data: urlData } = supabase.storage.from("products").getPublicUrl(`images/${fileName}`);
+        return urlData.publicUrl;
+      })
+    );
+
+    return imageUrls;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!newProduct.name || !newProduct.brand || !newProduct.state || !newProduct.stock || !newProduct.price || !newProduct.category_id) {
+      toast.error("Please fill in all fields!");
+    }
+
+    setUploading(true);
+    try {
+      let imageUrls = editingProduct?.image_urls || [];
+
+      if (files.length > 0) {
+        imageUrls = await uploadImages();
+      }
+
+      if (editingProduct) {
+        const { error: updateError } = await supabase.from("products").update({
+          name: newProduct.name,
+          phone: newProduct.phone,
+          brand: newProduct.brand,
+          state: newProduct.state,
+          description: newProduct.description,
+          specification: newProduct.specification,
+          stock: newProduct.stock,
+          price: parseFloat(newProduct.price),
+          image_urls: imageUrls,
+          category_id: newProduct.category_id,
+        }).eq("product_id", editingProduct.product_id);
+
+        if (updateError) throw new Error(updateError.message);
+
+        toast.success("Product updated successfully!");
+      } else {
+        const { error: insertError } = await supabase.from("products").insert([
+          {
+            phone: newProduct.phone,
+            name: newProduct.name,
+            brand: newProduct.brand,
+            state: newProduct.state,
+            description: newProduct.description,
+            specification: newProduct.specification,
+            stock: newProduct.stock,
+            price: parseFloat(newProduct.price),
+            image_urls: imageUrls,
+            category_id: newProduct.category_id,
+          },
+        ]);
+
+        if (insertError) throw new Error(insertError.message);
+
+        toast.success("Product added successfully!");
+      }
+
+      fetchProducts();
+      resetForm();
+    } catch (error) {
+      console.error("Error saving product:", error);
+      toast.error("Operation failed: " + error.message);
+    }
+
+    setUploading(false);
   };
 
   const handleDelete = async (productId) => {
@@ -82,11 +185,66 @@ const ManageProducts = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const resetForm = () => {
+    setNewProduct({ name: "", brand: "", state: "", phone: "", description: "", specification: "", stock: "", price: "", image_urls: [], category_id: "" });
+    setFiles([]);
+    setPreviews([]);
+    setEditingProduct(null);
+  };
+
   return (
     <AdminLayout>
       <h1 className="text-3xl font-bold mb-6">Manage Products</h1>
 
-      <ProductsForm categories={categories} editingProduct={editingProduct} newProduct={newProduct} files={files} previews={previews}/>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input type="text" name="name" placeholder="Product Name" value={newProduct.name} onChange={handleChange} required className="border p-2 w-full rounded" />
+
+        <input type="text" name="brand" placeholder="Product Brand" value={newProduct.brand} onChange={handleChange} required className="border p-2 w-full rounded" />
+
+        <select name="category_id" onChange={handleChange} value={newProduct.category_id} required className="border p-2 w-full rounded">
+          <option value="">Select Category</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>{category.category}</option>
+          ))}
+        </select>
+
+        <select 
+          name="state"
+          className="border p-2 w-full rounded"
+          onChange={handleChange}
+          value={newProduct.state} 
+          required
+        >
+          <option value="">Select State</option>
+          <option value="Brand New">Brand New</option>
+          <option value="Refurbished">Refurbished</option>
+        </select>
+
+
+        <textarea name="description" placeholder="Description" value={newProduct.description} onChange={handleChange} required className="border p-2 w-full rounded" />
+
+        <textarea name="specification" placeholder="Specification" value={newProduct.specification} onChange={handleChange} required className="border p-2 w-full rounded" />
+
+        <input type="number" name="stock" min={1} placeholder="Stock" value={newProduct.stock} onChange={handleChange} required className="border p-2 w-full rounded" />
+
+        <input type="phone" name="phone" max={10}  placeholder="Seller's Phone Number" value={newProduct.phone} onChange={handleChange} required className="border p-2 w-full rounded" />
+
+        <input type="number" name="price" min={1} placeholder="Price" value={newProduct.price} onChange={handleChange} required className="border p-2 w-full rounded" />
+
+        <input type="file" accept="image/*" multiple onChange={handleFileChange} className="w-full" />
+
+        {previews.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {previews.map((preview, index) => (
+              <img key={index} src={preview} alt="Preview" className="w-24 h-24 object-cover rounded-lg border" />
+            ))}
+          </div>
+        )}
+
+        <button type="submit" disabled={uploading} className="bg-green-600 text-white p-2 rounded hover:bg-green-700">
+          {uploading ? "Uploading..." : editingProduct ? "Update Product" : "Add Product"}
+        </button>
+      </form>
 
       {/* Product List */}
       {loading ? (
@@ -98,7 +256,25 @@ const ManageProducts = () => {
           ) : (
             products.map((product) => (
               <li key={product.product_id} className="border p-4 rounded-lg">
-                <AdminProductCard product={product} />
+                <h2 className="text-xl font-semibold"><strong>Product Name:</strong> {product.name}</h2>
+                <p><strong>Brand:</strong> {product.brand}</p>
+                <p><strong>Category:</strong> {product.categories?.category}</p>
+                <p><strong>State:</strong> {product.state}</p>
+                <p><strong>Seller's Phone Numbers:</strong> {product.phone}</p>
+                <p><strong>Description:</strong> {product.description}</p>
+                <p><strong>Specification:</strong> {product.specification}</p>
+                <p><strong>Price:</strong> Ksh {product.price}</p>
+                <p><strong>In Stock:</strong> {product.stock}</p>
+                <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
+                  {product.image_urls.map((url, index) => (
+                    <img
+                      key={index}
+                      src={url}
+                      alt="Product"
+                      className="w-24 h-24 object-cover rounded-lg border flex-shrink-0"
+                    />
+                  ))}
+                </div>
                 <button onClick={() => handleEdit(product)} className="text-white bg-blue-500 mt-2 px-4 py-2 rounded">Edit</button>
                 <button onClick={() => handleDelete(product.product_id)} className="text-white bg-red-500 px-4 py-2 rounded ml-2">Delete</button>
               </li>
