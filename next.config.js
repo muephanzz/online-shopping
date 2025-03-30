@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false,
-  experimental: {
-    appDir: true,
-  },
   eslint: {
     ignoreDuringBuilds: true,
   },
@@ -12,16 +8,15 @@ const nextConfig = {
   },
   images: {
     domains: [
-      "example.com",
-      "znjrafazpveysjguzxri.supabase.co",
-      "www.gravatar.com",
+      "example.com", // Add the domain where your product images are hosted
+      "znjrafazpveysjguzxri.supabase.co", // Supabase storage
+      "www.gravatar.com", // Gravatar images
     ],
   },
   env: {
     MPESA_CONSUMER_KEY: process.env.MPESA_CONSUMER_KEY,
     MPESA_CONSUMER_SECRET: process.env.MPESA_CONSUMER_SECRET,
   },
-  output: "standalone", 
 };
 
 module.exports = nextConfig;
