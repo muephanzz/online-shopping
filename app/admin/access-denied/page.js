@@ -2,7 +2,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function AccessDeniedPage() {
+export default function AccessDenied() {
   return (
     <Suspense fallback={<p>Loading...</p>}>
       <AccessDeniedContent />
@@ -11,17 +11,8 @@ export default function AccessDeniedPage() {
 }
 
 function AccessDeniedContent() {
-  // Use dynamic import to prevent pre-rendering issues
-  return (
-    <Suspense fallback={<p>Loading details...</p>}>
-      <AccessDeniedMessage />
-    </Suspense>
-  );
-}
-
-function AccessDeniedMessage() {
   const searchParams = useSearchParams();
-  const reason = searchParams?.get("reason") || "You do not have access.";
+  const reason = searchParams.get("reason") || "You do not have access.";
 
   return (
     <div className="p-5 text-center">
