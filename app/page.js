@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabaseClient";
-import { ProductCard } from "./components/ProductCard";
+import ProductCard from "./components/ProductCard";
 import { Loader2 } from "lucide-react";
 import Pagination from "./components/Pagination";
 import Footer from "./components/Footer";
