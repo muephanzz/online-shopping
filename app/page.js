@@ -44,7 +44,7 @@ export default function Home() {
     <div className="pb-2 mt-20">  
       {loading ? (
       <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+        <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
       </div>
       ) : (
         <>
