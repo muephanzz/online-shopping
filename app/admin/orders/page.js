@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import AdminLayout from "../../components/AdminLayout";
 import withAdminAuth from "../../components/withAdminAuth";
-import Items from "../../components/ProductCard";
+import Image from "next/image";
 
 const ManageOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -21,7 +21,7 @@ const ManageOrders = () => {
     const { data, error } = await supabase
       .from("orders")
       .select("*")
-      .order("order_id", { ascending: false });
+      .order("order_id", { ascending: false }); // Change 'created_at' to 'order_id'
     if (error) console.error("Error fetching orders:", error);
     else setOrders(data);
     setLoading(false);
@@ -39,6 +39,7 @@ const ManageOrders = () => {
     else fetchOrders();
   };
 
+  // Delete an order
   const handleDelete = async (order_id) => {
     const confirmation = window.confirm("Are you sure you want to delete this order?");
     if (!confirmation) return;
@@ -82,7 +83,14 @@ const ManageOrders = () => {
               <ul>
               {orderItems && orderItems.length > 0 ? (
                 orderItems.map((item, index) => (
-                  <Items item={item} key={index} />
+                  <li key={index} className="flex items-center gap-4 border-b pb-4">
+                    <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
+                    <div className="flex-1">
+                      <h3 className="text-lg font-medium">{item.name}</h3>
+                      <p className="text-gray-700">Quantity: {item.quantity}</p>
+                      <p className="text-blue-600 font-bold">Ksh {item.price}</p>
+                    </div>
+                  </li>
                 ))
               ) : (
                 <li>No items found.</li>

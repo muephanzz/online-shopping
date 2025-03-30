@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import toast from "react-hot-toast";
-import Items from "../../components/ProductCard";
+import Image from "next/image";
 
 export default function OrderTracking() {
   const [orders, setOrders] = useState([]);
@@ -139,24 +139,24 @@ export default function OrderTracking() {
         </button>
       </div>
 
-    {/* Order Status Progress Bar */}
-      {order && (
-        <div className="mt-6 p-4 border rounded-lg bg-gray-50">
-          <h3 className="text-lg font-bold mb-2">Order Status</h3>
-          <div className="flex justify-between items-center max-w-lg mx-auto mt-2">
-            {statusSteps.map((step, index) => (
-              <div key={step} className="text-center">
-                <div
-                  className={`w-6 h-6 rounded-full ${
-                    index <= getStatusIndex(order.status) ? "bg-blue-600" : "bg-gray-300"
-                  } mx-auto`}
-                />
-                <p className="text-xs">{step}</p>
-              </div>
-            ))}
-          </div>
+{/* Order Status Progress Bar */}
+{order && (
+  <div className="mt-6 p-4 border rounded-lg bg-gray-50">
+    <h3 className="text-lg font-bold mb-2">Order Status</h3>
+    <div className="flex justify-between items-center max-w-lg mx-auto mt-2">
+      {statusSteps.map((step, index) => (
+        <div key={step} className="text-center">
+          <div
+            className={`w-6 h-6 rounded-full ${
+              index <= getStatusIndex(order.status) ? "bg-blue-600" : "bg-gray-300"
+            } mx-auto`}
+          />
+          <p className="text-xs">{step}</p>
         </div>
-      )}
+      ))}
+    </div>
+  </div>
+)}
 
 {/* Order Details */}
 {order && (
@@ -172,7 +172,14 @@ export default function OrderTracking() {
     <ul>
       {order.items && order.items.length > 0 ? (
         order.items.map((item, index) => (
-          <Items item={item} key={index} />
+          <div key={index} className="flex items-center gap-4 border-b pb-4">
+          <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
+          <div className="flex-1">
+            <h3 className="text-lg font-medium">{item.name || "Name"}</h3>
+            <p className="text-gray-700">Quantity: {item.quantity}</p>
+            <p className="text-blue-600 font-bold">Ksh {item.price || "price"}</p>
+          </div>
+        </div>
         ))
       ) : (
         <li>Unable to load items.</li>

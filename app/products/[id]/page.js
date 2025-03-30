@@ -5,7 +5,7 @@ import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import { ProductCard } from "../../components/ProductCard";
+import ProductCard from "../../components/ProductCard";
 import moment from "moment";
 
 export default function ProductDetails() {
