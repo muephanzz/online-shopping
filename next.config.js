@@ -12,16 +12,16 @@ const nextConfig = {
   },
   images: {
     domains: [
-      "example.com", // Your product images domain
-      "znjrafazpveysjguzxri.supabase.co", // Supabase storage
-      "www.gravatar.com", // Gravatar images
+      "example.com",
+      "znjrafazpveysjguzxri.supabase.co",
+      "www.gravatar.com",
     ],
   },
   env: {
     MPESA_CONSUMER_KEY: process.env.MPESA_CONSUMER_KEY,
     MPESA_CONSUMER_SECRET: process.env.MPESA_CONSUMER_SECRET,
   },
-  output: "standalone", // Ensures dynamic rendering & no static export issues
+  output: "standalone", 
 };
 
 module.exports = nextConfig;
