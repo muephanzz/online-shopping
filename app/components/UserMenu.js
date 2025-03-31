@@ -83,7 +83,7 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                             {isAdmin && (
                                 <Menu.Item>
                                     {({ active }) => (
-                                        <Link href="/admin" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
+                                        <Link href="/admin/dashboard" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
                                             <ShoppingBasket className="inline-block mr-2" /> Admin Panel
                                         </Link>
                                     )}
