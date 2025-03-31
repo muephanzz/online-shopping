@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
@@ -70,6 +70,7 @@ export default function ProductsPage() {
   if (!category_id) return <p>Please select a category.</p>;
 
   return (
+    <Suspense>
     <div className="p-6 mt-20">
       <h1 className="sm:text-3xl text-2xl font-bold mb-6">
         Products in {categoryName} Category
@@ -89,5 +90,6 @@ export default function ProductsPage() {
         <Pagination totalPages={totalPages} currentPage={currentPage} />
       )}
     </div>
+    </Suspense>
   );
 }

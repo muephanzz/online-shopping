@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 // Initialize Supabase client
@@ -25,6 +25,7 @@ export default function DesktopMenu() {
   }, []);
 
   return (
+    <Suspense>
     <nav className="absolute shadow-md hidden md:flex space-x-6 mt-28 w-full text-lg space-x-4 overflow-x-auto">
       <Link
         href="/"
@@ -50,5 +51,6 @@ export default function DesktopMenu() {
         );
       })}
     </nav>
+    </Suspense>
   );
 }

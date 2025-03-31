@@ -1,4 +1,4 @@
-"use client"; // Mark this file as a client component
+"use client";
 
 import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -25,7 +25,11 @@ export default function ClientWrapper({ children }) {
       setUser(session?.user || null);
     });
 
-    return () => data?.subscription?.unsubscribe();
+    return () => {
+      if (data && data.subscription) {
+        data.subscription.unsubscribe();
+      }
+    };
   }, []);
 
   return (
