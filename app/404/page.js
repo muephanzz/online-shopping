@@ -2,7 +2,7 @@
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
-const NotFoundContent = dynamic(() => import("./NotFoundContent"), { ssr: false });
+const NotFoundContent = dynamic(() => import("../../NotFoundContent"), { ssr: false });
 
 export default function NotFoundPage() {
   return (
