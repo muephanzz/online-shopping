@@ -1,6 +1,6 @@
 "use client";
-import withAdminAuth from "../components/withAdminAuth";
-import AdminLayout from "../components/AdminLayout";
+import withAdminAuth from "../../components/withAdminAuth";
+import AdminLayout from "../../components/AdminLayout";
 import Link from "next/link";
 import { FaBox, FaShoppingCart, FaComments } from "react-icons/fa";
 
