@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import moment from "moment";
 import AdminLayout from "../../components/AdminLayout";
@@ -146,6 +146,7 @@ const AdminChat = () => {
 
   return (
     <AdminLayout>
+      <Suspense>
       <h1 className="text-3xl font-bold mb-4 text-gray-800">Manage Chat</h1>
       <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
         {/* User List */}
@@ -236,6 +237,7 @@ const AdminChat = () => {
           )}
         </div>
       </div>
+      </Suspense>
     </AdminLayout>
   );
 };
