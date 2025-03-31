@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Menu, X, Home, Tag } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -33,7 +33,6 @@ export default function MobileMenu() {
   };
 
   return (
-    <Suspense>
     <div className="md:hidden">
       {/* Menu Button */}
       <button
@@ -99,6 +98,5 @@ export default function MobileMenu() {
         </nav>
       </div>
     </div>
-    </Suspense>
   );
 }
