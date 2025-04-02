@@ -3,7 +3,7 @@ import { Home, Heart, Menu, ShoppingCart, User, XCircle, Tag } from "lucide-reac
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { supabase } from "../lib/supabaseClient";
+
 import SignInModal from "./SignInModal";
 
 export default function BottomNav() {
