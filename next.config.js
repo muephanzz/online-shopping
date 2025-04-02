@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "standalone", // If using a custom build setup
+  trailingSlash: true,  // Ensures static paths work properly
   eslint: {
     ignoreDuringBuilds: true,
   },
