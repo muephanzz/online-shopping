@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Eye, EyeOff, X } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-import { supabase } from '../lib/supabaseClient';
+
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

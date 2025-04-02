@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { supabase } from "../lib/supabaseClient";
+
 import Navbar from "./Navbar";
 import BottomNav from "./BottomNav";
 import { Toaster } from "react-hot-toast";
