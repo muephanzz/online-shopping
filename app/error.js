@@ -13,7 +13,7 @@ export default function Error({ error, reset }) {
       <p className="text-gray-700">{error.message || "An unknown error occurred."}</p>
       <button
         className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-        onClick={() => reset()} // Reset the state to retry
+        onClick={() => reset()}
       >
         Try Again
       </button>

@@ -70,18 +70,22 @@ const ManageProducts = () => {
   const uploadImages = async () => {
     const imageUrls = await Promise.all(
       files.map(async (file) => {
-        const fileName = `${Date.now()}-${file.name}`;
+        const fileName = `${Date.now()}-${encodeURIComponent(file.name)}`;
         const { error: uploadError } = await supabase.storage
-          .from("products")
-          .upload(`images/${fileName}`, file, {
-            cacheControl: "3600",
-            upsert: false,
-          });
-
-        if (uploadError) throw new Error(uploadError.message);
-
-        const { data: urlData } = supabase.storage.from("products").getPublicUrl(`images/${fileName}`);
-        return urlData.publicUrl;
+        .from("products")
+        .upload(`images/${fileName}`, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
+      
+      if (uploadError) throw new Error(uploadError.message);
+      
+      const { data: urlData, error: urlError } = supabase.storage.from("products").getPublicUrl(`images/${fileName}`);
+      
+      if (urlError) throw new Error(urlError.message);
+      
+      return urlData.publicUrl;
+      
       })
     );
 

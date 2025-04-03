@@ -3,13 +3,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Home, Tag } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
-
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { supabase } from "../lib/supabaseClient";
 
 export default function MobileMenu() {
   const [menuOpen, setMenuOpen] = useState(false);

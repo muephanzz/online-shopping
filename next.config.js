@@ -11,7 +11,7 @@ const nextConfig = {
   images: {
     domains: [
       "example.com", // Add the domain where your product images are hosted
-      "znjrafazpveysjguzxri.supabase.co", // Supabase storage
+      "vsrkmtebffntocpjapxz.supabase.co", // Supabase storage
       "www.gravatar.com", // Gravatar images
     ],
   },

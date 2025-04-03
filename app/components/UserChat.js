@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabaseClient";
 import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
 import moment from "moment"; // Import moment.js for formatting date/time
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
 
 const UserChat = () => {
   const [messages, setMessages] = useState([]);

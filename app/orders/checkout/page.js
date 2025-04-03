@@ -9,7 +9,6 @@ export default function Checkout() {
   const [amount, setAmount] = useState(0);
   const [phone, setPhone] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
-  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -17,23 +16,22 @@ export default function Checkout() {
     const items = JSON.parse(localStorage.getItem("checkoutItems")) || [];
     setCheckoutItems(items);
 
-    // Calculate total payable amount
+    // Calculate total amount payable
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     setAmount(total);
   }, []);
 
   async function handleMpesaPayment(e) {
     e.preventDefault();
-    setMessage("Processing payment...");
     setLoading(true);
-  
+
     try {
       // Ensure user is authenticated
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData?.user) throw new Error("User not authenticated");
-  
+
       const user = userData.user;
-  
+
       // Call M-Pesa API with user data
       const response = await fetch("/api/mpesa", {
         method: "POST",
@@ -46,13 +44,14 @@ export default function Checkout() {
           shipping_address: shippingAddress,
         }),
       });
-  
+
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "M-Pesa Payment Failed");
-  
-      setMessage("Payment request sent. Check your phone to complete the payment.");
+
+      // Redirect to STK Countdown Page
+      router.push(`/orders/stk-countdown?phone=${phone}`);
     } catch (error) {
-      setMessage("Error: " + error.message);
+      alert("Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -111,8 +110,6 @@ export default function Checkout() {
             {loading ? "Processing..." : "Pay Now"}
           </button>
         </form>
-
-        {message && <p className="text-center mt-4">{message}</p>}
       </div>
     </div>
   );
