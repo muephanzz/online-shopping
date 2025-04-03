@@ -1,6 +1,8 @@
 import { Inter, Roboto_Mono } from "next/font/google";
-import ClientWrapper from "./components/ClientWrapper";
 import "./styles/globals.css";
+import { Suspense } from "react";
+import ClientWrapper from "./components/ClientWrapper";
+import Loading from "./loading"; // Ensure this file exists
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,7 +23,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`}>
       <body className="antialiased">
-        <ClientWrapper>{children}</ClientWrapper>
+          <Suspense fallback={<Loading />}>
+            <ClientWrapper>{children}</ClientWrapper>
+          </Suspense>
       </body>
     </html>
   );
