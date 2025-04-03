@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-
+import { supabase } from "../lib/supabaseClient";
 import SignInModal from "./SignInModal";
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
