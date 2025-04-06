@@ -68,27 +68,32 @@ const ManageProducts = () => {
   };
 
   const uploadImages = async () => {
+    const sanitizeFileName = (name) => {
+      return name.replace(/[^a-zA-Z0-9._-]/g, "_"); // removes spaces, (), etc.
+    };
+    
     const imageUrls = await Promise.all(
       files.map(async (file) => {
-        const fileName = `${Date.now()}-${encodeURIComponent(file.name)}`;
+        const fileName = `${Date.now()}-${sanitizeFileName(file.name)}`;
         const { error: uploadError } = await supabase.storage
-        .from("products")
-        .upload(`images/${fileName}`, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-      
-      if (uploadError) throw new Error(uploadError.message);
-      
-      const { data: urlData, error: urlError } = supabase.storage.from("products").getPublicUrl(`images/${fileName}`);
-      
-      if (urlError) throw new Error(urlError.message);
-      
-      return urlData.publicUrl;
-      
+          .from("products")
+          .upload(`images/${fileName}`, file, {
+            cacheControl: "3600",
+            upsert: false,
+          });
+    
+        if (uploadError) throw new Error(uploadError.message);
+    
+        const { data: urlData, error: urlError } = supabase.storage
+          .from("products")
+          .getPublicUrl(`images/${fileName}`);
+    
+        if (urlError) throw new Error(urlError.message);
+    
+        return urlData.publicUrl;
       })
     );
-
+    
     return imageUrls;
   };
 
