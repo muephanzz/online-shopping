@@ -12,18 +12,22 @@ const STKCountdown = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          checkPaymentStatus();
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
-    if (countdown === 0) {
-      clearInterval(interval);
-      checkPaymentStatus();
-    }
-
     return () => clearInterval(interval);
-  }, [countdown]);
+  }, []);
 
+  // Function to check payment status
   async function checkPaymentStatus() {
+    setStatus("Verifying payment...");
     try {
       const response = await fetch("/api/check-payment", {
         method: "POST",
@@ -32,12 +36,14 @@ const STKCountdown = () => {
       });
 
       const data = await response.json();
+
+      // Check the payment status and update UI accordingly
       if (data.success) {
         setStatus("Payment Successful!");
         setPaymentSuccess(true);
         setTimeout(() => router.push("/orders/order-confirmation"), 3000);
       } else {
-        setStatus("Payment Failed! Returning to checkout...");
+        setStatus(`Payment Failed: ${data.error || "Returning to checkout..."}`);
         setPaymentSuccess(false);
         setTimeout(() => router.push("/orders/checkout"), 3000);
       }
@@ -48,7 +54,7 @@ const STKCountdown = () => {
     }
   }
 
-  // Calculate progress percentage
+  // Calculate progress percentage for countdown
   const progress = (countdown / 30) * 100;
 
   return (
