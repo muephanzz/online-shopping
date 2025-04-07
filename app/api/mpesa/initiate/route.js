@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
-import { supabase } from "../../../../lib/supabaseClient";
+import { supabase } from "../../../lib/supabaseClient";
 
 // Replace with your sandbox credentials
 const consumerKey = process.env.MPESA_CONSUMER_KEY;
