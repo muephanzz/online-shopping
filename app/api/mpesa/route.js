@@ -1,49 +1,52 @@
-import axios from "axios";
-import { getMpesaAccessToken } from "../../lib/mpesaConfig";
-
-const { MPESA_SHORTCODE, MPESA_PASSKEY, MPESA_CALLBACK_URL } = process.env;
+import { supabase } from "../../lib/supabaseClient";
 
 export async function POST(req) {
   try {
-    const body = await req.json(); // Read JSON body
-    const { amount, phone, user_id, checkoutItems, shipping_address } = body;
+    const body = await req.json();
 
-    if (!amount || !phone || !user_id || !checkoutItems) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), { status: 400 });
+    console.log("M-Pesa Callback Received:", body);
+
+    if (!body.Body) {
+      return new Response(JSON.stringify({ error: "Invalid callback data" }), { status: 400 });
     }
 
-    const accessToken = await getMpesaAccessToken();
-    const timestamp = new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
-    const password = Buffer.from(`${MPESA_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString("base64");
+    const { Body } = body;
+    const resultCode = Body.stkCallback.ResultCode;
 
-    const payload = {
-      BusinessShortCode: MPESA_SHORTCODE,
-      Password: password,
-      Timestamp: timestamp,
-      TransactionType: "CustomerBuyGoodsOnline",
-      Amount: amount,
-      PartyA: phone,
-      PartyB: MPESA_SHORTCODE,
-      PhoneNumber: phone,
-      CallBackURL: MPESA_CALLBACK_URL,
-      AccountReference: "Order12345",
-      TransactionDesc: "Payment for Order",
-    };
+    if (resultCode === 0) {
+      const metadata = Body.stkCallback.CallbackMetadata;
+      const transactionId = metadata?.Item.find(i => i.Name === "MpesaReceiptNumber")?.Value;
+      const phoneNumber = metadata?.Item.find(i => i.Name === "PhoneNumber")?.Value;
+      const amount = metadata?.Item.find(i => i.Name === "Amount")?.Value;
 
-    const { data } = await axios.post(
-      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-      payload,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
+      const { user_id, checkoutItems, shipping_address } = body;
+
+      if (!user_id || !checkoutItems) {
+        return new Response(JSON.stringify({ error: "Missing user ID or items" }), { status: 400 });
       }
-    );
 
-    return new Response(JSON.stringify({ ...data, user_id, checkoutItems, shipping_address }), { status: 200 });
+      const { error } = await supabase.from("orders").insert([{
+        user_id,
+        total: amount,
+        shipping_address,
+        status: "paid",
+        items: JSON.stringify(checkoutItems),
+        phone_number: phoneNumber,
+        mpesa_transaction_id: transactionId,
+      }]);
+
+      if (error) {
+        console.error("Supabase Insert Error:", error);
+        return new Response(JSON.stringify({ error: "Failed to save order" }), { status: 500 });
+      }
+
+      return new Response(JSON.stringify({ success: true, message: "Payment recorded" }), { status: 200 });
+    } else {
+      console.log("Payment Failed:", Body.stkCallback.ResultDesc);
+      return new Response(JSON.stringify({ success: false, error: Body.stkCallback.ResultDesc }), { status: 400 });
+    }
   } catch (error) {
-    console.error("M-Pesa STK Push Error:", error.response?.data || error.message);
-    return new Response(JSON.stringify({ error: "Failed to process STK Push" }), { status: 500 });
+    console.error("M-Pesa Error:", error);
+    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
   }
 }

@@ -16,24 +16,25 @@ export default function Checkout() {
     const items = JSON.parse(localStorage.getItem("checkoutItems")) || [];
     setCheckoutItems(items);
 
-    // Calculate total amount payable
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     setAmount(total);
   }, []);
 
+  const isValidPhone = (phone) => /^2547\d{8}$/.test(phone);
+
   async function handleMpesaPayment(e) {
     e.preventDefault();
-    setLoading(true);
+    if (!isValidPhone(phone)) return alert("Please enter a valid phone number (format: 2547...)");
+    if (checkoutItems.length === 0) return alert("No items found for checkout.");
 
+    setLoading(true);
     try {
-      // Ensure user is authenticated
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData?.user) throw new Error("User not authenticated");
 
       const user = userData.user;
 
-      // Call M-Pesa API with user data
-      const response = await fetch("/api/mpesa", {
+      const response = await fetch("/api/mpesa/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -48,10 +49,9 @@ export default function Checkout() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "M-Pesa Payment Failed");
 
-      // Redirect to STK Countdown Page
       router.push(`/orders/stk-countdown?phone=${phone}`);
     } catch (error) {
-      alert("Error: " + error.message);
+      alert("Payment Error: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -65,7 +65,14 @@ export default function Checkout() {
         <div className="space-y-6">
           {checkoutItems.map((item, index) => (
             <div key={index} className="flex items-center gap-4 border-b pb-4">
-              <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
+              <Image
+                src={item.image_url}
+                width={80}
+                height={80}
+                className="rounded-lg object-cover"
+                alt={item.name}
+                priority={index === 0} // prioritize first image for LCP
+              />
               <div className="flex-1">
                 <h3 className="text-lg font-medium">{item.name}</h3>
                 <p className="text-gray-700">Quantity: {item.quantity}</p>
@@ -78,17 +85,24 @@ export default function Checkout() {
         <form onSubmit={handleMpesaPayment} className="space-y-4 mt-6">
           <div>
             <label>Total Payable (Ksh)</label>
-            <input type="number" value={amount} readOnly className="w-full px-4 py-2 border rounded-lg" />
+            <input
+              type="number"
+              value={amount}
+              readOnly
+              className="w-full px-4 py-2 border rounded-lg"
+            />
           </div>
           <div>
             <label>Shipping Address</label>
-            <select 
+            <select
               value={shippingAddress}
               onChange={(e) => setShippingAddress(e.target.value)}
               className="w-full px-4 py-2 border rounded-lg"
+              required
             >
-              <option>Murang'a University</option>
-              <option>Karatina University</option>
+              <option value="">Select your campus</option>
+              <option value="Murang'a University">Murang'a University</option>
+              <option value="Karatina University">Karatina University</option>
             </select>
           </div>
           <div>
@@ -104,7 +118,9 @@ export default function Checkout() {
           </div>
           <button
             type="submit"
-            className={`w-full py-2 rounded-lg text-white ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}`}
+            className={`w-full py-2 rounded-lg text-white ${
+              loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+            }`}
             disabled={loading}
           >
             {loading ? "Processing..." : "Pay Now"}

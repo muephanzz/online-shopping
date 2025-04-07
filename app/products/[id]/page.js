@@ -119,14 +119,14 @@ export default function ProductDetails() {
 
       <div className="flex flex-col lg:flex-row gap-8">
       
-      <div className="border-b lg:outline pb-2 lg:w-1/2 flex flex-col sm:item-center gap-4">
+      <div className="border-b lg:outline pb-1 lg:w-1/2 flex flex-col sm:item-center gap-4 lg:h-[310px]">
         <div className="flex m-4 w-full relative justify-center items-center">
           <Image 
             src={mainImage} 
             width={300} 
             height={300} 
             alt={product.name} 
-            className="lg:w-80 md:h-80"
+            className="lg:w-80 md:h-70"
           />
         </div>
         
@@ -144,16 +144,6 @@ export default function ProductDetails() {
               isMobile ? "scroll-smooth" : ""
             } ${setMainImage === img ? "border-2 border-blue-500 shadow-lg" : ""}`}
           />
-        ))}
-      </div>
-
-      {/* Colors Section */}
-      <div className="flex px-14 items-center gap-2 mt-2 w-full">
-      <p><strong>Color:</strong></p>
-        {product.color?.map((color, index) => (
-          <span key={index} className="text-xs mt-1 px-2 py-1 border rounded w-full text-center">
-            {color}
-          </span>
         ))}
       </div>
     </div>
