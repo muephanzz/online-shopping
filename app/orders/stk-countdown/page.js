@@ -1,4 +1,4 @@
-import STKcountdown from "../../components/STKcountdown";
+import STKcountdown from "../../../components/STKcountdown";
 
 const STKCountdown = () => {
   return (
