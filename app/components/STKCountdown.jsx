@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const STKCountdown = () => {
+const STKcountdown = () => {
   const [countdown, setCountdown] = useState(30);
   const [status, setStatus] = useState("Waiting for payment...");
   const [paymentSuccess, setPaymentSuccess] = useState(null);
@@ -17,7 +17,7 @@ const STKCountdown = () => {
 
     if (countdown === 0) {
       clearInterval(interval);
-      checkPaymentStatus();
+      checkPaymentStatus();  // Immediately check payment status when countdown reaches 0
     }
 
     return () => clearInterval(interval);
@@ -32,19 +32,26 @@ const STKCountdown = () => {
       });
 
       const data = await response.json();
+
       if (data.success) {
         setStatus("✅ Payment Successful!");
         setPaymentSuccess(true);
-        setTimeout(() => router.push("/orders/order-confirmation"), 3000);
+        
+        // Delay the confirmation page redirection by 6 seconds
+        setTimeout(() => router.push("/orders/order-confirmation"), 6000);
       } else {
         setStatus("❌ Payment Failed! Redirecting...");
         setPaymentSuccess(false);
-        setTimeout(() => router.push("/orders/checkout"), 3000);
+        
+        // Delay the redirect back to checkout by 6 seconds
+        setTimeout(() => router.push("/orders/checkout"), 6000);
       }
     } catch (error) {
       setStatus("⚠️ Error verifying payment.");
       setPaymentSuccess(false);
-      setTimeout(() => router.push("/orders/checkout"), 3000);
+      
+      // Delay the redirect back to checkout by 6 seconds
+      setTimeout(() => router.push("/orders/checkout"), 6000);
     }
   }
 
@@ -83,4 +90,4 @@ const STKCountdown = () => {
   );
 };
 
-export default STKCountdown;
+export default STKcountdown;

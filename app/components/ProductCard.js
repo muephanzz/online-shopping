@@ -3,21 +3,23 @@ import Image from "next/image";
 
 export default function ProductCard({ product }) {
   return (
-    <Link href={`/products/${product.product_id}`} className="group">
-      <div className="border relative rounded-lg shadow-md p-2 sm:p-4 hover:shadow-lg transition duration-300">
+    <Link href={`/products/${product.product_id}`} className="group relative block">
+      <div className="border relative rounded-lg shadow-md p-2 sm:p-4 hover:shadow-lg transition duration-300 overflow-hidden">
         {product.state && (
           <h4 className="absolute top-0 left-0 bg-gray-500 text-white rounded px-2">
             {product.state}
           </h4>
         )}
-        <Image
-          src={product.image_urls?.[0] || "/placeholder.jpg"}
-          alt={product.name || "Product Image"}
-          className="w-full h-44 rounded-md object-cover"
-          width={500}
-          height={500}
-          unoptimized
-        />
+        <div className="relative group-hover:scale-105 transition-transform duration-500">
+          <Image
+            src={product.image_urls?.[0] || "/placeholder.jpg"}
+            alt={product.name || "Product Image"}
+            className="w-full h-44 rounded-md object-cover"
+            width={500}
+            height={500}
+            unoptimized
+          />
+        </div>
         <h3 className="mt-3 text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition">
           {product.name}
         </h3>
@@ -29,3 +31,4 @@ export default function ProductCard({ product }) {
     </Link>
   );
 }
+

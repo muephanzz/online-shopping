@@ -7,7 +7,43 @@ import Image from "next/image";
 const CompletedOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
+  const OrderItems = ({ order }) => {
+    const router = useRouter();  // Initialize useRouter hook
+
+    const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
+
+    return (
+      <ul>
+        {items && items.length > 0 ? (
+          items.map((item, index) => (
+            <li key={index} className="flex items-center gap-4 border-b pb-4">
+              <Image
+                src={item.image_url}
+                width={80}
+                height={80}
+                className="rounded-lg"
+                alt={item.name}
+              />
+              <div className="flex-1">
+                <h3 className="text-lg font-medium">{item.name}</h3>
+                <p className="text-gray-700">Quantity: {item.quantity}</p>
+                <p className="text-blue-600 font-bold">Ksh {item.price}</p>
+              </div>
+              <button
+                onClick={() => router.push(`/upload-review/${item.product_id}`)}
+                className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
+              >
+                Write a Review
+              </button>
+            </li>
+          ))
+        ) : (
+          <li>Unable to load items.</li>
+        )}
+      </ul>
+    );
+  };
 
   useEffect(() => {
     fetchCompletedOrders();
@@ -65,39 +101,8 @@ const CompletedOrders = () => {
               </p>
 
               <h3 className="mt-4 font-semibold">Items:</h3>
-              <ul>
-                {order.items && order.items.length > 0 ? (
-                  order.items.map((item, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center gap-4 border-b pb-4"
-                    >
-                      <Image
-                        src={item.image_url}
-                        width={80}
-                        height={80}
-                        className="rounded-lg"
-                        alt={item.name}
-                      />
-                      <div className="flex-1">
-                        <h3 className="text-lg font-medium">{item.name}</h3>
-                        <p className="text-gray-700">Quantity: {item.quantity}</p>
-                        <p className="text-blue-600 font-bold">Ksh {item.price}</p>
-                      </div>
-                      <button
-                        onClick={() =>
-                          router.push(`/upload-review/${item.product_id}`)
-                        }
-                        className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
-                      >
-                        Write a Review
-                      </button>
-                    </li>
-                  ))
-                ) : (
-                  <li>Unable to load items.</li>
-                )}
-              </ul>
+              {/* Pass the order to the OrderItems component */}
+              <OrderItems order={order} />
 
               <p>
                 <strong>Shipping Address:</strong> {order.shipping_address}

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabaseClient";
 import ProductCard from "./components/ProductCard";
+import FlashSale from "./components/FlashSale";
 import { Loader2 } from "lucide-react";
 import Pagination from "./components/Pagination";
 import Footer from "./components/Footer";
@@ -48,6 +49,7 @@ export default function Home() {
       </div>
       ) : (
         <>
+        <FlashSale/>
           <div className="relative p-2 mt-28 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products.map((product) => (
               <ProductCard key={product.product_id} product={product} />

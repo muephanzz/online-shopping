@@ -30,15 +30,32 @@ const ManageOrders = () => {
 
   // Update order status
   const handleStatusUpdate = async (order_id, newStatus) => {
+    const validTransitions = {
+      pending: ["paid", "cancelled"],
+      paid: ["processing", "cancelled"],
+      processing: ["shipped", "cancelled"],
+      shipped: ["completed", "cancelled"],
+      completed: [],
+      cancelled: [],
+    };
+  
+    const currentStatus = orders.find(order => order.order_id === order_id)?.status;
+  
+    if (!validTransitions[currentStatus]?.includes(newStatus)) {
+      alert(`Cannot transition from ${currentStatus} to ${newStatus}`);
+      return;
+    }
+  
     const { error } = await supabase
       .from("orders")
       .update({ status: newStatus })
       .eq("order_id", order_id);
-
+  
     if (error) alert("Error updating status: " + error.message);
-    else fetchOrders();
+    else fetchOrders(); // Refresh the list of orders
   };
-
+  
+  
   // Delete an order
   const handleDelete = async (order_id) => {
     const confirmation = window.confirm("Are you sure you want to delete this order?");
@@ -81,21 +98,25 @@ const ManageOrders = () => {
               {/* Display Order Items */}
               <h3 className="mt-4 font-semibold">Items:</h3>
               <ul>
-              {orderItems && orderItems.length > 0 ? (
-                orderItems.map((item, index) => (
-                  <li key={index} className="flex items-center gap-4 border-b pb-4">
-                    <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
-                    <div className="flex-1">
-                      <h3 className="text-lg font-medium">{item.name}</h3>
-                      <p className="text-gray-700">Quantity: {item.quantity}</p>
-                      <p className="text-blue-600 font-bold">Ksh {item.price}</p>
-                    </div>
-                  </li>
-                ))
-              ) : (
-                <li>No items found.</li>
-              )}
-            </ul>
+                {(() => {
+                  const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
+
+                  return items && items.length > 0 ? (
+                    items.map((item, index) => (
+                      <div key={index} className="flex items-center gap-4 border-b pb-4">
+                        <Image src={item.image_url} width={80} height={80} className="rounded-lg" alt={item.name} />
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium">{item.name || "Name"}</h3>
+                          <p className="text-gray-700">Quantity: {item.quantity}</p>
+                          <p className="text-blue-600 font-bold">Ksh {item.price || "price"}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <li>Unable to load items.</li>
+                  );
+                })()}
+              </ul>
 
               {/* Status Update Controls */}
               <div className="mt-4 flex flex-wrap gap-2">

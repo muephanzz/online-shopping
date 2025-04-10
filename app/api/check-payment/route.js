@@ -8,9 +8,9 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: "Phone number is required" }), { status: 400 });
     }
 
-    const { data, error } = await supabase
+      const { data, error } = await supabase
       .from("orders")
-      .select("id")
+      .select("order_id")
       .eq("phone_number", phone)
       .order("created_at", { ascending: false })
       .limit(1);

@@ -49,7 +49,7 @@ const Profiles = () => {
         {!loading && profile ? (
           <>
             <img
-              src={profile.avatar_url || "/default-avatar.png"}
+              src={profile.avatar_url || "/default-avatar.jpg"}
               alt="Profile Picture"
               width={100}
               height={100}

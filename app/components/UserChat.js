@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { motion } from "framer-motion";
 import { MessageSquare } from "lucide-react";
-import moment from "moment"; // Import moment.js for formatting date/time
+import moment from "moment";
 
 const UserChat = () => {
   const [messages, setMessages] = useState([]);
@@ -16,104 +16,77 @@ const UserChat = () => {
   const chatRef = useRef(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) console.error("Error fetching user:", error);
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
       if (user) setUser(user);
     };
-    fetchUser();
+    getUser();
   }, []);
 
   useEffect(() => {
-    function handleClickOutside(event) {
+    const handleClickOutside = (event) => {
       if (chatRef.current && !chatRef.current.contains(event.target)) {
         setIsOpen(false);
       }
-    }
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  }, []);
 
   useEffect(() => {
     if (!user) return;
 
-    const fetchMessages = async () => {
-      const { data, error } = await supabase
+    const loadMessages = async () => {
+      const { data } = await supabase
         .from("messages")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: true });
-
-      if (error) console.error("Error fetching messages:", error);
       setMessages(data || []);
     };
 
-    fetchMessages();
-
-    if (Notification.permission !== "granted") {
-      Notification.requestPermission();
-    }
+    loadMessages();
 
     const channel = supabase
-      .channel("realtime-messages")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "messages" },
-        (payload) => {
-          if (payload.new.user_id === user.id) {
-            setMessages((prev) => [...prev, payload.new]);
-
-            if (!isOpen) {
-              new Notification("New Message", {
-                body: payload.new.user_message,
-                icon: "/chat-icon.png",
-              });
-
-              const audio = new Audio("/notification.mp3");
-              audio.play().catch((error) => console.error("Audio error:", error));
-
-              setNewMessage(true);
-            }
+      .channel("realtime:messages")
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "messages",
+      }, (payload) => {
+        const msg = payload.new;
+        if (msg.user_id === user.id) {
+          setMessages((prev) => [...prev, msg]);
+          if (!isOpen && msg.admin_reply) {
+            new Notification("New reply", {
+              body: msg.admin_reply,
+              icon: "/chat-icon.png",
+            });
+            setNewMessage(true);
+            new Audio("/notification.mp3").play().catch(() => {});
           }
         }
-      )
+      })
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+    return () => supabase.removeChannel(channel);
   }, [user, isOpen]);
 
   const sendMessage = async () => {
     if (!message.trim() || !user) return;
-
-    const newMessage = {
-      id: Math.random(),
+    await supabase.from("messages").insert({
       user_id: user.id,
       user_message: message,
-      created_at: new Date().toISOString(),
-    };
-    setMessages((prev) => [...prev, newMessage]);
-
-    const { error } = await supabase
-      .from("messages")
-      .insert({ user_id: user.id, user_message: message });
-
-    if (error) console.error("Error sending message:", error);
+    });
     setMessage("");
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 100);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   return (
     <div>
-      {/* Draggable Chat Icon - Preserved Size & Position */}
       <motion.div
         drag
         dragConstraints={{ left: -6, right: 6, top: -6, bottom: 6 }}
@@ -131,7 +104,6 @@ const UserChat = () => {
         )}
       </motion.div>
 
-      {/* Chat Box */}
       {isOpen && (
         <motion.div
           ref={chatRef}
@@ -141,48 +113,38 @@ const UserChat = () => {
           className="fixed bottom-20 right-0 w-72 bg-white border shadow-lg rounded-lg"
         >
           <div className="p-3 border-b bg-blue-500 text-white flex justify-between">
-            <span>Chat with an agent</span>
-            <button onClick={() => setIsOpen(false)} className="text-white text-xl">&times;</button>
+            <span>Chat with Support</span>
+            <button onClick={() => setIsOpen(false)} className="text-white">&times;</button>
           </div>
 
           <div className="p-3 h-64 overflow-y-auto flex flex-col">
-          {messages.length === 0 ? (
-  <p className="text-gray-500">No messages yet.</p>
-) : (
-  messages
-    .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)) // Ensure correct order
-    .map((msg, index) => (
-      <div key={msg.id || index} className="mb-2">
-        <div className={`flex ${msg.admin_reply ? "justify-start" : "justify-end"}`}>
-          <div
-            className={`p-2 rounded-lg max-w-xs ${
-              msg.admin_reply ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
-            }`}
-          >
-            {msg.admin_reply || msg.user_message}
-            <p className={`text-xs mt-1 ${msg.admin_reply ? "text-white" : "text-gray-500"} text-right`}>
-              {moment(msg.created_at).format("MMMM Do YYYY, h:mm a")}
-            </p>
-          </div>
-        </div>
-      </div>
-    ))
-)}
+            {messages.map((msg) => (
+              <div key={msg.id} className={`mb-2 ${msg.admin_reply ? "text-left" : "text-right"}`}>
+                <div
+                  className={`inline-block p-2 rounded-lg max-w-[75%] ${
+                    msg.admin_reply ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
+                  }`}
+                >
+                  {msg.admin_reply || msg.user_message}
+                  <div className="text-xs mt-1 text-gray-400 text-right">
+                    {moment(msg.created_at).format("h:mm A")}
+                  </div>
+                </div>
+              </div>
+            ))}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Message Input */}
           <div className="flex space-x-2 p-3 border-t">
             <input
-              type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 w-3/4 border p-2 rounded-lg focus:outline-none"
+              className="flex-1 border p-2 rounded-lg"
+              placeholder="Type a message"
             />
             <button
               onClick={sendMessage}
-              className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+              className="bg-blue-500 text-white px-3 py-2 rounded-lg"
             >
               Send
             </button>
