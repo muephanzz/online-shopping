@@ -38,13 +38,13 @@ const STKcountdown = () => {
         setPaymentSuccess(true);
         
         // Delay the confirmation page redirection by 6 seconds
-        setTimeout(() => router.push("/orders/order-confirmation"), 6000);
+        setTimeout(() => router.push("/orders/order-confirmation"), 12000);
       } else {
         setStatus("❌ Payment Failed! Redirecting...");
         setPaymentSuccess(false);
         
         // Delay the redirect back to checkout by 6 seconds
-        setTimeout(() => router.push("/orders/checkout"), 6000);
+        setTimeout(() => router.push("/orders/checkout"), 12000);
       }
     } catch (error) {
       setStatus("⚠️ Error verifying payment.");
