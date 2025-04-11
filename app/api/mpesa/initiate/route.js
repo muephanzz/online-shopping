@@ -75,7 +75,7 @@ export async function POST(req) {
       return NextResponse.json({ error: "STK Push failed", details: stkData }, { status: 500 });
     }
 
-    // 4. Create a pending order to track callback later
+    // 4. Create a pending order to track callback later (now includes mpesa_transaction_id)
     const { error } = await supabase.from("orders").insert([
       {
         user_id,
@@ -84,6 +84,7 @@ export async function POST(req) {
         phone_number: phone,
         status: "pending",
         items: JSON.stringify(checkoutItems),
+        mpesa_transaction_id: stkData.CheckoutRequestID, // ✅ Insert M-Pesa transaction ID
       },
     ]);
 

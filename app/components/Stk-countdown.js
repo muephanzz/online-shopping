@@ -1,3 +1,4 @@
+// components/STKcountdown.js
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -28,7 +29,7 @@ const STKcountdown = () => {
       const response = await fetch("/api/check-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone }),
+        body: JSON.stringify({ phone, checkoutRequestId: "your_checkout_request_id_here" }),
       });
 
       const data = await response.json();
@@ -36,22 +37,16 @@ const STKcountdown = () => {
       if (data.success) {
         setStatus("✅ Payment Successful!");
         setPaymentSuccess(true);
-        
-        // Delay the confirmation page redirection by 6 seconds
-        setTimeout(() => router.push("/orders/order-confirmation"), 12000);
+        router.push("/orders/order-confirmation");
       } else {
         setStatus("❌ Payment Failed! Redirecting...");
         setPaymentSuccess(false);
-        
-        // Delay the redirect back to checkout by 6 seconds
-        setTimeout(() => router.push("/orders/checkout"), 12000);
+        router.push("/orders/checkout");
       }
     } catch (error) {
       setStatus("⚠️ Error verifying payment.");
       setPaymentSuccess(false);
-      
-      // Delay the redirect back to checkout by 6 seconds
-      setTimeout(() => router.push("/orders/checkout"), 6000);
+      router.push("/orders/checkout");
     }
   }
 

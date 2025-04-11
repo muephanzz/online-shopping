@@ -3,32 +3,39 @@ import Image from "next/image";
 
 export default function ProductCard({ product }) {
   return (
-    <Link href={`/products/${product.product_id}`} className="group relative block">
-      <div className="border relative rounded-lg shadow-md p-2 sm:p-4 hover:shadow-lg transition duration-300 overflow-hidden">
-        {product.state && (
-          <h4 className="absolute top-0 left-0 bg-gray-500 text-white rounded px-2">
-            {product.state}
-          </h4>
-        )}
-        <div className="relative group-hover:scale-105 transition-transform duration-500">
+    <Link
+      href={`/products/${product.product_id}`}
+      className="group relative block"
+    >
+      <div className="border border-gray-200 relative rounded-xl bg-white shadow-sm hover:shadow-xl p-3 sm:p-4 transition-all duration-300 overflow-hidden">
+       <div className="relative transition-transform duration-500 group-hover:scale-[1.03] rounded-lg overflow-hidden">
           <Image
             src={product.image_urls?.[0] || "/placeholder.jpg"}
             alt={product.name || "Product Image"}
-            className="w-full h-44 rounded-md object-cover"
+            className="w-full h-44 rounded-md object-fill"
             width={500}
             height={500}
             unoptimized
           />
         </div>
-        <h3 className="mt-3 text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition">
+        {product.state && (
+          <span className="absolute z-100 top-2 left-2 bg-indigo-600 text-white text-xs font-medium px-2 py-0.5 rounded-md shadow">
+            {product.state}
+          </span>
+        )}
+
+        <h3 className="mt-4 text-base font-semibold text-neutral-800 group-hover:text-indigo-600 transition-colors duration-200">
           {product.name}
         </h3>
-        <p className="flex">
-          {product.description ? product.description.split(" ").slice(0, 2).join(" ") : "No description"}...
+
+        <p className="text-sm text-gray-500 truncate">
+          {product.description || "No description"}
         </p>
-        <p className="mt-1 font-bold text-blue-600">Ksh {product.price}</p>
+
+        <p className="mt-2 font-bold text-indigo-700 text-sm sm:text-base">
+          Ksh {product.price}
+        </p>
       </div>
     </Link>
   );
 }
-

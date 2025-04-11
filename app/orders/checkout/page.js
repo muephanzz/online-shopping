@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useRouter } from "next/navigation";
@@ -10,31 +11,41 @@ export default function Checkout() {
   const [phone, setPhone] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const router = useRouter();
 
   useEffect(() => {
     const items = JSON.parse(localStorage.getItem("checkoutItems")) || [];
     setCheckoutItems(items);
-
     const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     setAmount(total);
   }, []);
 
   const isValidPhone = (phone) => /^2547\d{8}$/.test(phone);
 
-  async function handleMpesaPayment(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isValidPhone(phone)) return alert("Please enter a valid phone number (format: 2547...)");
-    if (checkoutItems.length === 0) return alert("No items found for checkout.");
+    setError("");
+
+    if (!isValidPhone(phone)) {
+      setError("Please enter a valid phone number (format: 2547...)");
+      return;
+    }
+
+    if (checkoutItems.length === 0) {
+      setError("No items found for checkout.");
+      return;
+    }
 
     setLoading(true);
+
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData?.user) throw new Error("User not authenticated");
 
       const user = userData.user;
 
-      const response = await fetch("/api/mpesa/initiate", {
+      const res = await fetch("/api/mpesa/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -46,16 +57,19 @@ export default function Checkout() {
         }),
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "M-Pesa Payment Failed");
+      const data = await res.json();
 
-      router.push(`/orders/stk-countdown?phone=${phone}`);
-    } catch (error) {
-      alert("Payment Error: " + error.message);
-    } finally {
+      if (res.ok && data.success) {
+        router.push(`/orders/processing?phone=${phone}`);
+      } else {
+        setError(data.message || "Payment initiation failed.");
+        setLoading(false);
+      }
+    } catch (err) {
+      setError(err.message || "Something went wrong.");
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen pb-20 pt-20 flex items-center justify-center bg-gray-100">
@@ -71,7 +85,7 @@ export default function Checkout() {
                 height={80}
                 className="rounded-lg object-cover"
                 alt={item.name}
-                priority={index === 0} // prioritize first image for LCP
+                priority={index === 0}
               />
               <div className="flex-1">
                 <h3 className="text-lg font-medium">{item.name}</h3>
@@ -82,7 +96,7 @@ export default function Checkout() {
           ))}
         </div>
 
-        <form onSubmit={handleMpesaPayment} className="space-y-4 mt-6">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <div>
             <label>Total Payable (Ksh)</label>
             <input
@@ -116,6 +130,9 @@ export default function Checkout() {
               placeholder="e.g. 254712345678"
             />
           </div>
+
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
           <button
             type="submit"
             className={`w-full py-2 rounded-lg text-white ${

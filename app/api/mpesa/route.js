@@ -1,52 +1,71 @@
-import { supabase } from "../../lib/supabaseClient";
+// pages/api/mpesa/route.js
+import fetch from "node-fetch";  // Use fetch for making HTTP requests
+
+async function getOAuthToken() {
+  const credentials = Buffer.from(`${process.env.MPESA_SHORTCODE}:${process.env.MPESA_SECRET}`).toString('base64');
+  
+  const response = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+    method: "GET",
+    headers: {
+      "Authorization": `Basic ${credentials}`,
+    },
+  });
+  
+  const data = await response.json();
+  return data.access_token;
+}
+
+async function verifyPayment(checkoutRequestId) {
+  const token = await getOAuthToken();
+
+  const response = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      "Shortcode": process.env.MPESA_SHORTCODE,
+      "LipaNaMpesaOnlineShortcode": process.env.MPESA_LIPA_NA_M_PESA_SHORTCODE,
+      "CheckoutRequestID": checkoutRequestId,
+    }),
+  });
+
+  const data = await response.json();
+  
+  return data.ResultCode === 0 ? { success: true } : { success: false };
+}
 
 export async function POST(req) {
   try {
-    const body = await req.json();
+    const { phone, checkoutRequestId } = await req.json();
 
-    console.log("M-Pesa Callback Received:", body);
-
-    if (!body.Body) {
-      return new Response(JSON.stringify({ error: "Invalid callback data" }), { status: 400 });
+    if (!phone || !checkoutRequestId) {
+      return new Response(JSON.stringify({ error: "Phone number and CheckoutRequestID are required" }), { status: 400 });
     }
 
-    const { Body } = body;
-    const resultCode = Body.stkCallback.ResultCode;
+    // Verify payment status using Safaricom API
+    const paymentStatus = await verifyPayment(checkoutRequestId);
 
-    if (resultCode === 0) {
-      const metadata = Body.stkCallback.CallbackMetadata;
-      const transactionId = metadata?.Item.find(i => i.Name === "MpesaReceiptNumber")?.Value;
-      const phoneNumber = metadata?.Item.find(i => i.Name === "PhoneNumber")?.Value;
-      const amount = metadata?.Item.find(i => i.Name === "Amount")?.Value;
-
-      const { user_id, checkoutItems, shipping_address } = body;
-
-      if (!user_id || !checkoutItems) {
-        return new Response(JSON.stringify({ error: "Missing user ID or items" }), { status: 400 });
-      }
-
-      const { error } = await supabase.from("orders").insert([{
-        user_id,
-        total: amount,
-        shipping_address,
-        status: "paid",
-        items: JSON.stringify(checkoutItems),
-        phone_number: phoneNumber,
-        mpesa_transaction_id: transactionId,
-      }]);
-
-      if (error) {
-        console.error("Supabase Insert Error:", error);
-        return new Response(JSON.stringify({ error: "Failed to save order" }), { status: 500 });
-      }
-
-      return new Response(JSON.stringify({ success: true, message: "Payment recorded" }), { status: 200 });
-    } else {
-      console.log("Payment Failed:", Body.stkCallback.ResultDesc);
-      return new Response(JSON.stringify({ success: false, error: Body.stkCallback.ResultDesc }), { status: 400 });
+    if (!paymentStatus.success) {
+      return new Response(JSON.stringify({ success: false }), { status: 200 });
     }
+
+    // Check if phone exists in database and payment status is successful
+    const { data, error } = await supabase
+      .from("payments") // Assuming you're storing payments here
+      .select("status")
+      .eq("phone_number", phone)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (error || !data || data.length === 0 || data[0].status !== "success") {
+      return new Response(JSON.stringify({ success: false }), { status: 200 });
+    }
+
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
-    console.error("M-Pesa Error:", error);
-    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
+    console.error("Payment Check Error:", error);
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
   }
 }
