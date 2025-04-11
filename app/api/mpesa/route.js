@@ -1,39 +1,17 @@
-// pages/api/mpesa/route.js
-import fetch from "node-fetch";  // Use fetch for making HTTP requests
+import { supabase } from "@/lib/supabaseClient";
 
 async function getOAuthToken() {
-  const credentials = Buffer.from(`${process.env.MPESA_SHORTCODE}:${process.env.MPESA_SECRET}`).toString('base64');
-  
-  const response = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+  const auth = Buffer.from(`${process.env.MPESA_CONSUMER_KEY}:${process.env.MPESA_CONSUMER_SECRET}`).toString("base64");
+
+  const res = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
     method: "GET",
     headers: {
-      "Authorization": `Basic ${credentials}`,
+      Authorization: `Basic ${auth}`,
     },
   });
-  
-  const data = await response.json();
+
+  const data = await res.json();
   return data.access_token;
-}
-
-async function verifyPayment(checkoutRequestId) {
-  const token = await getOAuthToken();
-
-  const response = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      "Shortcode": process.env.MPESA_SHORTCODE,
-      "LipaNaMpesaOnlineShortcode": process.env.MPESA_LIPA_NA_M_PESA_SHORTCODE,
-      "CheckoutRequestID": checkoutRequestId,
-    }),
-  });
-
-  const data = await response.json();
-  
-  return data.ResultCode === 0 ? { success: true } : { success: false };
 }
 
 export async function POST(req) {
@@ -41,31 +19,52 @@ export async function POST(req) {
     const { phone, checkoutRequestId } = await req.json();
 
     if (!phone || !checkoutRequestId) {
-      return new Response(JSON.stringify({ error: "Phone number and CheckoutRequestID are required" }), { status: 400 });
+      return new Response(JSON.stringify({ error: "Missing phone or request ID" }), { status: 400 });
     }
 
-    // Verify payment status using Safaricom API
-    const paymentStatus = await verifyPayment(checkoutRequestId);
+    const formattedPhone = phone.startsWith("07") ? "254" + phone.slice(1) : phone;
 
-    if (!paymentStatus.success) {
-      return new Response(JSON.stringify({ success: false }), { status: 200 });
+    const accessToken = await getOAuthToken();
+
+    const timestamp = new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
+    const password = Buffer.from(`${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`).toString("base64");
+
+    const stkQuery = {
+      BusinessShortCode: process.env.MPESA_SHORTCODE,
+      Password: password,
+      Timestamp: timestamp,
+      CheckoutRequestID: checkoutRequestId,
+    };
+
+    const res = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(stkQuery),
+    });
+
+    const data = await res.json();
+
+    if (data.ResultCode === "0") {
+      // Update both orders and payments to status: paid
+      await supabase
+        .from("payments")
+        .update({ status: "paid" })
+        .eq("checkout_request_id", checkoutRequestId);
+
+      await supabase
+        .from("orders")
+        .update({ status: "paid" })
+        .eq("mpesa_transaction_id", checkoutRequestId);
+
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
+    } else {
+      return new Response(JSON.stringify({ success: false, message: data.ResultDesc }), { status: 200 });
     }
-
-    // Check if phone exists in database and payment status is successful
-    const { data, error } = await supabase
-      .from("payments") // Assuming you're storing payments here
-      .select("status")
-      .eq("phone_number", phone)
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    if (error || !data || data.length === 0 || data[0].status !== "success") {
-      return new Response(JSON.stringify({ success: false }), { status: 200 });
-    }
-
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
-    console.error("Payment Check Error:", error);
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
+    console.error("Verification Error:", error);
+    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
   }
 }
