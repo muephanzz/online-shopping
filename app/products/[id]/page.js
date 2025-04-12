@@ -95,6 +95,7 @@ export default function ProductDetails() {
             product_id: product.product_id,
             user_id: session.user.id,
             items: {
+              product_id: product.product_id,
               name: product.name,
               price: product.price,
               image_url: mainImage,
@@ -178,6 +179,7 @@ export default function ProductDetails() {
           }
 
             const item = {
+              product_id : product.product_id,
               image_url: mainImage,
               name: product.name,
               price: product.price,

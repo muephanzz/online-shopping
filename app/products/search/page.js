@@ -1,5 +1,5 @@
-"use client";
-import { useRouter } from 'next/navigation';
+'use client';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Loader2 } from "lucide-react";
@@ -7,8 +7,8 @@ import ProductCard from '../../components/ProductCard';
 import Pagination from '../../components/Pagination';
 
 export default function SearchPage() {
-  const router = useRouter();
-  const { query } = router.query;
+  const searchParams = useSearchParams();
+  const query = searchParams.get('query') || '';
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,7 +28,7 @@ export default function SearchPage() {
 
     const { data, error, count } = await supabase
       .from('products')
-      .select('*', { count: "exact" }) // Get total count for pagination
+      .select('*', { count: "exact" })
       .ilike('name', `%${searchTerm}%`)
       .range(start, end);
 

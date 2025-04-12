@@ -26,7 +26,7 @@ export default function TopSalesSection() {
   }, []);
 
   return (
-    <section className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl overflow-hidden">
+    <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl overflow-hidden">
       <div className="flex items-center justify-between w-full flex-wrap sm:flex-nowrap gap-2 px-2">
         {/* Text on the left */}
         <p className="text-lg font-bold text-gray-900">
@@ -49,11 +49,6 @@ export default function TopSalesSection() {
           </span>
         </p>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product) => (
-          <ProductCard key={product.product_id} product={product} />
-        ))}
-      </div>
-    </section>
+    </div>
   );
 }

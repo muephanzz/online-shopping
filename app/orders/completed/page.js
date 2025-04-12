@@ -31,7 +31,7 @@ const CompletedOrders = () => {
                 <p className="text-blue-600 font-bold">Ksh {item.price}</p>
               </div>
               <button
-                onClick={() => router.push(`/upload-review/${product_id}`)}
+                onClick={() => router.push(`/upload-review/${item.product_id}`)}
                 className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
               >
                 Write a Review
@@ -94,10 +94,21 @@ const CompletedOrders = () => {
                 <strong>Order Number:</strong> {order.order_id}
               </p>
               <p>
+                <strong>Order Date:</strong>{" "}
+                {new Date(order.created_at).toLocaleString("en-GB", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: true,
+                })}
+              </p>
+              <p>
                 <strong>Status:</strong> {order.status}
               </p>
               <p>
-                <strong>Total:</strong> ${order.total}
+                <strong>Total:</strong> Ksh {order.total}
               </p>
 
               <h3 className="mt-4 font-semibold">Items:</h3>

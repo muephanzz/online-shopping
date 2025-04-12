@@ -44,10 +44,19 @@ export default function Home() {
   return (
     <div className="mt-20 pb-10">
       {/* Top Sales */}
-      <TopSalesSection />
+      <section className="border-2 border-orange-300 shadow-lg rounded-xl px-4 py-3 bg-white grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 py-2">
+        <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+          <TopSalesSection />
+        </div>
+
+        {products.slice(0, 10).map((product) => (
+          <ProductCard key={product.product_id} product={product} />
+        ))}
+      </section>
+
 
       {/* Product Grid */}
-      <section className="p-4 mt-16">
+      <section className="p-4 mt-10 border-2 border-orange-300 shadow-lg rounded-xl px-4 py-3 bg-white">
         {loading ? (
           <div className="flex justify-center items-center min-h-[50vh]">
             <div className="relative w-12 h-12 mb-4">
@@ -58,6 +67,9 @@ export default function Home() {
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+              <p className="text-sm font-semibold text-orange-600 pb-1 col-span-2 sm:col-span-3 lg:col-span-4">
+                  🔥 Top deals with affordable price
+                </p>
               {products.map((product) => (
                 <ProductCard key={product.product_id} product={product} />
               ))}
