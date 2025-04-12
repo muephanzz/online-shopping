@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabaseClient";
 import ProductCard from "./components/ProductCard";
 import TopSalesSection from "./components/TopSales";
-import { Loader2 } from "lucide-react";
 import Pagination from "./components/Pagination";
 import Footer from "./components/Footer";
 import UserChat from "./components/UserChat";
@@ -44,18 +43,17 @@ export default function Home() {
 
   return (
     <div className="mt-20 pb-10">
-      {/* Hero Banner */}
+      {/* Top Sales */}
       <TopSalesSection />
 
       {/* Product Grid */}
       <section className="p-4 mt-16">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-          Explore Our Products
-        </h2>
-
         {loading ? (
           <div className="flex justify-center items-center min-h-[50vh]">
-            <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+            <div className="relative w-12 h-12 mb-4">
+              <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin blur-sm"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-400 animate-spin"></div>
+            </div>
           </div>
         ) : (
           <>

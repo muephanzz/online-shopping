@@ -40,7 +40,7 @@ export default function OrderHistory() {
   }, []);
 
   const handleOrderClick = (orderId) => {
-    router.push(`/orders/confirmation?order_id=${orderId}`);
+    router.push(`/orders/tracking?order_id=${orderId}`);
   };
 
   if (loading) {
@@ -52,7 +52,7 @@ export default function OrderHistory() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 mt-28 p-4">
       <div className="bg-white rounded-lg shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-4">Order History</h2>
 
@@ -71,15 +71,15 @@ export default function OrderHistory() {
             <tbody>
               {orders.map((order) => (
                 <tr
-                  key={order.id}
-                  onClick={() => handleOrderClick(order.id)}
+                  key={order.order_id}
+                  onClick={() => handleOrderClick(order.order_id)}
                   className="cursor-pointer hover:bg-gray-200"
                 >
-                  <td className="px-4 py-2">{order.id}</td>
+                  <td className="px-4 py-2">{order.order_id}</td>
                   <td className="px-4 py-2">
                     {new Date(order.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-2">Ksh {order.total_amount?.toFixed(2)}</td>
+                  <td className="px-4 py-2">Ksh {order.total?.toFixed(2)}</td>
                   <td className="px-4 py-2">{order.status}</td>
                 </tr>
               ))}

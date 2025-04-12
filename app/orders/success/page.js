@@ -1,26 +1,9 @@
-"use client";
-import { useRouter } from "next/navigation";
-
-export default function Success() {
-  const router = useRouter();
-
+export default function SuccessPage() {
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h1>🎉 Payment Successful!</h1>
-      <p>Thank you for your order.</p>
-      <button
-        onClick={() => router.push("/")}
-        style={{
-          padding: "10px 20px",
-          backgroundColor: "#0070f3",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-      >
-        Continue Shopping
-      </button>
+    <div className="flex flex-col items-center justify-center min-h-screen text-center p-4">
+      <h1 className="text-4xl font-bold text-green-600 mb-4">Payment Successful!</h1>
+      <p className="text-lg mb-2">Thank you for your purchase 🎉</p>
+      <p className="text-sm text-gray-500">Your order will be processed shortly.</p>
     </div>
   );
 }

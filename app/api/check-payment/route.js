@@ -1,50 +1,31 @@
-import { supabase } from "../../lib/supabaseClient";
-import { verifyPayment } from "../../lib/verifyPayment";  // Import the verifyPayment function
+import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabaseClient";
 
-export async function POST(req) {
+export async function GET(req) {
   try {
-    const { phone } = await req.json();  // Get phone number from the request
+    const { searchParams } = new URL(req.url);
+    const checkoutRequestId = searchParams.get("checkoutRequestId");
 
-    if (!phone) {
-      return new Response(JSON.stringify({ error: "Phone number is required" }), { status: 400 });
+    if (!checkoutRequestId) {
+      return NextResponse.json({ error: "Missing checkoutRequestId" }, { status: 400 });
     }
 
-    // Retrieve the order based on the phone number
-    const { data, error } = await supabase
-      .from("orders")
-      .select("order_id, checkout_request_id")
-      .eq("phone_number", phone)
-      .order("created_at", { ascending: false })
-      .limit(1);
+    // 1. Fetch latest payment status from Supabase
+    const { data: payment, error } = await supabase
+      .from("payments")
+      .select("status")
+      .eq("checkout_request_id", checkoutRequestId)
+      .single();
 
-    if (error || !data || data.length === 0) {
-      return new Response(JSON.stringify({ success: false }), { status: 200 });
+    if (error || !payment) {
+      return NextResponse.json({ error: "Payment not found" }, { status: 404 });
     }
 
-    const checkoutRequestId = data[0].checkout_request_id; // Get checkout request ID from the latest order
+    // 2. Return payment status
+    return NextResponse.json({ status: payment.status }, { status: 200 });
 
-    // Verify the payment status using M-Pesa API
-    const paymentStatus = await verifyPayment(checkoutRequestId);
-
-    if (paymentStatus.success) {
-      // Update the payment status in the database to 'completed'
-      await supabase
-        .from("payments")
-        .update({ status: "completed" })
-        .eq("checkout_request_id", checkoutRequestId);
-
-      return new Response(JSON.stringify({ success: true, message: paymentStatus.message }), { status: 200 });
-    } else {
-      // Update the payment status in the database to 'failed'
-      await supabase
-        .from("payments")
-        .update({ status: "failed" })
-        .eq("checkout_request_id", checkoutRequestId);
-
-      return new Response(JSON.stringify({ success: false, message: paymentStatus.message }), { status: 200 });
-    }
-  } catch (error) {
-    console.error("Payment Check Error:", error);
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), { status: 500 });
+  } catch (err) {
+    console.error("Payment status error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

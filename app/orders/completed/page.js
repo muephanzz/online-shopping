@@ -31,7 +31,7 @@ const CompletedOrders = () => {
                 <p className="text-blue-600 font-bold">Ksh {item.price}</p>
               </div>
               <button
-                onClick={() => router.push(`/upload-review/${item.product_id}`)}
+                onClick={() => router.push(`/upload-review/${product_id}`)}
                 className="bg-blue-500 text-white px-3 py-1 rounded text-sm"
               >
                 Write a Review

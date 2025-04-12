@@ -10,6 +10,7 @@ export default function Checkout() {
   const [amount, setAmount] = useState(0);
   const [phone, setPhone] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
+  const [email, setEmail] = useState(""); // ✅ auto-filled from profiles
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -21,6 +22,25 @@ export default function Checkout() {
     setAmount(total);
   }, []);
 
+  useEffect(() => {
+    const fetchEmail = async () => {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData?.user) return;
+
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("user_id", userData.user.id)
+        .single();
+
+      if (!profileError && profile?.email) {
+        setEmail(profile.email);
+      }
+    };
+
+    fetchEmail();
+  }, []);
+
   const isValidPhone = (phone) => /^2547\d{8}$/.test(phone);
 
   const handleSubmit = async (e) => {
@@ -29,6 +49,11 @@ export default function Checkout() {
 
     if (!isValidPhone(phone)) {
       setError("Please enter a valid phone number (format: 2547...)");
+      return;
+    }
+
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -54,13 +79,14 @@ export default function Checkout() {
           user_id: user.id,
           checkoutItems,
           shipping_address: shippingAddress,
+          email, // ✅ auto-filled
         }),
       });
 
       const data = await res.json();
 
       if (res.ok && data.success) {
-        router.push(`/orders/processing?phone=${phone}`);
+        router.push(`/orders/processing?checkoutRequestId=${data.checkoutRequestId}`);
       } else {
         setError(data.message || "Payment initiation failed.");
         setLoading(false);

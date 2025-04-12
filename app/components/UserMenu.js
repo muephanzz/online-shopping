@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
 import toast from "react-hot-toast";
-import { User2, LogOut, ShoppingBasket, ChevronDown, LogIn, Package, User, CheckCircle } from "lucide-react";
+import { User2, LogOut, ShoppingBasket, ChevronDown, LogIn, Package, User, CheckCircle, History } from "lucide-react";
 
 export default function UserMenu({ user, setUser, onSignIn }) {
     const [isAdmin, setIsAdmin] = useState(false);
@@ -98,7 +98,14 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                             </Menu.Item>
                             <Menu.Item>
                                 {({ active }) => (
-                                    <Link href="/orders/order-tracking" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
+                                    <Link href="/orders/history" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
+                                        <History className="inline-block mr-2" /> Order History
+                                    </Link>
+                                )}
+                            </Menu.Item>
+                            <Menu.Item>
+                                {({ active }) => (
+                                    <Link href="/orders/tracking" className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}>
                                         <Package className="inline-block mr-2" /> Order Tracking
                                     </Link>
                                 )}

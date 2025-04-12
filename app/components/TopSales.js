@@ -26,35 +26,34 @@ export default function TopSalesSection() {
   }, []);
 
   return (
-    <section className="relative bg-gradient-to-r from-orange-100 to-yellow-50 px-6 py-16 rounded-3xl shadow-2xl mb-10 text-center overflow-hidden">
-      {/* Background sale flare or pattern */}
-      <div className="absolute -top-10 -left-10 w-48 h-48 bg-orange-400 opacity-10 rounded-full blur-3xl z-0 animate-pulse"></div>
+    <section className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl overflow-hidden">
+      <div className="flex items-center justify-between w-full flex-wrap sm:flex-nowrap gap-2 px-2">
+        {/* Text on the left */}
+        <p className="text-lg font-bold text-gray-900">
+          Flash deals end in:
+        </p>
 
-      <h1 className="relative z-10 text-4xl md:text-5xl font-extrabold text-gray-800 mb-6">
-        🔥 Today's Top Sales
-      </h1>
-      <p className="relative z-10 text-lg md:text-xl text-gray-700 max-w-2xl mx-auto mb-6">
-        Flash deals end in:
-      </p>
-
-      <div className="relative z-10 flex justify-center gap-6 text-center text-xl font-bold text-gray-900">
-        <div className="bg-white shadow-md rounded-xl px-4 py-2 w-20">
-          <div>{String(timeLeft.hours).padStart(2, "0")}</div>
-          <span className="text-xs font-medium text-gray-500">Hours</span>
-        </div>
-        <div className="bg-white shadow-md rounded-xl px-4 py-2 w-20">
-          <div>{String(timeLeft.minutes).padStart(2, "0")}</div>
-          <span className="text-xs font-medium text-gray-500">Minutes</span>
-        </div>
-        <div className="bg-white shadow-md rounded-xl px-4 py-2 w-20">
-          <div>{String(timeLeft.seconds).padStart(2, "0")}</div>
-          <span className="text-xs font-medium text-gray-500">Seconds</span>
-        </div>
+        {/* Countdown on the right */}
+        <p className="text-lg font-semibold text-gray-800 space-x-2">
+          <span>
+            {String(timeLeft.hours).padStart(2, "0")}
+            <span className="text-xs font-medium text-gray-500 ml-1">Hrs</span>
+          </span>
+          <span>
+            {String(timeLeft.minutes).padStart(2, "0")}
+            <span className="text-xs font-medium text-gray-500 ml-1">Mins</span>
+          </span>
+          <span>
+            {String(timeLeft.seconds).padStart(2, "0")}
+            <span className="text-xs font-medium text-gray-500 ml-1">Sec</span>
+          </span>
+        </p>
       </div>
-
-      <p className="relative z-10 mt-8 text-gray-600 max-w-xl mx-auto text-base md:text-lg">
-        Don’t miss out on today’s best electronics deals. Limited stock available – grab yours before the timer runs out!
-      </p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.map((product) => (
+          <ProductCard key={product.product_id} product={product} />
+        ))}
+      </div>
     </section>
   );
 }

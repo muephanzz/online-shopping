@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2, Heart, LucideLoaderPinwheel, LoaderCircleIcon } from "lucide-react";
+import { Loader2, Trash2, Heart } from "lucide-react";
 import Image from "next/image";
 import OrderSummary from "../components/OrderSummary";
 import { toast } from "react-toastify";
@@ -113,7 +113,9 @@ export default function Cart() {
 
     const { error } = await supabase
       .from("cart")
-      .update({ quantity: newQuantity })
+      .update({
+        items: { ...cartItems.find((item) => item.cart_id === cart_id).items, quantity: newQuantity },
+      })
       .eq("cart_id", cart_id);
 
     if (error) {
@@ -121,7 +123,9 @@ export default function Cart() {
     } else {
       setCartItems((prev) =>
         prev.map((item) =>
-          item.cart_id === cart_id ? { ...item, quantity: newQuantity } : item
+          item.cart_id === cart_id
+            ? { ...item, items: { ...item.items, quantity: newQuantity } }
+            : item
         )
       );
       toast.success("Quantity updated!");
@@ -129,11 +133,11 @@ export default function Cart() {
   };
 
   const quantity = cartItems
-    .filter((item) => item.quantity, 0);
+    .filter((item) => item.items.quantity, 0);
 
   const subtotal = cartItems
     .filter((item) => selectedItems[item.cart_id])
-    .reduce((sum, item) => sum + item.price * item.quantity, 0);
+    .reduce((sum, item) => sum + item.items.price * item.items.quantity, 0);
 
   const shippingFee = Object.keys(selectedItems).length > 0 ? 0 : 0;
 
@@ -150,88 +154,77 @@ export default function Cart() {
       <h1 className="text-3xl font-semibold mb-8 text-gray-800">Your Cart</h1>
 
       <div className="space-y-6">
-  {cartItems.map((item) => (
-    <div
-      key={item.cart_id}
-      className="flex flex-co sm:flex-row items-center sm:justify-between border-b pb-4 gap-4"
-    >
-      {/* Checkbox */}
-      <input
-        type="checkbox"
-        checked={!!selectedItems[item.cart_id]}
-        onChange={() => toggleSelection(item.cart_id)}
-        className="w-5 h-5"
-      />
+        {cartItems.map((item) => (
+          <div
+            key={item.cart_id}
+            className="flex flex-co sm:flex-row items-center sm:justify-between border-b pb-4 gap-4"
+          >
+            <input
+              type="checkbox"
+              checked={!!selectedItems[item.cart_id]}
+              onChange={() => toggleSelection(item.cart_id)}
+              className="w-5 h-5"
+            />
 
-      {/* Product Image */}
-      <Image
-        width={500}
-        height={500}
-        unoptimized
-        src={item.image_url}
-        alt={item.name}
-        className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
-      />
+            <Image
+              width={500}
+              height={500}
+              unoptimized
+              src={item.items.image_url}
+              alt={item.items.name}
+              className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-lg"
+            />
 
-      {/* Product Info */}
-      <div className="flex-1 px-4 text-center sm:text-left">
-        <h3 className="text-sm sm:text-lg font-medium text-gray-800">{item.name}</h3>
-        <p className="text-blue-600 font-bold text-sm sm:text-base">
-          {item.quantity}*{item.price}
-        </p>
-        <h2>Ksh {item.price * item.quantity}</h2>
-     </div>
+            <div className="flex-1 px-4 text-center sm:text-left">
+              <h3 className="text-sm sm:text-lg font-medium text-gray-800">{item.items.name}</h3>
+              <p className="text-blue-600 font-bold text-sm sm:text-base">
+                {item.items.quantity}*{item.items.price}
+              </p>
+              <h2>Ksh {item.items.price * item.items.quantity}</h2>
+            </div>
 
-      {/* Quantity Update Buttons */}
-      <div className="flex-1 px-4 text-center sm:text-left">
-        <button
-          onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
-          className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-300 text-gray-700 rounded-lg"
-        >
-          −
-        </button>
-        <span className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-100 rounded-lg">
-          {item.quantity}
-        </span>
-        <button
-          onClick={() => updateQuantity(item.cart_id, item.quantity + 1)}
-          className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-300 text-gray-700 rounded-lg"
-        >
-          +
-        </button>
+            <div className="flex-1 px-4 text-center sm:text-left">
+              <button
+                onClick={() => updateQuantity(item.cart_id, item.items.quantity - 1)}
+                className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-300 text-gray-700 rounded-lg"
+              >
+                −
+              </button>
+              <span className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-100 rounded-lg">
+                {item.items.quantity}
+              </span>
+              <button
+                onClick={() => updateQuantity(item.cart_id, item.items.quantity + 1)}
+                className="px-2 py-1 sm:px-3 sm:py-1 bg-gray-300 text-gray-700 rounded-lg"
+              >
+                +
+              </button>
+            </div>
+
+            <div className="flex-1 px-4 text-center sm:text-left">
+              <button
+                onClick={() => addToWishlist(item)}
+                className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-500 text-white rounded-lg hover:bg-green-700 transition"
+              >
+                <Heart />
+              </button>
+              <button
+                onClick={() => handleRemoveItem(item.cart_id)}
+                className="px-3 py-1 sm:px-4 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                <Trash2 />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex-1 px-4 text-center sm:text-left">        
-        <button
-          onClick={() => addToWishlist(item)}
-          className="px-3 py-1 sm:px-4 sm:py-2 bg-gray-500 text-white rounded-lg hover:bg-green-700 transition"
-        >
-          <Heart />
-        </button>
-        <button
-          onClick={() => handleRemoveItem(item.cart_id)}
-          className="px-3 py-1 sm:px-4 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-        >
-          <Trash2 />
-        </button>
-      </div>
-    </div>
-  ))}
-</div>
-
-      
       <OrderSummary quantity={quantity} subtotal={subtotal} shippingFee={shippingFee} />
       <button
         onClick={() => {
           const selectedProducts = cartItems
             .filter((item) => selectedItems[item.cart_id])
-            .map(({ image_url, name, price, quantity }) => ({
-              image_url,
-              name,
-              price,
-              quantity,
-            }));
+            .map(({ items }) => items);
 
           if (selectedProducts.length === 0) {
             toast.warning("Please select at least one item.");

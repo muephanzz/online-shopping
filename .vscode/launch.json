@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/USER/ephantronics/src/app/dashboard",
-      "program": "c:/Users/USER/ephantronics/src/app/dashboard/build/Debug/outDebug",
+      "cwd": "c:/Users/USER/ephantronics/app/orders/order-tracking",
+      "program": "c:/Users/USER/ephantronics/app/orders/order-tracking/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
