@@ -45,7 +45,7 @@ export default function TopSalesSection() {
           </span>
           <span>
             {String(timeLeft.seconds).padStart(2, "0")}
-            <span className="text-xs font-medium text-gray-500 ml-1">Sec</span>
+            <span className="text-xs font-medium text-gray-500 ml-1">Secs</span>
           </span>
         </p>
       </div>

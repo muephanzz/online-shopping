@@ -109,21 +109,26 @@ export async function POST(req) {
     }
 
     // 5. Send email to customer
-    await resend.emails.send({
-      from: "Ephantronics <muephanzz@gmail.com>",
-      to: [email],
-      subject: "Ephantronics: Order Initiated",
-      html: `
-        <p>Hello 👋,</p>
-        <p>Your order of <strong>KES ${amount}</strong> has been initiated and is awaiting M-Pesa payment confirmation.</p>
-        <p>If you completed the payment, we’ll send you another email once confirmed.</p>
-        <p>Thank you for shopping with <strong>Ephantronics</strong> 🎉</p>
-      `,
-    });
+    try {
+      await resend.emails.send({
+        from: "Ephantronics <onboarding@resend.dev>",
+        to: [email],
+        subject: "Ephantronics: Order Initiated",
+        html: `
+          <p>Hello 👋,</p>
+          <p>Your order of <strong>KES ${amount}</strong> has been initiated and is awaiting M-Pesa payment confirmation.</p>
+          <p>If you completed the payment, we’ll send you another email once confirmed.</p>
+          <p>Thank you for shopping with <strong>Ephantronics</strong> 🎉</p>
+        `,
+      });
+    } catch (err) {
+      console.error("❌ Error sending customer email:", err);
+    };
 
     // 6. Send email to admin
-    await resend.emails.send({
-      from: "Ephantronics <muephanzz@gmail.com>",
+    try {
+      await resend.emails.send({
+        from: "Ephantronics <onboarding@resend.dev>",
       to: ["muephanzz@gmail.com"],
       subject: "New Order Initiated",
       html: `
@@ -136,6 +141,9 @@ export async function POST(req) {
         </ul>
       `,
     });
+    } catch (err) {
+      console.error("❌ Error sending admin email:", err);
+    };
 
     // 7. Return success
     return NextResponse.json({

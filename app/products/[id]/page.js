@@ -6,12 +6,12 @@ import { supabase } from "../../lib/supabaseClient";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import ProductCard from "../../components/ProductCard";
+import ReviewSection from "../../components/ReviewSection";
 import moment from "moment";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const router = useRouter();
-
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [quantity] = useState(1);
@@ -126,154 +126,121 @@ export default function ProductDetails() {
           Back to Products
         </Link>
       </div>
-
+  
       <div className="flex flex-col lg:flex-row gap-8">
-      
-      <div className="border-b lg:outline pb-1 lg:w-1/2 flex flex-col sm:item-center gap-4 lg:h-[310px]">
-        <div className="flex m-4 w-full relative justify-center items-center">
-          <Image 
-            src={mainImage} 
-            width={300} 
-            height={300} 
-            alt={product.name} 
-            className="lg:w-80 md:h-70"
-          />
-        </div>
-        
-      {/* Thumbnails Section */}
-        <div className="flex z-40 lg:absolute lg:flex-col sm:px-14 gap-4">
-        {product.image_urls?.map((img, index) => (
-          <Image
-            key={index}
-            src={img}
-            width={50}
-            height={25}
-            alt="Thumbnail"
-            onClick={() => setMainImage(img)}
-            className={`cursor-pointer rounded ${mainImage === img ? "border-2 border-blue-500 shadow-lg" : 
-              isMobile ? "scroll-smooth" : ""
-            } ${setMainImage === img ? "border-2 border-blue-500 shadow-lg" : ""}`}
-          />
-        ))}
-      </div>
-    </div>
-
-    <div className="flex lg:w-1/2 flex-col gap-4">
-      <h1 className="text-2xl font-bold">{product.name}</h1>
-      <p className="text-gray-600">{product.description || "No description available."}</p>
-      <p className="text-xl text-blue-600 font-semibold">Ksh {product.price}</p>
-      <div className="flex gap-4">
-      <button
-        onClick={handleAddToCart}
-        disabled={adding}
-        className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
-      >
-        {adding ? "Adding..." : "Add to Cart"}
-      </button>
-
-      <button
-        onClick={() => {
-          if (!product) {
-            toast.error("Product details are missing!");
-            return;
-          }
-
-            const item = {
-              product_id : product.product_id,
-              image_url: mainImage,
-              name: product.name,
-              price: product.price,
-              quantity: 1, // Default to 1 or use selected quantity
-            };
-
-            localStorage.setItem("checkoutItems", JSON.stringify([item]));
-
-            router.push("/orders/checkout");
-          }}
-          disabled={checking}
-          className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
-        >
-          {checking ? "Checking..." : "Buy Now"}
-        </button>
-
-      </div>
-    </div>
-      </div>
-
-    <div className="flex gap-6 mt-8 mb-6 border-b pb-2 text-lg font-semibold">
-      <p onClick={() => setActiveTab("specifications")} className={`cursor-pointer transition duration-300 ${activeTab === "specifications" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Specifications</p>
-      <p onClick={() => setActiveTab("recommended")} className={`cursor-pointer transition duration-300 ${activeTab === "recommended" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Recommended</p>
-      <p onClick={() => setActiveTab("reviews")} className={`cursor-pointer transition duration-300 ${activeTab === "reviews" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Reviews</p>
-    </div>
-
-  {activeTab === "specifications" && (
-    <table className="w-full mb-20 border-collapse border border-gray-300 text-sm md:text-base rounded-lg">
-      <tbody>
-        {product.specification.split("\n").filter(line => line.includes(":"))
-          .map((line, index) => {
-            const [key, value] = line.split(":").map((item) => item.trim());
-            return (
-              <tr key={index} className="border border-gray-300 hover:bg-gray-100 transition">
-                <td className="p-3 font-semibold text-gray-700 bg-gray-50">{key}</td>
-                <td className="p-3 text-gray-600">{value}</td>
-              </tr>
-            );
-          })}
-      </tbody>
-    </table>  
-)}
-
-  {activeTab === "recommended" && (
-    <div id="recommended" className="relative mb-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-      {recommended.map((product) => (
-        <ProductCard key={product.product_id} product={product} />
-      ))}
-    </div>
-  )}
-
-  {activeTab === "reviews" && (
-    <div id="reviews" className="mt-6">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Customer Reviews ({reviews.length})</h2>
-      <select onChange={(e) => setSortOrder(e.target.value)} value={sortOrder} className="mb-4 p-2 border rounded-md">
-        <option value="newest">Newest First</option>
-        <option value="oldest">Oldest First</option>
-        <option value="highest">Highest Rated</option>
-        <option value="lowest">Lowest Rated</option>
-      </select>
-      {reviews.length === 0 ? (
-  <p className="text-gray-500 mb-20">No reviews yet. Be the first to review!</p>
-  ) : (
-    reviews.map((review) => (
-      <div key={review.review_id} className="mb-6 border-b pb-4">
-    <div className="flex items-center gap-3">
-          <Image
-            src={review.profiles?.avatar_url || "https://www.gravatar.com/avatar/?d=mp"} 
-            alt="User Avatar"
-            width={40}
-            height={40}
-            className="w-10 h-10 rounded-full border"
-          />        <h2>{review.username}</h2>
-                    <span className="text-gray-500 text-sm ml-2">
-            {moment(review.created_at).format('MMMM Do YYYY, h:mm a')}
-          </span>        
+        <div className="border-b lg:outline pb-1 lg:w-1/2 flex flex-col sm:item-center gap-4 lg:h-[310px]">
+          <div className="flex m-4 w-full relative justify-center items-center">
+            <Image 
+              src={mainImage} 
+              width={300} 
+              height={300} 
+              alt={product.name} 
+              className="lg:w-80 md:h-70"
+            />
           </div>
-                  
-          <div className="ml-12 text-gray-600">
-          <span>
-            {Array.from({ length: review.rating }, (_, i) => (
-              <span key={i} className="text-yellow-500 text-lg">⭐</span>
+  
+          {/* Thumbnails Section */}
+          <div className="flex z-40 lg:absolute lg:flex-col sm:px-14 gap-4">
+            {product.image_urls?.map((img, index) => (
+              <Image
+                key={index}
+                src={img}
+                width={50}
+                height={25}
+                alt="Thumbnail"
+                onClick={() => setMainImage(img)}
+                className={`cursor-pointer rounded ${mainImage === img ? "border-2 border-blue-500 shadow-lg" : 
+                  isMobile ? "scroll-smooth" : ""
+                } ${setMainImage === img ? "border-2 border-blue-500 shadow-lg" : ""}`}
+              />
             ))}
-          </span>
-
-      {/* Review Comment */}
-      <p className="mb-20">{review.comment}</p>
-      </div>    </div>
-  ))
-)}
-
+          </div>
+        </div>
+  
+        <div className="flex lg:w-1/2 flex-col gap-4">
+          <h1 className="text-2xl font-bold">{product.name}</h1>
+          <p className="text-gray-600">{product.description || "No description available."}</p>
+          <p className="text-xl text-blue-600 font-semibold">Ksh {product.price}</p>
+  
+          <div className="flex gap-4">
+            <button
+              onClick={handleAddToCart}
+              disabled={adding}
+              className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
+            >
+              {adding ? "Adding..." : "Add to Cart"}
+            </button>
+  
+            <button
+              onClick={() => {
+                if (!product) {
+                  toast.error("Product details are missing!");
+                  return;
+                }
+  
+                const item = {
+                  product_id: product.product_id,
+                  image_url: mainImage,
+                  name: product.name,
+                  price: product.price,
+                  quantity: 1,
+                };
+  
+                localStorage.setItem("checkoutItems", JSON.stringify([item]));
+                router.push("/orders/checkout");
+              }}
+              disabled={checking}
+              className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 w-full sm:w-auto"
+            >
+              {checking ? "Checking..." : "Buy Now"}
+            </button>
+          </div>
+        </div>
+      </div>
+  
+      <div className="flex gap-6 mt-8 mb-6 border-b pb-2 text-lg font-semibold">
+        <p onClick={() => setActiveTab("specifications")} className={`cursor-pointer transition duration-300 ${activeTab === "specifications" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Specifications</p>
+        <p onClick={() => setActiveTab("recommended")} className={`cursor-pointer transition duration-300 ${activeTab === "recommended" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Recommended</p>
+        <p onClick={() => setActiveTab("reviews")} className={`cursor-pointer transition duration-300 ${activeTab === "reviews" ? "text-orange-600 border-b-2 border-orange-600" : "text-gray-600 hover:text-orange-500"}`}>Reviews</p>
+      </div>
+  
+      {activeTab === "specifications" && (
+        <table className="w-full mb-20 border-collapse border border-gray-300 text-sm md:text-base rounded-lg">
+          <tbody>
+            {product.specification.split("\n").filter(line => line.includes(":"))
+              .map((line, index) => {
+                const [key, value] = line.split(":").map((item) => item.trim());
+                return (
+                  <tr key={index} className="border border-gray-300 hover:bg-gray-100 transition">
+                    <td className="p-3 font-semibold text-gray-700 bg-gray-50">{key}</td>
+                    <td className="p-3 text-gray-600">{value}</td>
+                  </tr>
+                );
+              })}
+          </tbody>
+        </table>
+      )}
+  
+      {activeTab === "recommended" && (
+        <div id="recommended" className="relative mb-20 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {recommended.map((product) => (
+            <ProductCard key={product.product_id} product={product} />
+          ))}
+        </div>
+      )}
+  
+      {activeTab === "reviews" && (
+        <div id="reviews" className="mt-6">
+          <h2 className="text-2xl font-bold mb-4 text-gray-800">Customer Reviews ({reviews.length})</h2>
+          <select onChange={(e) => setSortOrder(e.target.value)} value={sortOrder} className="mb-4 p-2 border rounded-md">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Rated</option>
+            <option value="lowest">Lowest Rated</option>
+          </select>    
+          <ReviewSection reviews={reviews} />
+        </div>
+      )}
     </div>
-  )}
-</div>
-
   );
 }

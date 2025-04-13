@@ -1,11 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { Loader2, Trash2, ShoppingCart } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-
 
 export default function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
@@ -18,8 +18,8 @@ export default function Wishlist() {
         data: { session },
         error: sessionError,
       } = await supabase.auth.getSession();
+
       if (sessionError || !session?.user) {
-        console.error("Error fetching session:", sessionError?.message);
         setLoading(false);
         return;
       }
@@ -30,7 +30,6 @@ export default function Wishlist() {
         .eq("user_id", session.user.id);
 
       if (error) {
-        console.error("Error fetching wishlist:", error.message);
         toast.error("Failed to fetch wishlist.");
       } else {
         setWishlist(data || []);
@@ -44,7 +43,6 @@ export default function Wishlist() {
   const removeFromWishlist = async (wishlist_id) => {
     const { error } = await supabase.from("wishlist").delete().eq("id", wishlist_id);
     if (error) {
-      console.error("Error removing from wishlist:", error.message);
       toast.error("Failed to remove from wishlist.");
     } else {
       toast.success("Removed from wishlist.");
@@ -69,29 +67,24 @@ export default function Wishlist() {
       price: product.price,
     });
 
-    if (error) {
-      console.error("Error adding to cart:", error.message);
-      toast.error("Failed to add to cart.");
-    } else {
-      toast.success("Added to cart!");
-    }
+    error ? toast.error("Failed to add to cart.") : toast.success("Added to cart!");
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+        <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
       </div>
     );
   }
 
   if (wishlist.length === 0) {
     return (
-      <div className="mt-28 text-center">
-        <p className="text-lg text-gray-600">Your wishlist is empty.</p>
+      <div className="flex flex-col items-center justify-center mt-28 text-gray-600">
+        <p className="text-xl mb-4">Your wishlist is empty.</p>
         <button
           onClick={() => router.push("/")}
-          className="mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
         >
           Browse Products
         </button>
@@ -100,34 +93,40 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="mt-20 mb-20 p-6 max-w-5xl mx-auto bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl font-semibold mb-6 text-gray-800">Your Wishlist</h1>
-      <div className="border rounded-lg shadow-md p-4 hover:shadow-lg transition duration-300">
+    <div className="mt-20 mb-20 px-4 md:px-8 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">Your Wishlist</h1>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {wishlist.map((item) => {
-          const imageUrl = Array.isArray(item.products.image_urls) && item.products.image_urls.length > 0
-            ? item.products.image_urls[0]
-            : "/placeholder.jpg";
+          const { products } = item;
+          const imageUrl =
+            Array.isArray(products.image_urls) && products.image_urls.length > 0
+              ? products.image_urls[0]
+              : "/placeholder.jpg";
 
           return (
-            <div key={item.id} className="bg-gray-100 p-4 rounded-lg shadow-sm">
-              <div className="mt-4">
-                <ProductCard />
-                <div className="mt-3 flex gap-2">
-                  <button
-                    onClick={() => addToCart(item.products)}
-                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex-1"
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2" />
-                  </button>
-                  <button
-                    onClick={() => removeFromWishlist(item.id)}
-                    className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition flex-1"
-                  >
-                    <Trash2 className="w-5 h-5 mr-2" />
-                  </button>
-                </div>
+            <div key={item.id} className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition">
+              <ProductCard
+                product={{
+                  ...products,
+                  image_urls: [imageUrl],
+                }}
+              />
+              <div className="mt-4 flex gap-3">
+                <button
+                  onClick={() => addToCart(products)}
+                  className="flex-1 flex items-center justify-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  Add to Cart
+                </button>
+                <button
+                  onClick={() => removeFromWishlist(item.id)}
+                  className="flex-1 flex items-center justify-center bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
+                >
+                  <Trash2 className="w-5 h-5 mr-2" />
+                  Remove
+                </button>
               </div>
-
             </div>
           );
         })}
