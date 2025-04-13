@@ -42,7 +42,7 @@ export default function Home() {
   }, [currentPage]);
 
   return (
-    <div className="mt-20 pb-10">
+    <div className="sm:mt-20 mt-20 md:mt-28 ">
       {/* Top Sales */}
       <section className="border-2 border-orange-300 shadow-lg rounded-xl px-4 py-3 bg-white grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 py-2">
         <div className="col-span-2 sm:col-span-3 lg:col-span-4">
@@ -65,27 +65,27 @@ export default function Home() {
             </div>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-              <p className="text-sm font-semibold text-orange-600 pb-1 col-span-2 sm:col-span-3 lg:col-span-4">
-                  🔥 Enjoy your shoppiing with the most affordable price
-                </p>
-              {products.map((product) => (
-                <ProductCard key={product.product_id} product={product} />
-              ))}
-            </div>
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <p className="text-center text-sm font-semibold text-orange-600 pb-1 col-span-2 sm:col-span-3 lg:col-span-4">
+                🔥 Enjoy your shoppiing with the most affordable price
+              </p>
+            {products.map((product) => (
+              <ProductCard key={product.product_id} product={product} />
+            ))}
+          </div>
 
-            {/* Pagination */}
-            <div className="mt-10">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </div>
-          </>
-        )}
-      </section>
+          {/* Pagination */}
+          <div className="mt-10">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
+        </>
+      )}
+    </section>
 
       {/* User Chat */}
       <UserChat />
