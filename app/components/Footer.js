@@ -1,11 +1,10 @@
 import Link from 'next/link';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { FaCcVisa, FaCcMastercard, FaPaypal } from 'react-icons/fa';
-import { SiMpesa } from 'react-icons/si';
 
 export default function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white p-10 rounded-t-3xl shadow-inner">
+    <footer className="bg-gradient-to-br mt-10 from-gray-900 via-gray-800 to-gray-900 text-white p-10 shadow-inner">
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
 
         {/* About Section */}
@@ -30,10 +29,25 @@ export default function Footer() {
         <div>
           <h2 className="mb-4 text-xl font-bold tracking-wide text-blue-400">Payment Methods</h2>
           <div className="flex items-center space-x-4">
-            <FaCcVisa size={30} className="text-blue-500" />
-            <FaCcMastercard size={30} className="text-red-500" />
-            <FaPaypal size={30} className="text-blue-400" />
-            <SiMpesa size={30} className="text-green-500" title="M-Pesa" />
+            <FaCcVisa size={32} className="text-blue-500" />
+            <FaCcMastercard size={32} className="text-red-600" />
+            <FaPaypal size={32} className="text-blue-400" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 400 80"
+                fill="none"
+                className="w-full h-auto"
+              >
+                <rect width="400" height="80" rx="12" />
+                <g transform="scale(1.1) translate(30, 20)">
+                  <path d="M50 0h10v40H50z" fill="#43B02A" />
+                  <circle cx="55" cy="20" r="5" fill="white" />
+                  <path d="M65 5h10v30H65z" fill="#43B02A" />
+                  <text x="90" y="28" fontSize="44" fontWeight="bold" fill="#43B02A" fontFamily="Arial, sans-serif">
+                    M-PESA
+                  </text>
+                </g>
+              </svg>
           </div>
         </div>
 
