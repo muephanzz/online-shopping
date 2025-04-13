@@ -68,7 +68,7 @@ export default function Home() {
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
               <p className="text-sm font-semibold text-orange-600 pb-1 col-span-2 sm:col-span-3 lg:col-span-4">
-                  🔥 Top deals with affordable price
+                  🔥 Enjoy your shoppiing with the most affordable price
                 </p>
               {products.map((product) => (
                 <ProductCard key={product.product_id} product={product} />

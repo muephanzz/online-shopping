@@ -1,13 +1,7 @@
 "use client";
 import { useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabaseClient";
 import { useRouter } from "next/router";
-import { Loader2 } from "lucide-react"; // Import loader icon
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
 
 const ResetPassword = () => {
   const router = useRouter();

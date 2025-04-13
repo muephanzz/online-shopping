@@ -9,7 +9,7 @@ import ProductCard from "../../components/ProductCard";
 import moment from "moment";
 
 export default function ProductDetails() {
-  const { id } = useParams(); // ✅ Use useParams() instead of useRouter()
+  const { id } = useParams();
   const router = useRouter();
 
   const [product, setProduct] = useState(null);

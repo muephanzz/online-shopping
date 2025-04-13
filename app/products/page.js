@@ -1,21 +1,14 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../lib/supabaseClient";
 import ProductCard from "../components/ProductCard";
 import Pagination from "../components/Pagination";
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
-
 export default function ProductsPage() {
   const searchParams = useSearchParams();
-  const category_id = searchParams.get("category_id"); // Get category from URL
-  const page = parseInt(searchParams.get("page")) || 1; // Get page number, default to 1
-
+  const category_id = searchParams.get("category_id");
+  const page = parseInt(searchParams.get("page")) || 1;
   const [products, setProducts] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
   const [categoryName, setCategoryName] = useState("");
@@ -66,7 +59,14 @@ export default function ProductsPage() {
 
   const totalPages = Math.ceil(totalProducts / productsPerPage);
 
-  if (loading) return <p>Loading products...</p>;
+  if (loading) return
+    <div className="flex justify-center items-center min-h-[50vh]">
+      <div className="relative w-12 h-12 mb-4">
+        <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin blur-sm"></div>
+        <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-400 animate-spin"></div>
+      </div>
+    </div>;
+    
   if (!category_id) return <p>Please select a category.</p>;
 
   return (

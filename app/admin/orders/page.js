@@ -72,8 +72,11 @@ const ManageOrders = () => {
       <h1 className="text-3xl font-bold mb-6">Manage Orders</h1>
 
       {loading ? (
-        <div className="flex justify-center items-center">
-          <p className="text-blue-500">Loading orders...</p>
+        <div className="flex justify-center items-center min-h-[50vh]">
+          <div className="relative w-12 h-12 mb-4">
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin blur-sm"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-400 animate-spin"></div>
+          </div>
         </div>
       ) : ( 
         <ul className="space-y-4">

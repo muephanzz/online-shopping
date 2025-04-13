@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import AdminLayout from "../../components/AdminLayout";
 import withAdminAuth from '../../components/withAdminAuth';
-import { Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ManageProducts = () => {
@@ -257,7 +256,12 @@ const ManageProducts = () => {
 
       {/* Product List */}
       {loading ? (
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+        <div className="flex justify-center items-center min-h-[50vh]">
+          <div className="relative w-12 h-12 mb-4">
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin blur-sm"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-400 animate-spin"></div>
+          </div>
+        </div>
       ) : (
         <ul className="mt-8 space-y-4">
           {products.length === 0 ? (

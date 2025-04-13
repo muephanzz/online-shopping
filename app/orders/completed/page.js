@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
-import { useRouter } from "next/navigation"; // ✅ Correct import for App Router
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 const CompletedOrders = () => {
@@ -9,7 +9,7 @@ const CompletedOrders = () => {
   const [loading, setLoading] = useState(false);
 
   const OrderItems = ({ order }) => {
-    const router = useRouter();  // Initialize useRouter hook
+    const router = useRouter();
 
     const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
 
@@ -82,7 +82,14 @@ const CompletedOrders = () => {
     <div className="max-w-4xl mx-auto mt-20 p-6">
       <h1 className="text-3xl font-bold mb-6">Your Completed Orders</h1>
 
-      {loading && <p>Loading your completed orders...</p>}
+      {loading &&
+        <div className="flex justify-center items-center min-h-[50vh]">
+          <div className="relative w-12 h-12 mb-4">
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin blur-sm"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-400 animate-spin"></div>
+          </div>
+        </div>
+          }
 
       {!loading && orders.length === 0 && <p>No completed orders found.</p>}
 
