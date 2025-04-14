@@ -45,7 +45,7 @@ export default function Home() {
     <div className="sm:mt-20 mt-20 md:mt-28">
       {/* Top Sales */}
       <section className="border-2 border-orange-300 shadow-lg rounded-xl bg-white mb-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4">
         <div className="col-span-2 sm:col-span-3 lg:col-span-4">
           <TopSalesSection />
         </div>
@@ -67,7 +67,7 @@ export default function Home() {
           </div>
         ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 mb-6">
             <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl rounded-xl overflow-hidden col-span-2 sm:col-span-3 lg:col-span-4">
               <p className="text-lg px-2 font-bold text-gray-900">
                 Most Affordable price 🔥 
