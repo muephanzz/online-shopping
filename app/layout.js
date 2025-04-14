@@ -3,6 +3,7 @@ import "./styles/globals.css";
 import { Suspense } from "react";
 import ClientWrapper from "./components/ClientWrapper";
 import Loading from "./loading"; // Ensure this file exists
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +25,9 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${inter.variable} ${mono.variable}`}>
       <body className="antialiased">
           <Suspense fallback={<Loading />}>
-            <ClientWrapper>{children}</ClientWrapper>
+            <AuthProvider>
+              <ClientWrapper>{children}</ClientWrapper>
+            </AuthProvider>
           </Suspense>
       </body>
     </html>

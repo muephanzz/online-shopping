@@ -8,24 +8,16 @@ import CartIcon from "./CartIcon";
 import UserMenu from "./UserMenu";
 import DesktopMenu from "./DesktopNav";
 import MobileMenu from "./TabletNav";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [cartCount, setCartCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [showSignIn, setShowSignIn] = useState(false);
+  const { user, setUser } = useAuth(); // ✅ use useAuth()
 
-  // Fetch authenticated user
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    };
-    fetchUser();
-  }, []);
-
-  // Fetch cart count
+  // Fetch cart count if user is logged in
   useEffect(() => {
     const fetchCartCount = async () => {
       if (user) {
@@ -50,23 +42,22 @@ export default function Navbar() {
   return (
     <nav className="bg-gray-900 shadow-md py-4 fixed w-full top-0 z-50">
       <div className="w-full mx-auto flex justify-between items-center">
-      
-      {!isMobile && (
-        <>
-        <MobileMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-        <Logo />
-        </>
-      )}
+        {!isMobile && (
+          <>
+            <MobileMenu menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+            <Logo />
+          </>
+        )}
 
-        {/* Show SearchBar on all devices */}      
+        {/* Show SearchBar on all devices */}
         <SearchBar />
-    
+
         {!isMobile && (
           <>
             <DesktopMenu />
             <div className="flex items-center space-x-6">
               <CartIcon cartCount={cartCount} />
-              <UserMenu user={user} setUser={setUser} onSignIn={() => setShowSignIn(true)} />
+              <UserMenu onSignIn={() => setShowSignIn(true)} />
             </div>
           </>
         )}

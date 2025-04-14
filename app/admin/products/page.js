@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [images, setImages] = useState([]); 
   const [editingProduct, setEditingProduct] = useState(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -52,9 +53,10 @@ const ManageProducts = () => {
   };
 
   const removeImage = (index) => {
-    setImages(products.image_urls.filter((_, i) => i !== index));
+    setPreviews(previews.filter((_, i) => i !== index));
+    setFiles(files.filter((_, i) => i !== index)); // Optional: keep files in sync
   };
-
+  
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
@@ -105,7 +107,8 @@ const ManageProducts = () => {
 
     if (!newProduct.name || !newProduct.brand || !newProduct.state || !newProduct.stock || !newProduct.price || !newProduct.category_id) {
       toast.error("Please fill in all fields!");
-    }
+      return; // stop execution
+    }    
 
     setUploading(true);
     try {
@@ -116,19 +119,22 @@ const ManageProducts = () => {
       }
 
       if (editingProduct) {
-        const { error: updateError } = await supabase.from("products").update({
-          name: newProduct.name,
-          phone: newProduct.phone,
-          brand: newProduct.brand,
-          state: newProduct.state,
-          description: newProduct.description,
-          specification: newProduct.specification,
-          stock: newProduct.stock,
-          price: parseFloat(newProduct.price),
-          image_urls: imageUrls,
-          category_id: newProduct.category_id,
-        }).eq("product_id", editingProduct.product_id);
-
+        const { error: updateError } = await supabase
+          .from("products")
+          .update({
+            name: newProduct.name,
+            phone: newProduct.phone,
+            brand: newProduct.brand,
+            state: newProduct.state,
+            description: newProduct.description,
+            specification: newProduct.specification,
+            stock: newProduct.stock,
+            price: parseFloat(newProduct.price),
+            image_urls: imageUrls,
+            category_id: newProduct.category_id,
+          })
+          .eq("product_id", editingProduct.product_id);
+      
         if (updateError) throw new Error(updateError.message);
 
         toast.success("Product updated successfully!");
@@ -248,19 +254,22 @@ const ManageProducts = () => {
         {previews.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
             {previews.map((preview, index) => (
-              <div key={idx} className="relative w-24 h-24">
-                <img key={index} src={preview} alt="Preview" className="w-24 h-24 object-cover rounded-lg border" />
+              <div key={index} className="relative w-24 h-24">
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-24 h-24 object-cover rounded-lg border"
+                />
                 <button
-                onClick={() => removeImage(index)}
-                className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5"
-              >
-                ✕
-              </button>
-            </div>
+                  onClick={() => removeImage(index)}
+                  className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5"
+                >
+                  ✕
+                </button>
+              </div>
             ))}
           </div>
         )}
-
         <button type="submit" disabled={uploading} className="bg-green-600 text-white p-2 rounded hover:bg-green-700">
           {uploading ? "Uploading..." : editingProduct ? "Update Product" : "Add Product"}
         </button>
