@@ -7,7 +7,6 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import ProductCard from "../../components/ProductCard";
 import ReviewSection from "../../components/ReviewSection";
-import moment from "moment";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -106,6 +105,12 @@ export default function ProductDetails() {
       }
   
       toast.success("Item added to cart!");
+  
+      // 🔁 Redirect to cart after 1 second
+      setTimeout(() => {
+        window.location.href = "/cart";
+      }, 1000);
+      
     } catch (err) {
       console.error("Error adding to cart:", err.message);
       toast.error("Failed to add item to cart.");
@@ -115,7 +120,6 @@ export default function ProductDetails() {
     }
   };
   
-
   if (loading) return <p className="text-center">Loading product...</p>;
   if (!product) return <p className="text-center">Product not found!</p>;
 
