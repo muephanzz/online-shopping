@@ -2,6 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+.loading-state {
+  filter: blur(4px); /* Apply the blur effect to the entire page */
+  pointer-events: none; /* Prevent interactions while loading */
+  transition: filter 0.3s ease-out; /* Smooth transition */
+}
+
 :root {
   --font-inter: "Inter", sans-serif;
   --font-mono: "Roboto Mono", monospace;
