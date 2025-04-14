@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
-import SignInModal from "./SignInModal";
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
 import CartIcon from "./CartIcon";
@@ -14,8 +14,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const [showSignIn, setShowSignIn] = useState(false);
-  const { user, setUser } = useAuth(); // ✅ use useAuth()
+  const { user, setUser } = useAuth();
 
   // Fetch cart count if user is logged in
   useEffect(() => {
@@ -32,7 +31,7 @@ export default function Navbar() {
   }, [user]);
 
   useEffect(() => {
-    // Detect mobile devices (Android, iPhone, iPad, iPod)
+    // Detect mobile devices
     const checkMobile = () => {
       setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
     };
@@ -49,7 +48,7 @@ export default function Navbar() {
           </>
         )}
 
-        {/* Show SearchBar on all devices */}
+        {/* Search bar is visible on all devices */}
         <SearchBar />
 
         {!isMobile && (
@@ -57,13 +56,11 @@ export default function Navbar() {
             <DesktopMenu />
             <div className="flex items-center space-x-6">
               <CartIcon cartCount={cartCount} />
-              <UserMenu onSignIn={() => setShowSignIn(true)} />
+              <UserMenu />
             </div>
           </>
         )}
       </div>
-
-      {showSignIn && <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />}
     </nav>
   );
 }

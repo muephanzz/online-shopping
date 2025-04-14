@@ -1,48 +1,44 @@
-"use client"; // Mark this file as a client component
+"use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
-import { ToastContainer } from "react-toastify";
-import { useAuth } from "@/context/AuthContext"; // Import the AuthContext
-import Loading from "@/Loading"; // Import the loading component
+import { supabase } from "../lib/supabaseClient";
 import Navbar from "./Navbar";
 import BottomNav from "./BottomNav";
+import { Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
 
-// Create a new query client for react-query
 const queryClient = new QueryClient();
 
 export default function ClientWrapper({ children }) {
-  const { user, setUser } = useAuth(); // Access user and setUser from AuthContext
-  const [isLoading, setIsLoading] = useState(true); // Track the loading state
+  const [user, setUser] = useState(null);
 
-  // Add blur effect to body when loading starts
   useEffect(() => {
-    if (isLoading) {
-      document.body.classList.add("loading-state"); // Apply blur on first load
-    } else {
-      document.body.classList.remove("loading-state"); // Remove blur after loading
-    }
+    const fetchUser = async () => {
+      const { data: sessionData } = await supabase.auth.getSession();
+      setUser(sessionData?.session?.user || null);
+    };
+
+    fetchUser();
+
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user || null);
+    });
 
     return () => {
-      document.body.classList.remove("loading-state"); // Clean up on unmount
+      if (data && data.subscription) {
+        data.subscription.unsubscribe();
+      }
     };
-  }, [isLoading]);
-
-  // Set isLoading to false once the page is fully loaded
-  const handleLoadComplete = () => {
-    setIsLoading(false);
-  };
+  }, []);
 
   return (
-    <Suspense fallback={<Loading />}>
-      <QueryClientProvider client={queryClient}>
-        <Navbar user={user} setUser={setUser} />
-        <Toaster position="top-right" autoClose={800} />
-        <ToastContainer position="top-right" autoClose={800} />
-        <div onLoad={handleLoadComplete}>{children}</div> {/* Mark page as loaded */}
-        <BottomNav />
-      </QueryClientProvider>
-    </Suspense>
+    <QueryClientProvider client={queryClient}>
+      <Navbar user={user} setUser={setUser} />
+      <Toaster position="top-right" autoClose={800} />
+      <ToastContainer position="top-right" autoClose={800} />
+      {children}
+      <BottomNav />
+    </QueryClientProvider>
   );
 }

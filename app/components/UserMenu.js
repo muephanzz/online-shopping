@@ -67,11 +67,11 @@ export default function UserMenu({ onSignIn }) {
     if (!error) {
       toast.success("Logged out successfully!");
       setUser(null);
-      router.push("/");
+      window.location.reload(); // 🔁 Hard refresh the page
     } else {
       toast.error("Logout failed. Please try again.");
     }
-  };
+  };  
 
   return (
     <div className="relative">
@@ -162,12 +162,11 @@ export default function UserMenu({ onSignIn }) {
           </Transition>
         </Menu>
       ) : (
-        <button
-          onClick={onSignIn}
-          className="bg-green-600 text-white rounded-md w-16 hover:bg-white hover:text-black mr-4 transition"
-        >
-          Sign In
-        </button>
+        <Link href="/signin">
+        <button className="bg-green-600 text-white rounded-md w-16 hover:bg-white hover:text-black mr-4 transition">
+            Sign In 
+          </button>
+        </Link>
       )}
     </div>
   );

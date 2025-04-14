@@ -46,9 +46,9 @@ export default function Home() {
       {/* Top Sales */}
       <section className="border-2 border-orange-300 shadow-lg rounded-xl bg-white mb-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 mb-6">
-          <p className="col-span-2 sm:col-span-3 lg:col-span-4">
-            <TopSalesSection />
-          </p>
+        <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+          <TopSalesSection />
+        </div>
           {products.slice(0, 10).map((product) => (
             <ProductCard key={product.product_id} product={product} />
           ))}
