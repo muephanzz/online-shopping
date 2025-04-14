@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
-import SignInModal from "./SignInModal";
 
 export default function BottomNav() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -101,10 +100,9 @@ export default function BottomNav() {
           onClick={() => {
             if (user) {
               setUserMenuOpen(!userMenuOpen);
-              setShowSignIn(false);
             } else {
-              setShowSignIn(true);
-              setUserMenuOpen(false);
+              // Redirect to sign-in page instead of showing modal
+              window.location.href = "/sign-in"; 
             }
           }}
           className={`flex flex-col items-center ${userMenuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
@@ -112,7 +110,6 @@ export default function BottomNav() {
           <User size={24} />
           <span className="text-xs mt-1">Account</span>
         </button>
-      </div>
 
     {/* Full-screen Categories Menu */}
     {menuOpen && (
@@ -150,7 +147,6 @@ export default function BottomNav() {
         )}
       </div>
     )}
-
 
     {userMenuOpen && user && (
       <div className="fixed inset-0 bg-gray-100 z-50 p-6 overflow-y-auto animate-fadeIn">
@@ -206,8 +202,7 @@ export default function BottomNav() {
       </div>
     )}
 
-          {/* Sign-In Modal */}
-          {showSignIn && <SignInModal isOpen={showSignIn} onClose={() => setShowSignIn(false)} />}
+      </div>
         </nav>
       );
     }
