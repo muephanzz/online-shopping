@@ -187,17 +187,19 @@ export default function BottomNav() {
             </Link>
           ))}
 
-          {/* Logout Button */}
-          <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              setUser(null);
-              setUserMenuOpen(false);
-            }}
-            className="block w-full text-center text-left py-3 px-4 bg-red-500 text-white text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
-          >
-            Logout
-          </button>
+    {/* Logout Button */}
+    <button
+      onClick={async () => {
+        await supabase.auth.signOut();
+        setUser(null);
+        setUserMenuOpen(false);
+        window.location.href = "/"; // Change to "/sign-in" if you want to redirect to login instead
+      }}
+      className="block w-full text-center text-left py-3 px-4 bg-red-500 text-white text-lg font-medium rounded-lg shadow hover:bg-red-600 transition duration-200"
+    >
+      Logout
+    </button>
+
         </nav>
       </div>
     )}
