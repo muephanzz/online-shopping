@@ -5,17 +5,27 @@ import { FaCcVisa, FaCcMastercard, FaPaypal } from 'react-icons/fa';
 export default function Footer() {
   return (
     <footer className="bg-gradient-to-br mt-10 from-gray-900 via-gray-800 to-gray-900 text-white p-10 shadow-inner">
+      {/* About Section */}
+      <div className='mb-8' id='about'>
+        <h2 className="mb-4 text-xl font-bold tracking-wide text-blue-400">About Ephantronics</h2>
+        <p className="text-sm text-gray-300 leading-relaxed">
+          <span className="font-semibold text-white">Ephantronics</span> is your ultimate hub for premium electronics — from smartphones to laptops and audio gear. We deliver top-notch tech with unbeatable prices.
+        </p>
+        <p className="mt-3 text-sm text-gray-300">
+          Fast delivery. Secure payments. Dedicated support. Upgrade your digital lifestyle today! ⚡🛒
+        </p>
+      </div>
+        
       <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-10">
-
-        {/* About Section */}
-        <div id='about'>
-          <h2 className="mb-4 text-xl font-bold tracking-wide text-blue-400">About Ephantronics</h2>
-          <p className="text-sm text-gray-300 leading-relaxed">
-            <span className="font-semibold text-white">Ephantronics</span> is your ultimate hub for premium electronics — from smartphones to laptops and audio gear. We deliver top-notch tech with unbeatable prices.
-          </p>
-          <p className="mt-3 text-sm text-gray-300">
-            Fast delivery. Secure payments. Dedicated support. Upgrade your digital lifestyle today! ⚡🛒
-          </p>
+        {/* Quick Links */}
+        <div>
+          <h2 className="mb-4 text-xl font-bold tracking-wide text-blue-400">Quick Links</h2>
+          <ul className="space-y-2 text-sm text-gray-300">
+            <li><Link href="/" className="hover:text-blue-300">🏠 Home</Link></li>
+            <li><Link href="/privacy-policy" className="hover:text-blue-300">🔒 Privacy Policy</Link></li>
+            <li><Link href="/terms" className="hover:text-blue-300">📄 Terms & Conditions</Link></li>
+            <li><Link href="/faqs" className="hover:text-blue-300">❓ FAQs</Link></li>
+          </ul>
         </div>
 
         {/* Contact Section */}
@@ -61,17 +71,6 @@ export default function Footer() {
             <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-300"><Linkedin size={24} /></a>
             <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-red-500"><Youtube size={24} /></a>
           </div>
-        </div>
-
-        {/* Quick Links */}
-        <div>
-          <h2 className="mb-4 text-xl font-bold tracking-wide text-blue-400">Quick Links</h2>
-          <ul className="space-y-2 text-sm text-gray-300">
-            <li><Link href="/" className="hover:text-blue-300">🏠 Home</Link></li>
-            <li><Link href="/privacy-policy" className="hover:text-blue-300">🔒 Privacy Policy</Link></li>
-            <li><Link href="/terms" className="hover:text-blue-300">📄 Terms & Conditions</Link></li>
-            <li><Link href="/faqs" className="hover:text-blue-300">❓ FAQs</Link></li>
-          </ul>
         </div>
       </div>
 

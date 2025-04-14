@@ -51,6 +51,10 @@ const ManageProducts = () => {
     setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
   };
 
+  const removeImage = (index) => {
+    setImages(products.image_urls.filter((_, i) => i !== index));
+  };
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
@@ -244,7 +248,15 @@ const ManageProducts = () => {
         {previews.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
             {previews.map((preview, index) => (
-              <img key={index} src={preview} alt="Preview" className="w-24 h-24 object-cover rounded-lg border" />
+              <div key={idx} className="relative w-24 h-24">
+                <img key={index} src={preview} alt="Preview" className="w-24 h-24 object-cover rounded-lg border" />
+                <button
+                onClick={() => removeImage(index)}
+                className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5"
+              >
+                ✕
+              </button>
+            </div>
             ))}
           </div>
         )}

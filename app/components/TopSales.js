@@ -26,7 +26,7 @@ export default function TopSalesSection() {
   }, []);
 
   return (
-    <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl overflow-hidden">
+    <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl rounded-xl overflow-hidden">
       <div className="flex items-center justify-between w-full flex-wrap sm:flex-nowrap gap-2 px-2">
         {/* Text on the left */}
         <p className="text-lg font-bold text-gray-900">

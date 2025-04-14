@@ -31,7 +31,7 @@ export default function MobileMenu() {
       {/* Menu Button */}
       <button
         onClick={() => setMenuOpen(!menuOpen)}
-        className="top-4 text-white p-2 rounded-full hover:bg-white hover:text-black transition-all duration-300"
+        className="top-4 ml-2 text-white p-2 rounded-full hover:bg-white hover:text-black transition-all duration-300"
       >
         {menuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>

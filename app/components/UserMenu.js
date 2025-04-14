@@ -62,7 +62,7 @@ export default function UserMenu({ user, setUser, onSignIn }) {
     return (
         <div className="relative">
             {user ? (
-                <Menu as="div" className="relative inline-block text-left">
+                <Menu as="div" className="relative inline-block mr-4 text-left">
                     <Menu.Button className="flex items-center p-2 text-white rounded-full hover:bg-white hover:text-black transition">
                         <User2 className="h-6 w-6" />
                         <ChevronDown className="h-4 w-4 ml-1" />
@@ -128,7 +128,7 @@ export default function UserMenu({ user, setUser, onSignIn }) {
                     </Transition>
                 </Menu>
             ) : (
-                <button onClick={onSignIn} className="bg-green-600 text-white rounded-md w-16 hover:bg-white hover:text-black transition">
+                <button onClick={onSignIn} className="bg-green-600 text-white rounded-md w-16 hover:bg-white hover:text-black mr-4 transition">
                    Sign In
                 </button>
             )}

@@ -70,10 +70,12 @@ export default function ProductsPage() {
   if (!category_id) return <p>Please select a category.</p>;
 
   return (
-    <div className="p-6 mt-20">
-      <h1 className="sm:text-3xl text-2xl font-bold mb-6">
-        Products in {categoryName} Category
-      </h1>
+    <div className="border-2 border-orange-300 shadow-lg rounded-xl bg-white mb-6 sm:mt-20 mt-20 md:mt-28">
+      <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl rounded-xl overflow-hidden col-span-2 sm:col-span-3 lg:col-span-4">      
+        <h1 className="text-lg px-2 font-bold text-gray-900">
+          Products in {categoryName} Category
+        </h1>
+      </div>
 
       {products.length === 0 ? (
         <p className="text-gray-600">No products found in this category.</p>

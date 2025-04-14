@@ -40,7 +40,7 @@ const Profiles = () => {
   };
 
   const handleEditProfile = () => {
-    router.push("/profile/edit-profile"); // Redirect to profile edit page
+    router.push("/profile/edit-profile");
   };
 
   return (

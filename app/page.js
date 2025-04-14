@@ -42,21 +42,22 @@ export default function Home() {
   }, [currentPage]);
 
   return (
-    <div className="sm:mt-20 mt-20 md:mt-28 ">
+    <div className="sm:mt-20 mt-20 md:mt-28">
       {/* Top Sales */}
-      <section className="border-2 border-orange-300 shadow-lg rounded-xl px-4 py-3 bg-white grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 py-2">
-        <div className="col-span-2 sm:col-span-3 lg:col-span-4">
-          <TopSalesSection />
+      <section className="border-2 border-orange-300 shadow-lg rounded-xl bg-white mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 mb-6">
+          <p className="col-span-2 sm:col-span-3 lg:col-span-4">
+            <TopSalesSection />
+          </p>
+          {products.slice(0, 10).map((product) => (
+            <ProductCard key={product.product_id} product={product} />
+          ))}
         </div>
-
-        {products.slice(0, 10).map((product) => (
-          <ProductCard key={product.product_id} product={product} />
-        ))}
       </section>
 
 
       {/* Product Grid */}
-      <section className="p-4 mt-10 border-2 border-orange-300 shadow-lg rounded-xl px-4 py-3 bg-white">
+      <section className="border-2 border-orange-300 shadow-lg rounded-xl bg-white mb-6">
         {loading ? (
           <div className="flex justify-center items-center min-h-[50vh]">
             <div className="relative w-12 h-12 mb-4">
@@ -66,26 +67,28 @@ export default function Home() {
           </div>
         ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            <p className="text-center text-sm font-semibold text-orange-600 pb-1 col-span-2 sm:col-span-3 lg:col-span-4">
-                🔥 Enjoy your shoppiing with the most affordable price
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 mb-6">
+            <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl rounded-xl overflow-hidden col-span-2 sm:col-span-3 lg:col-span-4">
+              <p className="text-lg px-2 font-bold text-gray-900">
+                Most Affordable price 🔥 
               </p>
+            </div>
             {products.map((product) => (
               <ProductCard key={product.product_id} product={product} />
             ))}
           </div>
-
-          {/* Pagination */}
-          <div className="mt-10">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={setCurrentPage}
-            />
-          </div>
         </>
       )}
     </section>
+
+    {/* Pagination */}
+    <div className="m-4">
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+    </div>
 
       {/* User Chat */}
       <UserChat />

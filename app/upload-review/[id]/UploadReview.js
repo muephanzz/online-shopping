@@ -51,10 +51,21 @@ export default function UploadReview() {
 
   const fetchUserName = async () => {
     try {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) throw error;
-      const meta = data?.user?.user_metadata;
-      setUserName(`${meta?.first_name || ""} ${meta?.last_name || ""}`.trim() || "Anonymous");
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+          console.error("Error fetching user or user not logged in:", userError);
+          return;
+      }
+
+      const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("first_name, last_name")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+      if (profileError) console.error("Error fetching profile data:", profileError);
+      setUserName(`${profileData?.first_name || ""} ${profileData?.last_name || ""}`.trim() || "Anonymous");
     } catch {
       setUserName("Anonymous");
     }

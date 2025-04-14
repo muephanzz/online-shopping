@@ -19,7 +19,7 @@ export default function DesktopMenu() {
   }, []);
 
   return (
-    <nav className="absolute shadow-md hidden md:flex space-x-6 mt-28 w-full text-lg space-x-4 overflow-x-auto">
+    <nav className="absolute bg-gradient-to-r from-orange-100 to-yellow-50 shadow-md hidden md:flex space-x-6 mt-28 w-full text-lg space-x-4 overflow-x-auto py-1 px-4 mb-4">
       <Link
         href="/"
         className="hover:text-blue-500 transition duration-300 text-gray-700"

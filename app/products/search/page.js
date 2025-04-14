@@ -42,9 +42,10 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto pl-2 mt-28 mb-60">
-      <h1 className="text-2xl font-bold mb-4">Search Results for "{query}"</h1>
-
+    <div className="border-2 border-orange-300 shadow-lg rounded-xl bg-white mb-6 sm:mt-20 mt-20 md:mt-28">
+      <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl rounded-xl overflow-hidden col-span-2 sm:col-span-3 lg:col-span-4">
+        <h1 className="text-lg px-2 font-bold text-gray-900">Search Results for "{query}"</h1>
+      </div>
       {loading ? (
         <div className="flex justify-center items-center min-h-[50vh]">
           <div className="relative w-12 h-12 mb-4">
