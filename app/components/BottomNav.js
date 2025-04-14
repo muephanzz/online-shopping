@@ -102,7 +102,7 @@ export default function BottomNav() {
               setUserMenuOpen(!userMenuOpen);
             } else {
               // Redirect to sign-in page instead of showing modal
-              window.location.href = "/sign-in"; 
+              window.location.href = "/signin"; 
             }
           }}
           className={`flex flex-col items-center ${userMenuOpen ? "text-orange-600" : "text-gray-600 hover:text-black"}`}
