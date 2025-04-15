@@ -106,7 +106,7 @@ export default function ProductDetails() {
   
       toast.success("Item added to cart!");
   
-      window.location.reload;
+      window.location.reload();
       
     } catch (err) {
       console.error("Error adding to cart:", err.message);

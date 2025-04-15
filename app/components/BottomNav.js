@@ -4,61 +4,55 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
+import { useAuth } from "@/context/AuthContext";
 
 export default function BottomNav() {
+  const { user } = useAuth();
+  const [userName, setUserName] = useState("");
+  const [loadingUserName, setLoadingUserName] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-  const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
   const [loadingUser, setLoadingUser] = useState(true);
-  const [userName, setUserName] = useState("");
   const [loadingCategories, setLoadingCategories] = useState(true);
   const pathname = usePathname();
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  useEffect(() => {
-      if (user?.user_metadata?.role === "admin") {
-          setIsAdmin(true);
-      }
-  }, [user]);
 
   useEffect(() => {
     setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
   }, []);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      setLoadingUser(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoadingUser(false);
-    };
-    fetchUser();
-  }, []);
-
-  const fetchUserName = async () => {
-    try {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-          console.error("Error fetching user or user not logged in:", userError);
-          return;
-      }
-
-      const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("first_name, last_name")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-      if (profileError) console.error("Error fetching profile data:", profileError);
-      setUserName(`${profileData?.first_name || ""} ${profileData?.last_name || ""}`.trim() || "Use");
-    } catch {
-      setUserName("User");
+    if (user?.user_metadata?.role === "admin") {
+      setIsAdmin(true);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (!user) return;
+      try {
+        const { data: profileData, error } = await supabase
+          .from("profiles")
+          .select("first_name")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        if (error) console.error("Error fetching profile data:", error);
+        setUserName(
+          `${profileData?.first_name || ""} ${profileData?.last_name || ""}`.trim() || "User"
+        );
+      } catch {
+        setUserName("User");
+      } finally {
+        setLoadingUserName(false);
+      }
+    };
+
+    fetchUserName();
+  }, [user]);
 
   useEffect(() => {
     const fetchCategories = async () => {
