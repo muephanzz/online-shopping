@@ -7,7 +7,7 @@ export default function ProductCard({ product }) {
       href={`/products/${product.product_id}`}
       className="group relative block"
     >
-      <div className="border mb-4 border-gray-200 relative rounded-xl bg-white shadow-sm hover:shadow-xl p-3 sm:p-4 transition-all duration-300 overflow-hidden">
+      <div className="border mb-4 border-gray-200 relative bg-white shadow-sm hover:shadow-xl p-3 sm:p-4 transition-all duration-300 overflow-hidden">
        <div className="relative transition-transform duration-500 group-hover:scale-[1.03] rounded-lg overflow-hidden">
           <Image
             src={product.image_urls?.[0] || "/placeholder.jpg"}

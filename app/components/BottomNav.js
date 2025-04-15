@@ -16,7 +16,6 @@ export default function BottomNav() {
   const [isMobile, setIsMobile] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [categories, setCategories] = useState([]);
-  const [loadingUser, setLoadingUser] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const pathname = usePathname();
 
