@@ -106,10 +106,7 @@ export default function ProductDetails() {
   
       toast.success("Item added to cart!");
   
-      // 🔁 Redirect to cart after 1 second
-      setTimeout(() => {
-        window.location.href = "/cart";
-      }, 1000);
+      window.location.reload;
       
     } catch (err) {
       console.error("Error adding to cart:", err.message);

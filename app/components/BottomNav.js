@@ -12,8 +12,8 @@ export default function BottomNav() {
   const [cartCount, setCartCount] = useState(0);
   const [user, setUser] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [showSignIn, setShowSignIn] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
+  const [userName, setUserName] = useState("");
   const [loadingCategories, setLoadingCategories] = useState(true);
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -37,6 +37,28 @@ export default function BottomNav() {
     };
     fetchUser();
   }, []);
+
+  const fetchUserName = async () => {
+    try {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+          console.error("Error fetching user or user not logged in:", userError);
+          return;
+      }
+
+      const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("first_name, last_name")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+      if (profileError) console.error("Error fetching profile data:", profileError);
+      setUserName(`${profileData?.first_name || ""} ${profileData?.last_name || ""}`.trim() || "Use");
+    } catch {
+      setUserName("User");
+    }
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -160,7 +182,7 @@ export default function BottomNav() {
 
         {/* Greeting */}
         <h2 className="text-2xl font-bold text-gray-800 mb-6">
-          Hello, <span className="text-orange-600">{user.user_metadata?.first_name || user.email || "User"}</span>
+          Hello, <span className="text-orange-600">{userName}</span>
         </h2>
 
         {isAdmin && (
@@ -173,7 +195,7 @@ export default function BottomNav() {
         {/* Menu Items */}
         <nav className="space-y-3 w-full">
           {[
-            { href: "/contacts", label: "Contacts" },
+            { href: "/profile/see-profile", label: "Profile" },
             { href: "/orders/order-tracking", label: "Order Tracking" },
             { href: "/orders/completed", label: "Completed Orders" },
           ].map(({ href, label }) => (
