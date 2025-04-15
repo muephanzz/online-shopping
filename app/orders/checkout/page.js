@@ -53,7 +53,7 @@ export default function Checkout() {
     }
 
     if (!email || !email.includes("@")) {
-      setError("Please enter a valid email address.");
+      setError("Please Login to purchase this Product.");
       return;
     }
 
