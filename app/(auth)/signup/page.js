@@ -48,27 +48,24 @@ export default function SignUpPage() {
         <h2 className="text-xl font-semibold text-center mb-6 text-blue-600">Sign Up</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              name="firstName"
-              value={form.firstName}
-              onChange={handleChange}
-              placeholder="First Name"
-              required
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            />
-            <input
-              type="text"
-              name="lastName"
-              value={form.lastName}
-              onChange={handleChange}
-              placeholder="Last Name"
-              required
-              className="w-1/2 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            />
-          </div>
-
+          <input
+            type="text"
+            name="firstName"
+            value={form.firstName}
+            onChange={handleChange}
+            placeholder="First Name"
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />
+          <input
+            type="text"
+            name="lastName"
+            value={form.lastName}
+            onChange={handleChange}
+            placeholder="Last Name"
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          />       
           <input
             type="email"
             name="email"
@@ -78,7 +75,6 @@ export default function SignUpPage() {
             placeholder="Email"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
           />
-
           <input
             type="password"
             name="password"

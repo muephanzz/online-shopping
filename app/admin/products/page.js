@@ -1,14 +1,14 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import AdminLayout from "@/components/AdminLayout";
-import withAdminAuth from '@/components/withAdminAuth';
+import withAdminAuth from "@/components/withAdminAuth";
 import toast from "react-hot-toast";
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [images, setImages] = useState([]); 
   const [editingProduct, setEditingProduct] = useState(null);
   const [newProduct, setNewProduct] = useState({
     name: "",
@@ -37,46 +37,50 @@ const ManageProducts = () => {
     const { data, error } = await supabase
       .from("products")
       .select("*, categories(category)");
-    if (error) console.error("Error fetching products:", error);
-    else setProducts(data);
+    if (error) {
+      console.error("Error fetching products:", error);
+    } else {
+      setProducts(data);
+    }
     setLoading(false);
   };
 
   const fetchCategories = async () => {
     const { data, error } = await supabase.from("categories").select("*");
-    if (error) console.error("Error fetching categories:", error);
-    else setCategories(data);
+    if (error) {
+      console.error("Error fetching categories:", error);
+    } else {
+      setCategories(data);
+    }
   };
 
   const handleChange = (e) => {
-    setNewProduct({ ...newProduct, [e.target.name]: e.target.value });
+    setNewProduct((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const removeImage = (index) => {
-    setPreviews(previews.filter((_, i) => i !== index));
-    setFiles(files.filter((_, i) => i !== index)); // Optional: keep files in sync
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
-  
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
 
     const filePreviews = selectedFiles.map((file) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
       return new Promise((resolve) => {
+        const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(file);
       });
     });
 
-    Promise.all(filePreviews).then((results) => setPreviews(results));
+    Promise.all(filePreviews).then(setPreviews);
   };
 
   const uploadImages = async () => {
-    const sanitizeFileName = (name) => {
-      return name.replace(/[^a-zA-Z0-9._-]/g, "_"); // removes spaces, (), etc.
-    };
-    
+    const sanitizeFileName = (name) => name.replace(/[^a-zA-Z0-9._-]/g, "_");
+
     const imageUrls = await Promise.all(
       files.map(async (file) => {
         const fileName = `${Date.now()}-${sanitizeFileName(file.name)}`;
@@ -86,29 +90,31 @@ const ManageProducts = () => {
             cacheControl: "3600",
             upsert: false,
           });
-    
+
         if (uploadError) throw new Error(uploadError.message);
-    
+
         const { data: urlData, error: urlError } = supabase.storage
           .from("products")
           .getPublicUrl(`images/${fileName}`);
-    
+
         if (urlError) throw new Error(urlError.message);
-    
+
         return urlData.publicUrl;
       })
     );
-    
+
     return imageUrls;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!newProduct.name || !newProduct.brand || !newProduct.state || !newProduct.stock || !newProduct.price || !newProduct.category_id) {
+    const { name, brand, state, stock, price, category_id } = newProduct;
+
+    if (!name || !brand || !state || !stock || !price || !category_id) {
       toast.error("Please fill in all fields!");
-      return; // stop execution
-    }    
+      return;
+    }
 
     setUploading(true);
     try {
@@ -118,43 +124,27 @@ const ManageProducts = () => {
         imageUrls = await uploadImages();
       }
 
+      const productData = {
+        ...newProduct,
+        price: parseFloat(newProduct.price),
+        image_urls: imageUrls,
+      };
+
       if (editingProduct) {
-        const { error: updateError } = await supabase
+        const { error } = await supabase
           .from("products")
-          .update({
-            name: newProduct.name,
-            phone: newProduct.phone,
-            brand: newProduct.brand,
-            state: newProduct.state,
-            description: newProduct.description,
-            specification: newProduct.specification,
-            stock: newProduct.stock,
-            price: parseFloat(newProduct.price),
-            image_urls: imageUrls,
-            category_id: newProduct.category_id,
-          })
+          .update(productData)
           .eq("product_id", editingProduct.product_id);
-      
-        if (updateError) throw new Error(updateError.message);
+
+        if (error) throw new Error(error.message);
 
         toast.success("Product updated successfully!");
       } else {
-        const { error: insertError } = await supabase.from("products").insert([
-          {
-            phone: newProduct.phone,
-            name: newProduct.name,
-            brand: newProduct.brand,
-            state: newProduct.state,
-            description: newProduct.description,
-            specification: newProduct.specification,
-            stock: newProduct.stock,
-            price: parseFloat(newProduct.price),
-            image_urls: imageUrls,
-            category_id: newProduct.category_id,
-          },
-        ]);
+        const { error } = await supabase
+          .from("products")
+          .insert([productData]);
 
-        if (insertError) throw new Error(insertError.message);
+        if (error) throw new Error(error.message);
 
         toast.success("Product added successfully!");
       }
@@ -164,16 +154,18 @@ const ManageProducts = () => {
     } catch (error) {
       console.error("Error saving product:", error);
       toast.error("Operation failed: " + error.message);
+    } finally {
+      setUploading(false);
     }
-
-    setUploading(false);
   };
 
   const handleDelete = async (productId) => {
-    const confirmation = window.confirm("Are you sure you want to delete this product?");
-    if (!confirmation) return;
+    if (!window.confirm("Are you sure you want to delete this product?")) return;
 
-    const { error } = await supabase.from("products").delete().eq("product_id", productId);
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("product_id", productId);
 
     if (error) {
       console.error("Error deleting product:", error.message);
@@ -186,25 +178,25 @@ const ManageProducts = () => {
 
   const handleEdit = (product) => {
     setEditingProduct(product);
-    setNewProduct({
-      phone: product.phone,
-      name: product.name,
-      brand: product.brand,
-      state: product.state,
-      description: product.description,
-      specification: product.specification,
-      stock: product.stock,
-      price: product.price,
-      image_urls: product.image_urls,
-      category_id: product.category_id,
-    });
+    setNewProduct({ ...product });
     setFiles([]);
-    setPreviews(product.image_urls);
+    setPreviews(product.image_urls || []);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const resetForm = () => {
-    setNewProduct({ name: "", brand: "", state: "", phone: "", description: "", specification: "", stock: "", price: "", image_urls: [], category_id: "" });
+    setNewProduct({
+      name: "",
+      brand: "",
+      state: "",
+      phone: "",
+      description: "",
+      specification: "",
+      stock: "",
+      price: "",
+      image_urls: [],
+      category_id: "",
+    });
     setFiles([]);
     setPreviews([]);
     setEditingProduct(null);
@@ -215,53 +207,124 @@ const ManageProducts = () => {
       <h1 className="text-3xl font-bold mb-6">Manage Products</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input type="text" name="name" placeholder="Product Name" value={newProduct.name} onChange={handleChange} required className="border p-2 w-full rounded" />
+        <input
+          type="text"
+          name="name"
+          placeholder="Product Name"
+          value={newProduct.name}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
 
-        <input type="text" name="brand" placeholder="Product Brand" value={newProduct.brand} onChange={handleChange} required className="border p-2 w-full rounded" />
+        <input
+          type="text"
+          name="brand"
+          placeholder="Product Brand"
+          value={newProduct.brand}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
 
-        <select name="category_id" onChange={handleChange} value={newProduct.category_id} required className="border p-2 w-full rounded">
+        <select
+          name="category_id"
+          onChange={handleChange}
+          value={newProduct.category_id}
+          required
+          className="border p-2 w-full rounded"
+        >
           <option value="">Select Category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>{category.category}</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.category}
+            </option>
           ))}
         </select>
 
-        <select 
+        <select
           name="state"
-          className="border p-2 w-full rounded"
           onChange={handleChange}
-          value={newProduct.state} 
+          value={newProduct.state}
           required
+          className="border p-2 w-full rounded"
         >
           <option value="">Select State</option>
           <option value="Brand New">Brand New</option>
           <option value="Refurbished">Refurbished</option>
         </select>
 
+        <textarea
+          name="description"
+          placeholder="Description"
+          value={newProduct.description}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
 
-        <textarea name="description" placeholder="Description" value={newProduct.description} onChange={handleChange} required className="border p-2 w-full rounded" />
+        <textarea
+          name="specification"
+          placeholder="Specification"
+          value={newProduct.specification}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
 
-        <textarea name="specification" placeholder="Specification" value={newProduct.specification} onChange={handleChange} required className="border p-2 w-full rounded" />
+        <input
+          type="number"
+          name="stock"
+          min={1}
+          placeholder="Stock"
+          value={newProduct.stock}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
 
-        <input type="number" name="stock" min={1} placeholder="Stock" value={newProduct.stock} onChange={handleChange} required className="border p-2 w-full rounded" />
+        <input
+          type="text"
+          name="phone"
+          maxLength={10}
+          placeholder="Seller's Phone Number"
+          value={newProduct.phone}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
 
-        <input type="phone" name="phone" max={10}  placeholder="Seller's Phone Number" value={newProduct.phone} onChange={handleChange} required className="border p-2 w-full rounded" />
+        <input
+          type="number"
+          name="price"
+          min={1}
+          placeholder="Price"
+          value={newProduct.price}
+          onChange={handleChange}
+          required
+          className="border p-2 w-full rounded"
+        />
 
-        <input type="number" name="price" min={1} placeholder="Price" value={newProduct.price} onChange={handleChange} required className="border p-2 w-full rounded" />
-
-        <input type="file" accept="image/*" multiple onChange={handleFileChange} className="w-full" />
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          className="w-full"
+        />
 
         {previews.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-3">
-            {previews.map((preview, index) => (
-              <div key={index} className="relative w-24 h-24">
+            {previews.map((src, i) => (
+              <div key={i} className="relative w-24 h-24">
                 <img
-                  src={preview}
+                  src={src}
                   alt="Preview"
                   className="w-24 h-24 object-cover rounded-lg border"
                 />
                 <button
-                  onClick={() => removeImage(index)}
+                  type="button"
+                  onClick={() => removeImage(i)}
                   className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5"
                 >
                   ✕
@@ -270,8 +333,17 @@ const ManageProducts = () => {
             ))}
           </div>
         )}
-        <button type="submit" disabled={uploading} className="bg-green-600 text-white p-2 rounded hover:bg-green-700">
-          {uploading ? "Uploading..." : editingProduct ? "Update Product" : "Add Product"}
+
+        <button
+          type="submit"
+          disabled={uploading}
+          className="bg-green-600 text-white p-2 rounded hover:bg-green-700"
+        >
+          {uploading
+            ? "Uploading..."
+            : editingProduct
+            ? "Update Product"
+            : "Add Product"}
         </button>
       </form>
 
@@ -279,8 +351,8 @@ const ManageProducts = () => {
       {loading ? (
         <div className="flex justify-center items-center min-h-[50vh]">
           <div className="relative w-12 h-12 mb-4">
-            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin blur-sm"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-400 animate-spin"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin blur-sm" />
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-400 animate-spin" />
           </div>
         </div>
       ) : (
@@ -289,28 +361,47 @@ const ManageProducts = () => {
             <p>No products found.</p>
           ) : (
             products.map((product) => (
-              <li key={product.product_id} className="border p-4 rounded-lg">
-                <h2 className="text-xl font-semibold"><strong>Product Name:</strong> {product.name}</h2>
+              <li
+                key={product.product_id}
+                className="border p-4 rounded-lg space-y-1"
+              >
+                <h2 className="text-xl font-semibold">
+                  <strong>Product Name:</strong> {product.name}
+                </h2>
                 <p><strong>Brand:</strong> {product.brand}</p>
                 <p><strong>Category:</strong> {product.categories?.category}</p>
                 <p><strong>State:</strong> {product.state}</p>
-                <p><strong>Seller's Phone Numbers:</strong> {product.phone}</p>
+                <p><strong>Seller's Phone:</strong> {product.phone}</p>
                 <p><strong>Description:</strong> {product.description}</p>
                 <p><strong>Specification:</strong> {product.specification}</p>
-                <p><strong>Price:</strong> Ksh {product.price}</p>
-                <p><strong>In Stock:</strong> {product.stock}</p>
-                <div className="flex gap-2 mt-3 overflow-x-auto no-scrollbar">
-                  {product.image_urls.map((url, index) => (
-                    <img
-                      key={index}
-                      src={url}
-                      alt="Product"
-                      className="w-24 h-24 object-cover rounded-lg border flex-shrink-0"
-                    />
-                  ))}
+                <p><strong>Stock:</strong> {product.stock}</p>
+                <p><strong>Price:</strong> KES {product.price}</p>
+                {product.image_urls?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {product.image_urls.map((url, idx) => (
+                      <img
+                        key={idx}
+                        src={url}
+                        alt="Product"
+                        className="w-20 h-20 object-cover rounded"
+                      />
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2 mt-2">
+                  <button
+                    onClick={() => handleEdit(product)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(product.product_id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                  >
+                    Delete
+                  </button>
                 </div>
-                <button onClick={() => handleEdit(product)} className="text-white bg-blue-500 mt-2 px-4 py-2 rounded">Edit</button>
-                <button onClick={() => handleDelete(product.product_id)} className="text-white bg-red-500 px-4 py-2 rounded ml-2">Delete</button>
               </li>
             ))
           )}
