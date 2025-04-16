@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabaseClient";
-import AdminLayout from "../../components/AdminLayout";
-import withAdminAuth from "../../components/withAdminAuth";
+import { supabase } from "@/lib/supabaseClient";
+import AdminLayout from "@/components/AdminLayout";
+import withAdminAuth from "@/components/withAdminAuth";
 import Image from "next/image";
 
 const ManageOrders = () => {

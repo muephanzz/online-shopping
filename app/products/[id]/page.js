@@ -2,11 +2,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "../../lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import ProductCard from "../../components/ProductCard";
-import ReviewSection from "../../components/ReviewSection";
+import ProductCard from "@/components/ProductCard";
+import ReviewSection from "@/components/ReviewSection";
 
 export default function ProductDetails() {
   const { id } = useParams();

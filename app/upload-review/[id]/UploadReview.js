@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from 'next/navigation';
-import { supabase } from "../../lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import toast from "react-hot-toast";
 
 export default function UploadReview() {
@@ -121,7 +121,7 @@ export default function UploadReview() {
 
       if (result.error) throw result.error;
       toast.success("Review submitted successfully!");
-      router.push(`/products/${id}`);
+      router.push(`/products/category/${id}`);
     } catch (err) {
       toast.error("Failed to submit review");
       console.error(err);

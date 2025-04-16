@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function DesktopMenu() {
   const searchParams = useSearchParams(); // Get URL search parameters
@@ -28,11 +28,11 @@ export default function DesktopMenu() {
       </Link>
 
       {categories?.map((category) => {
-        const isActive = categoryId === category.id.toString(); // Ensure comparison is valid
+        const isActive = categoryId === category.id.toString();
         return (
           <Link
             key={category.id}
-            href={`/products?category_id=${category.id}`}
+            href={`/products/category?category_id=${category.id}`}
             className={`hover:text-blue-500 transition duration-300 ${
               isActive
                 ? "text-blue-600 font-bold border-b-2 border-blue-600"

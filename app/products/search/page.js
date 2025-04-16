@@ -1,9 +1,9 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
-import ProductCard from '../../components/ProductCard';
-import Pagination from '../../components/Pagination';
+import { supabase } from '@/lib/supabaseClient';
+import ProductCard from '@/components/ProductCard';
+import Pagination from '@/components/Pagination';
 
 export default function SearchPage() {
   const searchParams = useSearchParams();

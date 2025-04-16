@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "./lib/supabaseClient";
-import ProductCard from "./components/ProductCard";
-import TopSalesSection from "./components/TopSales";
-import Pagination from "./components/Pagination";
-import Footer from "./components/Footer";
-import UserChat from "./components/UserChat";
+import { supabase } from "@/lib/supabaseClient";
+import ProductCard from "@/components/ProductCard";
+import TopSalesSection from "@/components/TopSales";
+import Pagination from "@/components/Pagination";
+import Footer from "@/components/Footer";
+import UserChat from "@/components/UserChat";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 

@@ -19,7 +19,7 @@ export default function SignInPage() {
       if (error) throw error;
 
       toast.success("Signed in Successfully!");
-      window.location.href = "/"; // 🔁 Refresh the page after login
+      window.location.href = "/";
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -74,12 +74,18 @@ export default function SignInPage() {
           </button>
         </form>
 
-        <p className="text-sm text-center mt-4">
-          Don't have an account?{" "}
-          <a href="/signup" className="text-blue-600 hover:underline">
-            Sign up
-          </a>
-        </p>
+        <div className="flex justify-center space-x-2">
+          <p className="text-sm text-center mt-4">
+            <a href="/reset-password" className="text-blue-600 hover:underline">
+              Reset Password
+            </a>
+          </p>
+          <p className="text-sm text-center mt-4">{"| "}
+            <a href="/signup" className="text-blue-600 hover:underline">
+              Sign up
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );
