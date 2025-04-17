@@ -20,10 +20,10 @@ const formatPhone = (phone) => {
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { amount, phone, user_id, checkoutItems, shipping_address } = body;
+    const { amount, phone, user_id, checkoutItems, shipping_address, email } = body;
 
     if (!amount || !phone || !user_id || !checkoutItems || !shipping_address) {
-      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const formattedPhone = formatPhone(phone);
@@ -71,22 +71,34 @@ export async function POST(req) {
 
     const checkoutRequestId = stkData.CheckoutRequestID;
 
+    // Check for duplicates
+    const { data: existingPayment } = await supabase
+      .from("payments")
+      .select("id")
+      .eq("checkoutRequestId", checkoutRequestId)
+      .maybeSingle();
+
+    if (!existingPayment) {
+      await supabase.from("payments").insert({
+        user_id,
+        email,
+        phone_number: formattedPhone,
+        amount,
+        status: "pending",
+        checkoutRequestId,
+      });
+    }
+
+    // Optional: Store order with pending status (or wait until payment is confirmed)
     await supabase.from("orders").insert({
       user_id,
       phone_number: formattedPhone,
       total: amount,
-      items: JSON.stringify(checkoutItems),
+      items: checkoutItems,
       shipping_address,
       mpesa_transaction_id: checkoutRequestId,
+      email,
       status: "pending",
-    });
-
-    await supabase.from("payments").insert({
-      user_id,
-      phone_number: formattedPhone,
-      amount,
-      status: "pending",
-      checkout_request_id: checkoutRequestId,
     });
 
     return NextResponse.json({

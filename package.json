@@ -47,6 +47,7 @@
     "react-slick": "^0.30.3",
     "react-swipeable": "^7.0.2",
     "react-toastify": "^11.0.5",
+    "react-use": "^17.6.0",
     "resend": "^4.2.0",
     "rimraf": "^6.0.1",
     "slate": "^0.112.0",
