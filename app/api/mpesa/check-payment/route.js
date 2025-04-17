@@ -1,6 +1,6 @@
 // app/api/check-payment/route.js
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseClient";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
