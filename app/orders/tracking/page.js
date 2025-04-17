@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import jsPDF from "jspdf";
 import { Button } from "@/components/ui/button";
 import QRCode from "qrcode";
+import { format } from "date-fns";
 
 export default function OrderTracking() {
   const [orders, setOrders] = useState([]);
@@ -150,11 +151,11 @@ export default function OrderTracking() {
     doc.text(`Status: ${order.status}`, 14, startY + 8);
     doc.text(`Total: Ksh ${order.total.toLocaleString()}`, 14, startY + 16);
     doc.text("Shipping Address:", 14, startY + 24);
-  
+
     doc.setFontSize(10);
-    doc.setTextColor("#4B5563");
-    doc.text(order.shipping_address || "—", 14, startY + 32);
-  
+    doc.setTextColor("#6B7280");
+    doc.text(order.shipping_address || "—", 100, startY + 24);
+
     doc.setFontSize(11);
     doc.setTextColor("#111827");
     doc.text("Customer Details:", 14, startY + 44);
@@ -162,7 +163,7 @@ export default function OrderTracking() {
     doc.setFontSize(10);
     doc.setTextColor("#4B5563");
     doc.text(`Name: ${order.username || "—"}`, 14, startY + 52);
-    doc.text(`Phone: ${order.phone || "—"}`, 14, startY + 68);
+    doc.text(`Phone: ${order.phone_number || "—"}`, 14, startY + 68);
   
     // Items List
     const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
@@ -310,11 +311,6 @@ export default function OrderTracking() {
 
           {/* PDF Download & Cancel Button */}
           <div className="flex gap-4 mt-6">
-          <Button onClick={() => downloadPDF(order)} variant="outline">
-              Download Receipt PDF
-            </Button>
-
-            
             <button
               onClick={() => downloadPDF(order)}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"

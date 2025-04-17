@@ -205,7 +205,7 @@ const CompletedOrders = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto mt-10 px-4 pb-20">
+    <div className="max-w-5xl mx-auto sm:pt-20 pt-20 md:pt-22 lg:pt-28">
       <h1 className="text-3xl font-bold mb-4 text-center sm:text-left">Your Completed Orders</h1>
 
       <div className="flex flex-col sm:flex-row sm:items-end gap-4 justify-between mb-6">
