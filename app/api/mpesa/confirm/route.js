@@ -1,21 +1,16 @@
-import { supabase } from "@/lib/supabaseClient";
+import { NextResponse } from "next/server";
 
 export async function POST(req) {
   try {
     const body = await req.json();
 
-    // Example: store confirmation data
-    await supabase.from("mpesa_confirmations").insert({
-      transaction: body,
-    });
+    console.log("Received Validation from Safaricom:", body);
 
-    return new Response(JSON.stringify({ ResultCode: 0, ResultDesc: "Accepted" }), {
-      status: 200,
-    });
+    // Optionally validate here (e.g. check against orders)
+
+    return NextResponse.json({ ResultCode: 0, ResultDesc: "Accepted" });
   } catch (error) {
-    console.error("Confirmation error:", error);
-    return new Response(JSON.stringify({ ResultCode: 1, ResultDesc: "Rejected" }), {
-      status: 500,
-    });
+    console.error("Validation Error:", error);
+    return NextResponse.json({ ResultCode: 1, ResultDesc: "Rejected" }, { status: 500 });
   }
 }
