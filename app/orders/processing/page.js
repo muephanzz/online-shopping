@@ -1,101 +1,109 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 
-export default function ProcessingPage() {
-  const searchParams = useSearchParams();
+export default function PaymentProcessing() {
+  const [status, setStatus] = useState("pending"); // "pending", "success", "failed"
+  const [message, setMessage] = useState("Waiting for payment confirmation...");
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const checkoutRequestId = searchParams.get("checkoutRequestId");
 
-  const [status, setStatus] = useState("pending");
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
-    if (!checkoutRequestId) {
-      router.push("/orders/checkout?error=missing_request_id");
-      return;
-    }
+    if (!checkoutRequestId) return;
+
+    let attempts = 0;
+    const maxAttempts = 6;
 
     const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/check-payment?checkoutRequestId=${checkoutRequestId}`);
-        const data = await res.json();
+      attempts++;
+      const res = await fetch("/api/check-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ checkoutRequestId }),
+      });
 
-        if (data.status === "paid") {
-          setStatus("paid");
-          setLoading(false);
-          clearInterval(interval);
+      const data = await res.json();
 
-          // Redirect to success page after 3 seconds
-          setTimeout(() => {
-            router.push("/orders/checkout/success");
-          }, 3000);
-        } else {
-          setTimeLeft((prev) => prev - 1);
-        }
-
-        if (timeLeft <= 1) {
-          setLoading(false);
-          clearInterval(interval);
-        }
-      } catch (err) {
-        console.error("Error checking payment status:", err);
-        setLoading(false);
+      if (data.status === "paid") {
         clearInterval(interval);
+        setStatus("success");
+        setMessage("Payment received successfully!");
+        setTimeout(() => router.push("/orders/success"), 2000);
+      } else if (attempts >= maxAttempts) {
+        clearInterval(interval);
+        setStatus("failed");
+        setMessage("We couldn't verify your payment in time.");
+        setLoading(false);
       }
-    }, 1000);
+    }, 5000);
 
     return () => clearInterval(interval);
-  }, [checkoutRequestId, timeLeft]);
+  }, [checkoutRequestId]);
 
   const handleRetry = () => {
-    router.push("/orders/checkout");
-  };
-
-  const handleBack = () => {
-    router.push("/");
+    setStatus("pending");
+    setLoading(true);
+    setMessage("Retrying payment check...");
+    window.location.reload();
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <h1 className="text-3xl font-bold mb-6">Processing Payment</h1>
+    <div className="min-h-screen bg-gradient-to-tr from-blue-50 to-white flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-md w-full bg-white shadow-xl rounded-2xl p-6 text-center space-y-6"
+      >
+        <h2 className="text-2xl font-bold text-blue-700">Processing Payment</h2>
 
-      {loading && status === "pending" && (
-        <>
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-solid mb-4"></div>
-          <p className="mb-2 text-lg">Waiting for M-Pesa confirmation...</p>
-          <p className="text-sm text-gray-500">Time remaining: {timeLeft}s</p>
-        </>
-      )}
+        <p className="text-gray-600">{message}</p>
 
-      {!loading && status === "paid" && (
-        <>
-          <p className="text-green-600 text-xl font-semibold mb-4">Payment confirmed!</p>
-          <p className="text-sm text-gray-500">Redirecting to confirmation page...</p>
-        </>
-      )}
+        {status === "pending" && (
+          <motion.div
+            className="flex justify-center"
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          >
+            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+          </motion.div>
+        )}
 
-      {!loading && status !== "paid" && (
-        <>
-          <p className="text-red-600 text-xl font-semibold mb-4">Payment not confirmed</p>
-          <div className="flex gap-4">
+      {status === "failed" && (
+        <div className="space-y-4">
+          <p className="text-red-600 font-semibold">We couldn't confirm your payment in time.</p>
+          <p className="text-gray-600 text-sm">
+            If you completed payment manually, kindly forward your M-Pesa message to <strong>0712 345 678</strong> or use the Paybill method below.
+          </p>
+          <div className="bg-gray-100 rounded-lg p-4 text-left text-sm text-gray-700">
+            <p><strong>Paybill:</strong> 123456</p>
+            <p><strong>Account No:</strong> Your Order ID</p>
+            <p><strong>Amount:</strong> Exact order total</p>
+          </div>
+          <div className="flex gap-4 justify-center">
             <button
               onClick={handleRetry}
-              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
             >
+              <RefreshCw className="w-4 h-4" />
               Retry
             </button>
             <button
-              onClick={handleBack}
-              className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+              onClick={() => router.push("/")}
+              className="border border-gray-400 text-gray-600 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-100 transition"
             >
+              <ArrowLeft className="w-4 h-4" />
               Go Back
             </button>
           </div>
-        </>
+        </div>
       )}
+      </motion.div>
     </div>
   );
 }

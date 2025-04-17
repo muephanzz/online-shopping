@@ -4,13 +4,14 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 
 export default function Checkout() {
   const [checkoutItems, setCheckoutItems] = useState([]);
   const [amount, setAmount] = useState(0);
   const [phone, setPhone] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
-  const [email, setEmail] = useState(""); // ✅ auto-filled from profiles
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -24,20 +25,19 @@ export default function Checkout() {
 
   useEffect(() => {
     const fetchEmail = async () => {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError || !userData?.user) return;
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user) return;
 
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile } = await supabase
         .from("profiles")
         .select("email")
         .eq("user_id", userData.user.id)
         .single();
 
-      if (!profileError && profile?.email) {
+      if (profile?.email) {
         setEmail(profile.email);
       }
     };
-
     fetchEmail();
   }, []);
 
@@ -68,18 +68,16 @@ export default function Checkout() {
       const { data: userData, error: userError } = await supabase.auth.getUser();
       if (userError || !userData?.user) throw new Error("User not authenticated");
 
-      const user = userData.user;
-
       const res = await fetch("/api/mpesa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount,
           phone,
-          user_id: user.id,
+          user_id: userData.user.id,
           checkoutItems,
           shipping_address: shippingAddress,
-          email, // ✅ auto-filled
+          email,
         }),
       });
 
@@ -98,46 +96,50 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen pb-20 pt-20 flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-6">Checkout</h2>
+    <div className="min-h-screen py-20 px-4 flex items-center justify-center bg-gradient-to-br from-blue-50 to-white">
+      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-xl transition-all duration-500">
+        <h2 className="text-3xl font-bold text-center text-blue-700 mb-6">Secure Checkout</h2>
 
-        <div className="space-y-6">
-          {checkoutItems.map((item, index) => (
-            <div key={index} className="flex items-center gap-4 border-b pb-4">
+        {email && (
+          <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg text-sm mb-4">
+            <p className="text-gray-700">Logged in as <strong>{email}</strong></p>
+          </div>
+        )}
+
+        <div className="space-y-4">
+          {checkoutItems.map((item, i) => (
+            <div key={i} className="flex items-center gap-4 border-b pb-4">
               <Image
                 src={item.image_url}
                 width={80}
                 height={80}
-                className="rounded-lg object-cover"
+                className="rounded-xl object-cover"
                 alt={item.name}
-                priority={index === 0}
               />
               <div className="flex-1">
-                <h3 className="text-lg font-medium">{item.name}</h3>
-                <p className="text-gray-700">Quantity: {item.quantity}</p>
-                <p className="text-blue-600 font-bold">Ksh {item.price.toFixed(2)}</p>
+                <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                <p className="text-sm font-bold text-blue-600">Ksh {item.price.toFixed(2)}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+        {/* Order summary */}
+        <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 my-6 space-y-1">
+          <p className="flex justify-between text-sm"><span>Subtotal</span><span>Ksh {amount.toFixed(2)}</span></p>
+          <p className="flex justify-between text-sm"><span>Shipping</span><span>FREE</span></p>
+          <hr />
+          <p className="flex justify-between font-bold text-gray-900"><span>Total</span><span>Ksh {amount.toFixed(2)}</span></p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label>Total Payable (Ksh)</label>
-            <input
-              type="number"
-              value={amount}
-              readOnly
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-          </div>
-          <div>
-            <label>Shipping Address</label>
+            <label className="text-sm font-medium">Shipping Address</label>
             <select
               value={shippingAddress}
               onChange={(e) => setShippingAddress(e.target.value)}
-              className="w-full px-4 py-2 border rounded-lg"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             >
               <option value="">Select your campus</option>
@@ -145,15 +147,16 @@ export default function Checkout() {
               <option value="Karatina University">Karatina University</option>
             </select>
           </div>
+
           <div>
-            <label>Your Phone Number</label>
+            <label className="text-sm font-medium">Your Phone Number</label>
             <input
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
-              className="w-full px-4 py-2 border rounded-lg"
               placeholder="e.g. 254712345678"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
 
@@ -161,12 +164,18 @@ export default function Checkout() {
 
           <button
             type="submit"
-            className={`w-full py-2 rounded-lg text-white ${
-              loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className={`w-full py-3 flex items-center justify-center rounded-xl font-semibold text-white ${
+              loading ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+            } transition-all duration-300`}
             disabled={loading}
           >
-            {loading ? "Processing..." : "Pay Now"}
+            {loading ? (
+              <>
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processing...
+              </>
+            ) : (
+              "Pay Now"
+            )}
           </button>
         </form>
       </div>
