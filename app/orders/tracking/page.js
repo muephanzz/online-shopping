@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import jsPDF from "jspdf";
+import { Button } from "@/components/ui/button";
+import QRCode from "qrcode";
 
 export default function OrderTracking() {
   const [orders, setOrders] = useState([]);
@@ -100,26 +102,99 @@ export default function OrderTracking() {
       setTrackingInfo(null);
     }
   };
-
-  const downloadPDF = () => {
+ 
+  const downloadPDF = async (order) => {
     const doc = new jsPDF();
-    doc.setFontSize(14);
-    doc.text("Order Receipt", 20, 20);
-    doc.text(`Order ID: ${order.order_id}`, 20, 30);
-    doc.text(`Status: ${order.status}`, 20, 40);
-    doc.text(`Total: Ksh ${order.total}`, 20, 50);
-    doc.text(`Shipping Address: ${order.shipping_address}`, 20, 60);
-
+    const pageWidth = doc.internal.pageSize.getWidth();
+  
+    // Load logo
+    const logo = await fetch("/default-avatar.jpg")
+      .then((res) => res.blob())
+      .then((blob) => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      });
+  
+    // Generate QR Code for Order ID
+    const qrCodeData = await QRCode.toDataURL(order.order_id);
+  
+    // Add logo at top center
+    doc.addImage(logo, "JPG", pageWidth / 2 - 15, 10, 30, 15);
+  
+    // Title
+    doc.setFontSize(16);
+    doc.setTextColor("#1E3A8A");
+    doc.text("EPHANTRONICS", pageWidth / 2, 30, { align: "center" });
+  
+    // Subheader
+    doc.setFontSize(12);
+    doc.setTextColor("#374151");
+    doc.text("Order Receipt", pageWidth / 2, 38, { align: "center" });
+  
+    // Timestamp
+    doc.setFontSize(10);
+    doc.setTextColor("#6B7280");
+    doc.text(`Generated on: ${format(new Date(), "dd MMM yyyy, hh:mm a")}`, 14, 45);
+  
+    // Add QR Code
+    doc.addImage(qrCodeData, "PNG", pageWidth - 50, 50, 30, 30);
+  
+    // Order & Customer Info
+    const startY = 55;
+    doc.setFontSize(11);
+    doc.setTextColor("#111827");
+    doc.text(`Order ID: ${order.order_id}`, 14, startY);
+    doc.text(`Status: ${order.status}`, 14, startY + 8);
+    doc.text(`Total: Ksh ${order.total.toLocaleString()}`, 14, startY + 16);
+    doc.text("Shipping Address:", 14, startY + 24);
+  
+    doc.setFontSize(10);
+    doc.setTextColor("#4B5563");
+    doc.text(order.shipping_address || "—", 14, startY + 32);
+  
+    doc.setFontSize(11);
+    doc.setTextColor("#111827");
+    doc.text("Customer Details:", 14, startY + 44);
+  
+    doc.setFontSize(10);
+    doc.setTextColor("#4B5563");
+    doc.text(`Name: ${order.username || "—"}`, 14, startY + 52);
+    doc.text(`Phone: ${order.phone || "—"}`, 14, startY + 68);
+  
+    // Items List
     const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
     if (items && items.length > 0) {
-      doc.text("Items:", 20, 70);
+      doc.setFontSize(11);
+      doc.setTextColor("#1E3A8A");
+      doc.text("Items:", 14, startY + 80);
+  
+      let itemY = startY + 88;
+      doc.setFontSize(10);
+      doc.setTextColor("#374151");
       items.forEach((item, index) => {
-        doc.text(`- ${item.name} (Qty: ${item.quantity}) - Ksh ${item.price}`, 20, 80 + index * 10);
+        const line = `${index + 1}. ${item.name} — Qty: ${item.quantity}, Price: Ksh ${item.price}`;
+        doc.text(line, 14, itemY);
+        itemY += 8;
       });
     }
-
+  
+    // Footer
+    const pageHeight = doc.internal.pageSize.getHeight();
+    doc.setFontSize(9);
+    doc.setTextColor("#9CA3AF");
+    doc.text(
+      `Thank you for shopping with us — Page 1 of 1`,
+      pageWidth / 2,
+      pageHeight - 10,
+      { align: "center" }
+    );
+  
     doc.save(`Order_${order.order_id}.pdf`);
   };
+  
 
   return (
     <div className="max-w-3xl mt-20 mx-auto p-6 bg-white shadow-md rounded-lg">
@@ -198,7 +273,7 @@ export default function OrderTracking() {
           <p><strong>Status:</strong> {order.status.toUpperCase()}</p>
           <p><strong>Total:</strong> Ksh {order.total}</p>
           <p><strong>Shipping Address:</strong> {order.shipping_address}</p>
-          <p><strong>Estimated Delivery:</strong> 3–5 business days</p>
+          <p><strong>Estimated Delivery:</strong> Less than 2 Hours</p>
 
           {/* Shipment Tracking */}
           {trackingInfo && (
@@ -235,11 +310,16 @@ export default function OrderTracking() {
 
           {/* PDF Download & Cancel Button */}
           <div className="flex gap-4 mt-6">
+          <Button onClick={() => downloadPDF(order)} variant="outline">
+              Download Receipt PDF
+            </Button>
+
+            
             <button
-              onClick={downloadPDF}
+              onClick={() => downloadPDF(order)}
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
-              Download Receipt (PDF)
+              Download Receipt
             </button>
 
             {order.status !== "cancelled" && (
