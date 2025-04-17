@@ -1,70 +1,100 @@
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
 
-async function getOAuthToken() {
-  const auth = Buffer.from(`${process.env.MPESA_CONSUMER_KEY}:${process.env.MPESA_CONSUMER_SECRET}`).toString("base64");
+const consumerKey = process.env.MPESA_CONSUMER_KEY;
+const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
+const shortcode = process.env.MPESA_SHORTCODE;
+const passkey = process.env.MPESA_PASSKEY;
+const callbackURL = process.env.MPESA_CALLBACK_URL;
 
-  const res = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
-    method: "GET",
-    headers: {
-      Authorization: `Basic ${auth}`,
-    },
-  });
+const getTimestamp = () => {
+  return new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
+};
 
-  const data = await res.json();
-  return data.access_token;
-}
+const formatPhone = (phone) => {
+  if (phone.startsWith("07")) return "254" + phone.slice(1);
+  if (phone.startsWith("+")) return phone.slice(1);
+  return phone;
+};
 
 export async function POST(req) {
   try {
-    const { phone, checkoutRequestId } = await req.json();
+    const body = await req.json();
+    const { amount, phone, user_id, checkoutItems, shipping_address } = body;
 
-    if (!phone || !checkoutRequestId) {
-      return new Response(JSON.stringify({ error: "Missing phone or request ID" }), { status: 400 });
+    if (!amount || !phone || !user_id || !checkoutItems || !shipping_address) {
+      return NextResponse.json({ error: "Missing fields" }, { status: 400 });
     }
 
-    const formattedPhone = phone.startsWith("07") ? "254" + phone.slice(1) : phone;
+    const formattedPhone = formatPhone(phone);
+    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
 
-    const accessToken = await getOAuthToken();
+    const tokenRes = await fetch(
+      "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+      {
+        headers: { Authorization: `Basic ${auth}` },
+      }
+    );
+    const { access_token } = await tokenRes.json();
 
-    const timestamp = new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
-    const password = Buffer.from(`${process.env.MPESA_SHORTCODE}${process.env.MPESA_PASSKEY}${timestamp}`).toString("base64");
+    const timestamp = getTimestamp();
+    const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString("base64");
 
-    const stkQuery = {
-      BusinessShortCode: process.env.MPESA_SHORTCODE,
+    const stkBody = {
+      BusinessShortCode: shortcode,
       Password: password,
       Timestamp: timestamp,
-      CheckoutRequestID: checkoutRequestId,
+      TransactionType: "CustomerBuyGoodsOnline",
+      Amount: amount,
+      PartyA: formattedPhone,
+      PartyB: shortcode,
+      PhoneNumber: formattedPhone,
+      CallBackURL: callbackURL,
+      AccountReference: `Order-${user_id}`,
+      TransactionDesc: "E-commerce order",
     };
 
-    const res = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query", {
+    const stkRes = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${access_token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(stkQuery),
+      body: JSON.stringify(stkBody),
     });
 
-    const data = await res.json();
+    const stkData = await stkRes.json();
 
-    if (data.ResultCode === "0") {
-      // Update both orders and payments to status: paid
-      await supabase
-        .from("payments")
-        .update({ status: "paid" })
-        .eq("checkout_request_id", checkoutRequestId);
-
-      await supabase
-        .from("orders")
-        .update({ status: "paid" })
-        .eq("mpesa_transaction_id", checkoutRequestId);
-
-      return new Response(JSON.stringify({ success: true }), { status: 200 });
-    } else {
-      return new Response(JSON.stringify({ success: false, message: data.ResultDesc }), { status: 200 });
+    if (stkData.ResponseCode !== "0") {
+      return NextResponse.json({ error: "STK Push failed", details: stkData }, { status: 500 });
     }
-  } catch (error) {
-    console.error("Verification Error:", error);
-    return new Response(JSON.stringify({ error: "Server error" }), { status: 500 });
+
+    const checkoutRequestId = stkData.CheckoutRequestID;
+
+    await supabase.from("orders").insert({
+      user_id,
+      phone_number: formattedPhone,
+      total: amount,
+      items: JSON.stringify(checkoutItems),
+      shipping_address,
+      mpesa_transaction_id: checkoutRequestId,
+      status: "pending",
+    });
+
+    await supabase.from("payments").insert({
+      user_id,
+      phone_number: formattedPhone,
+      amount,
+      status: "pending",
+      checkout_request_id: checkoutRequestId,
+    });
+
+    return NextResponse.json({
+      message: "STK Push sent",
+      checkoutRequestId,
+    });
+  } catch (err) {
+    console.error("STK Push Error:", err);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

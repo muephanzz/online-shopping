@@ -70,7 +70,7 @@ export default function Checkout() {
 
       const user = userData.user;
 
-      const res = await fetch("/api/mpesa/initiate", {
+      const res = await fetch("/api/mpesa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
