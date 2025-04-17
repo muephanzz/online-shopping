@@ -7,9 +7,7 @@ const shortcode = process.env.MPESA_SHORTCODE;
 const passkey = process.env.MPESA_PASSKEY;
 const callbackURL = process.env.MPESA_CALLBACK_URL;
 
-const getTimestamp = () => {
-  return new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
-};
+const getTimestamp = () => new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
 
 const formatPhone = (phone) => {
   if (phone.startsWith("07")) return "254" + phone.slice(1);
@@ -22,19 +20,17 @@ export async function POST(req) {
     const body = await req.json();
     const { amount, phone, user_id, checkoutItems, shipping_address, email } = body;
 
-    if (!amount || !phone || !user_id || !checkoutItems || !shipping_address) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    if (!amount || !phone || !user_id || !checkoutItems || !shipping_address || !email) {
+      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
     const formattedPhone = formatPhone(phone);
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
 
-    const tokenRes = await fetch(
-      "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
-      {
-        headers: { Authorization: `Basic ${auth}` },
-      }
-    );
+    const tokenRes = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+      headers: { Authorization: `Basic ${auth}` },
+    });
+
     const { access_token } = await tokenRes.json();
 
     const timestamp = getTimestamp();
@@ -66,12 +62,12 @@ export async function POST(req) {
     const stkData = await stkRes.json();
 
     if (stkData.ResponseCode !== "0") {
-      return NextResponse.json({ error: "STK Push failed", details: stkData }, { status: 500 });
+      return NextResponse.json({ message: "STK Push failed", details: stkData }, { status: 500 });
     }
 
     const checkoutRequestId = stkData.CheckoutRequestID;
 
-    // Check for duplicates
+    // Save to payments table
     const { data: existingPayment } = await supabase
       .from("payments")
       .select("id")
@@ -89,7 +85,7 @@ export async function POST(req) {
       });
     }
 
-    // Optional: Store order with pending status (or wait until payment is confirmed)
+    // Save to orders table
     await supabase.from("orders").insert({
       user_id,
       phone_number: formattedPhone,
@@ -101,12 +97,9 @@ export async function POST(req) {
       status: "pending",
     });
 
-    return NextResponse.json({
-      message: "STK Push sent",
-      checkoutRequestId,
-    });
+    return NextResponse.json({ success: true, checkoutRequestId });
   } catch (err) {
     console.error("STK Push Error:", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }

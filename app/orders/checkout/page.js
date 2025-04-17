@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -14,6 +14,7 @@ export default function Checkout() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const router = useRouter();
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function Checkout() {
     }
 
     if (!email || !email.includes("@")) {
-      setError("Please Login to purchase this Product.");
+      setError("Please log in to purchase.");
       return;
     }
 
@@ -83,10 +84,10 @@ export default function Checkout() {
 
       const data = await res.json();
 
-      if (res.ok && data.success) {
+      if (res.ok && data.checkoutRequestId) {
         router.push(`/orders/processing?checkoutRequestId=${data.checkoutRequestId}`);
       } else {
-        setError(data.message || "Payment initiation failed.");
+        setError(data.error || "Payment initiation failed.");
         setLoading(false);
       }
     } catch (err) {
@@ -125,7 +126,6 @@ export default function Checkout() {
           ))}
         </div>
 
-        {/* Order summary */}
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 my-6 space-y-1">
           <p className="flex justify-between text-sm"><span>Subtotal</span><span>Ksh {amount.toFixed(2)}</span></p>
           <p className="flex justify-between text-sm"><span>Shipping</span><span>FREE</span></p>

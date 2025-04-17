@@ -6,104 +6,70 @@ import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function PaymentProcessing() {
-  const [status, setStatus] = useState("pending"); // "pending", "success", "failed"
-  const [message, setMessage] = useState("Waiting for payment confirmation...");
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const [status, setStatus] = useState("pending");
+  const [error, setError] = useState("");
   const searchParams = useSearchParams();
+  const router = useRouter();
   const checkoutRequestId = searchParams.get("checkoutRequestId");
 
   useEffect(() => {
     if (!checkoutRequestId) return;
 
-    let attempts = 0;
-    const maxAttempts = 6;
-
     const interval = setInterval(async () => {
-      attempts++;
-      const res = await fetch("/api/check-payment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ checkoutRequestId }),
-      });
+      try {
+        const res = await fetch(`/api/check-payment?checkoutRequestId=${checkoutRequestId}`);
+        const data = await res.json();
 
-      const data = await res.json();
-
-      if (data.status === "paid") {
+        if (data.status === "paid") {
+          clearInterval(interval);
+          router.push("/orders/success");
+        } else if (data.status === "failed") {
+          clearInterval(interval);
+          setStatus("failed");
+        }
+      } catch (err) {
+        setError("Something went wrong. Try again.");
         clearInterval(interval);
-        setStatus("success");
-        setMessage("Payment received successfully!");
-        setTimeout(() => router.push("/orders/success"), 2000);
-      } else if (attempts >= maxAttempts) {
-        clearInterval(interval);
-        setStatus("failed");
-        setMessage("We couldn't verify your payment in time.");
-        setLoading(false);
       }
     }, 5000);
 
     return () => clearInterval(interval);
   }, [checkoutRequestId]);
 
-  const handleRetry = () => {
-    setStatus("pending");
-    setLoading(true);
-    setMessage("Retrying payment check...");
-    window.location.reload();
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-blue-50 to-white flex items-center justify-center px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-md w-full bg-white shadow-xl rounded-2xl p-6 text-center space-y-6"
-      >
-        <h2 className="text-2xl font-bold text-blue-700">Processing Payment</h2>
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="text-center space-y-4 max-w-md mx-auto">
+        {status === "pending" ? (
+          <>
+            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
+              <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto" />
+            </motion.div>
+            <h2 className="text-xl font-semibold">Waiting for payment confirmation...</h2>
+            <p className="text-sm text-gray-500">This might take up to 30 seconds.</p>
+          </>
+        ) : status === "failed" ? (
+          <>
+            <h2 className="text-xl font-bold text-red-600">Payment Failed</h2>
+            <p className="text-sm text-gray-600">Your payment could not be confirmed.</p>
+            <div className="flex justify-center gap-4 mt-4">
+              <button
+                onClick={() => router.push("/checkout")}
+                className="px-4 py-2 rounded-lg border border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                <ArrowLeft className="inline w-4 h-4 mr-1" /> Back to Checkout
+              </button>
+              <button
+                onClick={() => router.refresh()}
+                className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 flex items-center"
+              >
+                <RefreshCw className="inline w-4 h-4 mr-1" /> Retry
+              </button>
+            </div>
+          </>
+        ) : null}
 
-        <p className="text-gray-600">{message}</p>
-
-        {status === "pending" && (
-          <motion.div
-            className="flex justify-center"
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-          >
-            <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
-          </motion.div>
-        )}
-
-      {status === "failed" && (
-        <div className="space-y-4">
-          <p className="text-red-600 font-semibold">We couldn't confirm your payment in time.</p>
-          <p className="text-gray-600 text-sm">
-            If you completed payment manually, kindly forward your M-Pesa message to <strong>0712 345 678</strong> or use the Paybill method below.
-          </p>
-          <div className="bg-gray-100 rounded-lg p-4 text-left text-sm text-gray-700">
-            <p><strong>Paybill:</strong> 123456</p>
-            <p><strong>Account No:</strong> Your Order ID</p>
-            <p><strong>Amount:</strong> Exact order total</p>
-          </div>
-          <div className="flex gap-4 justify-center">
-            <button
-              onClick={handleRetry}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Retry
-            </button>
-            <button
-              onClick={() => router.push("/")}
-              className="border border-gray-400 text-gray-600 px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-100 transition"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Go Back
-            </button>
-          </div>
-        </div>
-      )}
-      </motion.div>
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+      </div>
     </div>
   );
 }
