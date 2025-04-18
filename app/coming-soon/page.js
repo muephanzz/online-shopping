@@ -9,7 +9,7 @@ export default function ComingSoonPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/");
-    }, 2000);
+    }, 4000);
 
     return () => clearTimeout(timer);
   }, [router]);
