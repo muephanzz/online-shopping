@@ -14,6 +14,7 @@ const CompletedOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [viewAll, setViewAll] = useState(false); // for toggle
   const [dateRange, setDateRange] = useState({ from: "", to: "" });
   const { user, setUser } = useAuth();
   const router = useRouter();
@@ -38,9 +39,14 @@ const CompletedOrders = () => {
                 <p className="text-gray-700">Quantity: {item.quantity}</p>
                 <p className="text-blue-600 font-bold">Ksh {item.price}</p>
               </div>
-              <Button onClick={() => router.push(`/upload-review/${item.product_id}`)} className="text-sm">
-                Write a Review
-              </Button>
+              {!isAdmin && (
+                <Button
+                  onClick={() => router.push(`/upload-review/${item.product_id}`)}
+                  className="text-sm"
+                >
+                  Write a Review
+                </Button>
+              )}
             </li>
           ))
         ) : (
@@ -52,122 +58,103 @@ const CompletedOrders = () => {
 
   useEffect(() => {
     fetchCompletedOrders();
-  }, [dateRange]);
+  }, [dateRange, viewAll]);
 
   const fetchCompletedOrders = async () => {
     setLoading(true);
-  
     const { data, error: userError } = await supabase.auth.getUser();
     const user = data?.user;
-  
+
     if (userError || !user) {
       console.error("Error fetching user or user not logged in:", userError);
       setLoading(false);
       return;
     }
-  
-    setUser(user); // optional: if you're using user state globally
-  
+
+    setUser(user);
+
     const { data: isAdminData, error: adminError } = await supabase.rpc("check_is_admin", {
       uid: user.id,
     });
-  
-    if (adminError) {
-      console.error("Error checking admin status:", adminError);
-    }
-  
+
+    if (adminError) console.error("Admin check error:", adminError);
     const admin = isAdminData || false;
     setIsAdmin(admin);
-  
-    // Fetch orders (either all for admin, or user-specific)
+
     const { data: ordersData, error: ordersError } = await supabase
       .from("orders")
       .select("*")
       .eq("status", "completed")
       .order("created_at", { ascending: false });
-  
+
     let filteredOrders = ordersData;
-  
-    if (!admin) {
+    if (!admin || !viewAll) {
       filteredOrders = ordersData?.filter((order) => order.user_id === user.id);
     }
-  
-    if (ordersError) console.error("Error fetching completed orders:", ordersError);
-    else setOrders(filteredOrders || []);
-  
+
+    if (ordersError) console.error("Orders fetch error:", ordersError);
+    setOrders(filteredOrders || []);
     setLoading(false);
   };
-  
+
   const downloadPDF = async (orders) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-  
-    // Load logo image (replace with your real logo if available)
-    const logo = await fetch("/default-avatar.jpg") // use real logo or base64 here
+
+    const logo = await fetch("/default-avatar.jpg")
       .then((res) => res.blob())
-      .then((blob) => {
-        return new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.readAsDataURL(blob);
-        });
-      });
-  
-    // Add logo at the top center
+      .then((blob) => new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      }));
+
     doc.addImage(logo, "JPG", pageWidth / 2 - 15, 10, 30, 15);
-  
-    // Header
     doc.setFontSize(18);
-    doc.setTextColor("#1E3A8A"); // Tailwind blue-800
+    doc.setTextColor("#1E3A8A");
     doc.text("Milimani Online Shopping", pageWidth / 2, 30, { align: "center" });
-  
-    // Subheader
     doc.setFontSize(13);
-    doc.setTextColor("#374151"); // Tailwind gray-700
+    doc.setTextColor("#374151");
     doc.text("Completed Orders Report", pageWidth / 2, 38, { align: "center" });
-  
-    // Timestamp
     doc.setFontSize(10);
-    doc.setTextColor("#6B7280"); // Tailwind gray-500
+    doc.setTextColor("#6B7280");
     doc.text(`Downloaded on: ${format(new Date(), "dd MMM yyyy, hh:mm a")}`, 14, 45);
-  
-    // Map order data into table rows
-    const tableData = orders.map((order) => {
-      const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
-      const firstItem = items?.[0] || {};
-  
-      return [
-        order.order_id,
-        format(new Date(order.created_at), "dd MMM yyyy"),
-        firstItem.name || "—",
-        `KSh ${order.total.toLocaleString()}`,
-        order.status,
-        order.shipping_address || "—"
-      ];
-    });
-  
-    // Draw the table
+
+    const tableData = await Promise.all(
+      orders.map(async (order) => {
+        const items = typeof order.items === "string" ? JSON.parse(order.items) : order.items;
+        const firstItem = items?.[0] || {};
+        const img = await loadImageAsBase64(firstItem.image_url);
+        return [
+          { content: order.order_id, rowSpan: 1 },
+          format(new Date(order.created_at), "dd MMM yyyy"),
+          {
+            content: firstItem.name || "—",
+            styles: { cellWidth: 50 }
+          },
+          `KSh ${order.total.toLocaleString()}`,
+          order.status,
+          order.shipping_address || "—",
+          {
+            image: img,
+            width: 15,
+            height: 15
+          }
+        ];
+      })
+    );
+
     autoTable(doc, {
-      head: [["Order ID", "Date", "First Item", "Total", "Status", "Shipping Address"]],
+      head: [["Order ID", "Date", "First Item", "Total", "Status", "Shipping", "Preview"]],
       body: tableData,
       startY: 50,
-      styles: {
-        fontSize: 10,
-        halign: "center",
-        valign: "middle",
-      },
-      headStyles: {
-        fillColor: [30, 58, 138], // blue-800
-        textColor: 255,
-        fontStyle: "bold",
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245], // light gray
-      },
+      styles: { fontSize: 10, halign: "center", valign: "middle" },
+      headStyles: { fillColor: [30, 58, 138], textColor: 255, fontStyle: "bold" },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
       didDrawPage: (data) => {
         const pageHeight = doc.internal.pageSize.getHeight();
         doc.setFontSize(9);
-        doc.setTextColor("#9CA3AF"); // gray-400
+        doc.setTextColor("#9CA3AF");
         doc.text(
           `Page ${data.pageNumber} of ${doc.internal.getNumberOfPages()}`,
           pageWidth / 2,
@@ -176,12 +163,20 @@ const CompletedOrders = () => {
         );
       },
     });
-  
-    // Save file
+
     doc.save("Completed_Orders_Report.pdf");
   };
-  
-  
+
+  const loadImageAsBase64 = async (url) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    });
+  };
+
   const downloadCSV = () => {
     const data = orders.map((order) => {
       const items = JSON.parse(order.items)
@@ -194,6 +189,7 @@ const CompletedOrders = () => {
         Total: order.total,
         Status: order.status,
         Shipping: order.shipping_address,
+        Email: order.email,
         UserID: order.user_id,
       };
     });
@@ -206,7 +202,26 @@ const CompletedOrders = () => {
 
   return (
     <div className="max-w-5xl mx-auto sm:pt-20 pt-20 md:pt-22 lg:pt-28">
-      <h1 className="text-3xl font-bold mb-4 text-center sm:text-left">Your Completed Orders</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center sm:text-left">
+        Completed Orders
+      </h1>
+
+      {isAdmin && (
+        <div className="flex gap-2 mb-4 justify-center sm:justify-start">
+          <Button
+            variant={!viewAll ? "default" : "outline"}
+            onClick={() => setViewAll(false)}
+          >
+            My Orders
+          </Button>
+          <Button
+            variant={viewAll ? "default" : "outline"}
+            onClick={() => setViewAll(true)}
+          >
+            All Orders
+          </Button>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row sm:items-end gap-4 justify-between mb-6">
         <div className="flex gap-2 flex-col sm:flex-row">
@@ -232,7 +247,7 @@ const CompletedOrders = () => {
         {orders.length > 0 && (
           <div className="flex gap-2">
             <Button onClick={() => downloadPDF(orders)}>Download PDF</Button>
-            {isAdmin && (<Button onClick={downloadCSV} variant="outline">Export CSV</Button>)}
+            {isAdmin && <Button onClick={downloadCSV} variant="outline">Export CSV</Button>}
           </div>
         )}
       </div>
@@ -254,7 +269,12 @@ const CompletedOrders = () => {
               <p><strong>Order Date:</strong> {format(new Date(order.created_at), "dd MMM yyyy, hh:mm a")}</p>
               <p><strong>Status:</strong> {order.status}</p>
               <p><strong>Total:</strong> Ksh {order.total}</p>
-              {isAdmin && <p><strong>User ID:</strong> {order.user_id}</p>}
+              {isAdmin && (
+                <div className="block">
+                  <p><strong>User ID:</strong> {order.user_id}</p>
+                  <p><strong>Email:</strong> {order.email}</p>  
+                </div>
+              )}
               <h3 className="mt-4 font-semibold">Items:</h3>
               <OrderItems order={order} />
               <p><strong>Shipping Address:</strong> {order.shipping_address}</p>

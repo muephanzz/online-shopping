@@ -151,10 +151,7 @@ export default function OrderTracking() {
     doc.text(`Status: ${order.status}`, 14, startY + 8);
     doc.text(`Total: Ksh ${order.total.toLocaleString()}`, 14, startY + 16);
     doc.text("Shipping Address:", 14, startY + 24);
-
-    doc.setFontSize(10);
-    doc.setTextColor("#6B7280");
-    doc.text(order.shipping_address || "—", 100, startY + 24);
+    doc.text(`Shipping Address: ${order.shipping_address}`, 14, startY + 8);
 
     doc.setFontSize(11);
     doc.setTextColor("#111827");
@@ -162,7 +159,7 @@ export default function OrderTracking() {
   
     doc.setFontSize(10);
     doc.setTextColor("#4B5563");
-    doc.text(`Name: ${order.username || "—"}`, 14, startY + 52);
+    doc.text(`Name: ${order.firt_name} " " ${order.last_name}|| "—"`, 14, startY + 52);
     doc.text(`Phone: ${order.phone_number || "—"}`, 14, startY + 68);
   
     // Items List

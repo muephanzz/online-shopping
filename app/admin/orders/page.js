@@ -124,6 +124,7 @@ const ManageOrders = () => {
                   <div>
                     <p><strong>Order ID:</strong> {order.order_id}</p>
                     <p><strong>User ID:</strong> {order.user_id}</p>
+                    <p><strong>Email:</strong> {order.email}</p>
                     <p><strong>Total:</strong> Ksh {order.total}</p>
                     <p><strong>Shipping:</strong> {order.shipping_address}</p>
                   </div>

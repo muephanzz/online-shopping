@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const AdminLayout = ({ children }) => {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex ">
       <aside className="w-64 bg-gray-900 text-white p-4">
         <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
         <nav className="space-y-2">
