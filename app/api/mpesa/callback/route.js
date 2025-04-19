@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
-// Helper function to flatten callback JSON
 const extractCallbackData = (body) => {
   const stkCallback = body?.Body?.stkCallback;
   const resultCode = stkCallback?.ResultCode;
@@ -39,7 +38,6 @@ export async function POST(req) {
       return NextResponse.json({ message: "Missing CheckoutRequestID" }, { status: 400 });
     }
 
-    // Update the payments table
     const { error: paymentError } = await supabase
       .from("payments")
       .update({
@@ -48,18 +46,17 @@ export async function POST(req) {
         mpesa_receipt: mpesaReceiptNumber,
         result_desc: resultDesc,
       })
-      .eq("checkout_id", checkoutRequestId);
+      .eq("checkout_request_id", checkoutRequestId);
 
     if (paymentError) {
       console.error("Payment update error:", paymentError.message);
     }
 
-    // Optionally update orders status
     if (resultCode === 0) {
       await supabase
         .from("orders")
         .update({ status: "confirmed" })
-        .eq("checkout_id", checkoutRequestId);
+        .eq("mpesa_transaction_id", checkoutRequestId);
     }
 
     return NextResponse.json({ message: "Callback received successfully" });

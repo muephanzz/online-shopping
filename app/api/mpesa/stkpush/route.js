@@ -7,17 +7,17 @@ const shortcode = process.env.MPESA_SHORTCODE;
 const passkey = process.env.MPESA_PASSKEY;
 const callbackURL = process.env.BASE_URL + "/api/mpesa/stkpush";
 
-const getTimestamp = () => new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
+const getTimestamp = () =>
+  new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
 
-const formatPhone = (phone) => {
-  if (phone.startsWith("07")) return "254" + phone.slice(1);
-  return phone;
-};
+const formatPhone = (phone) =>
+  phone.startsWith("07") ? "254" + phone.slice(1) : phone;
 
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { amount, phone, user_id, checkoutItems, shipping_address, email } = body;
+    const { amount, phone, user_id, checkoutItems, shipping_address, email } =
+      body;
 
     if (!amount || !phone || !user_id || !checkoutItems || !shipping_address || !email) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
@@ -26,10 +26,10 @@ export async function POST(req) {
     const formattedPhone = formatPhone(phone);
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
 
-    const tokenRes = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
-      headers: { Authorization: `Basic ${auth}` },
-    });
-
+    const tokenRes = await fetch(
+      "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials",
+      { headers: { Authorization: `Basic ${auth}` } }
+    );
     const { access_token } = await tokenRes.json();
 
     const timestamp = getTimestamp();
@@ -44,22 +44,24 @@ export async function POST(req) {
       PartyA: formattedPhone,
       PartyB: shortcode,
       PhoneNumber: formattedPhone,
-      CallBackURL: callbackURL ,
+      CallBackURL: callbackURL,
       AccountReference: `Order-${user_id}`,
-      TransactionDesc: "E-commerce order",
+      TransactionDesc: "E-commerce Order",
     };
 
-    const stkRes = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(stkBody),
-    });
+    const stkRes = await fetch(
+      "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(stkBody),
+      }
+    );
 
     const stkData = await stkRes.json();
-
     if (stkData.ResponseCode !== "0") {
       return NextResponse.json({ message: "STK Push failed", details: stkData }, { status: 500 });
     }
