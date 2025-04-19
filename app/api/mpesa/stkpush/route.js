@@ -1,37 +1,46 @@
-// File: app/api/mpesa/stkpush/route.js
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
-import { sanitizePhone } from "@/lib/utils";
-import { initiateSTKPush } from "@/lib/mpesaClient";
+import mpesaClient from "@/lib/mpesaClient";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export async function POST(req) {
-  const body = await req.json();
-  const { phone, amount, items, shipping, email, user_id } = body;
+  try {
+    const { phone, amount, shipping, email, user_id, items } = await req.json();
 
-  const sanitizedPhone = sanitizePhone(phone);
+    if (!phone || !amount || !shipping || !email || !user_id || !items.length) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
 
-  const { checkoutRequestID } = await initiateSTKPush({
-    phone: sanitizedPhone,
-    amount,
-  });
-
-  const { data, error } = await supabase.from("payments").insert([
-    {
+    await supabase.from("orders").insert({
       user_id,
-      email,
-      phone: sanitizedPhone,
-      checkout_request_id: checkoutRequestID,
-      amount,
-      status: "pending",
+      order_id,
       items,
       shipping,
-    },
-  ]);
+      status: "pending",
+      amount,
+      email,
+    });
 
-  if (error) {
-    console.error("Error saving payment:", error);
-    return NextResponse.json({ error: "Failed to save payment." }, { status: 500 });
+    await supabase.from("payments").insert({
+      user_id,
+      order_id,
+      amount,
+      phone,
+      status: "pending",
+    });
+
+    const response = await mpesaClient.stkPush({
+      phoneNumber: phone,
+      amount,
+      accountReference: "CampusCart",
+      transactionDesc: `Payment by ${email}`,
+      callbackUrl: `${process.env.BASE_URL}/api/mpesa/callback`,
+    });
+
+    return NextResponse.json({ checkoutRequestId });
+  } catch (err) {
+    console.error("STK Push Error:", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  return NextResponse.json({ checkoutRequestId: checkoutRequestID });
 }

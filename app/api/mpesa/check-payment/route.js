@@ -1,70 +1,26 @@
+// --- File: app/api/mpesa/check-payment/route.js ---
+
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
-import { Resend } from "resend";
+import { createClient } from "@supabase/supabase-js";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
-export async function GET(req) {
-  const { searchParams } = new URL(req.url);
-  const checkoutRequestId = searchParams.get("checkoutRequestId");
+export async function POST(req) {
+  try {
+    const { checkoutRequestId } = await req.json();
 
-  const { data: payment, error } = await supabase
-    .from("payments")
-    .select("*")
-    .eq("checkout_request_id", checkoutRequestId)
-    .single();
+    if (!checkoutRequestId) return NextResponse.json({ error: "Missing request ID" }, { status: 400 });
 
-  if (error || !payment) {
-    return NextResponse.json({ status: "failed" });
-  }
-
-  if (payment.status !== "paid") {
-    return NextResponse.json({ status: "pending" });
-  }
-
-  const { data: existing } = await supabase
-    .from("orders")
-    .select("id")
-    .eq("payment_id", payment.id)
-    .maybeSingle();
-
-  let newOrderId;
-  if (!existing) {
-    const { data: newOrder } = await supabase
-      .from("orders")
-      .insert([
-        {
-          user_id: payment.user_id,
-          payment_id: payment.id,
-          items: payment.items,
-          total: payment.amount,
-          status: "processing",
-          shipping: payment.shipping,
-        },
-      ])
-      .select("id")
+    const { data, error } = await supabase
+      .from("payments")
+      .select("status")
+      .eq("checkout_request_id", checkoutRequestId)
       .single();
 
-    newOrderId = newOrder?.id;
+    if (error) throw new Error("Unable to check payment status");
 
-    if (payment.email && newOrderId) {
-      try {
-        await resend.emails.send({
-          from: process.env.FROM_EMAIL,
-          to: payment.email,
-          subject: "🧾 Order Confirmation",
-          html: `
-            <h2>Thanks for your purchase!</h2>
-            <p>Order <strong>#${newOrderId}</strong> has been received.</p>
-            <p>Total: <strong>KES ${payment.amount}</strong></p>
-            <p>We’ll let you know when it ships!</p>
-          `,
-        });
-      } catch (emailError) {
-        console.error("Email sending failed:", emailError.message);
-      }
-    }
+    return NextResponse.json({ status: data?.status });
+  } catch (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  return NextResponse.json({ status: "paid" });
 }
