@@ -5,7 +5,7 @@ const consumerKey = process.env.MPESA_CONSUMER_KEY;
 const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
 const shortcode = process.env.MPESA_SHORTCODE;
 const passkey = process.env.MPESA_PASSKEY;
-const callbackURL = process.env.BASE_URL + "/api/mpesa/stkpush";
+const callbackURL = process.env.BASE_URL + "/api/mpesa/callback";
 
 const getTimestamp = () => new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
 
@@ -13,8 +13,6 @@ const formatPhone = (phone) => {
   if (phone.startsWith("07")) return "254" + phone.slice(1);
   return phone;
 };
-
-console.log("cc", callbackURL);
 
 export async function POST(req) {
   try {
@@ -34,8 +32,6 @@ export async function POST(req) {
 
     const { access_token } = await tokenRes.json();
     
-    console.log("cc", callbackURL);
-    
     const timestamp = getTimestamp();
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString("base64");
 
@@ -49,8 +45,8 @@ export async function POST(req) {
       PartyB: shortcode,
       PhoneNumber: formattedPhone,
       CallBackURL: callbackURL,
-      AccountReference: `Order-${user_id}`,
-      TransactionDesc: "E-commerce order",
+      AccountReference: "order123",
+      TransactionDesc: "Payment for order",
     };
 
     const stkRes = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
