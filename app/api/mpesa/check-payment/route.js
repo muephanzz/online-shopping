@@ -10,7 +10,7 @@ export async function POST(req) {
   const { data: payment, error } = await supabase
     .from("payments")
     .select("*")
-    .eq("checkoutRequestId", checkoutRequestId)
+    .eq("checkout_request_id", checkoutRequestId) // ✅ Correct column name
     .single();
 
   if (error || !payment) {
@@ -21,30 +21,32 @@ export async function POST(req) {
     return NextResponse.json({ status: "pending" });
   }
 
-  // Check if order already exists
+  // ✅ Check if order already exists
   const { data: existing } = await supabase
     .from("orders")
     .select("id")
     .eq("payment_id", payment.id)
     .maybeSingle();
 
-  // Insert order if not already inserted
   let newOrderId;
   if (!existing) {
-    const { data: newOrder } = await supabase.from("orders").insert([
-      {
-        user_id: payment.user_id,
-        payment_id: payment.id,
-        items: payment.items,
-        total: payment.amount,
-        status: "processing",
-        shipping: payment.shipping,
-      },
-    ]).select("id").single();
+    const { data: newOrder } = await supabase
+      .from("orders")
+      .insert([
+        {
+          user_id: payment.user_id,
+          payment_id: payment.id,
+          items: payment.items,
+          total: payment.amount,
+          status: "processing",
+          shipping: payment.shipping,
+        },
+      ])
+      .select("id")
+      .single();
 
     newOrderId = newOrder?.id;
 
-    // ✅ Send email confirmation
     if (payment.email && newOrderId) {
       try {
         await resend.emails.send({
