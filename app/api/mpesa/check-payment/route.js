@@ -4,13 +4,14 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-export async function POST(req) {
-  const { checkoutRequestId } = await req.json();
+export async function GET(req) {
+  const { searchParams } = new URL(req.url);
+  const checkoutRequestId = searchParams.get("checkoutRequestId");
 
   const { data: payment, error } = await supabase
     .from("payments")
     .select("*")
-    .eq("checkout_request_id", checkoutRequestId) // ✅ Correct column name
+    .eq("checkout_request_id", checkoutRequestId)
     .single();
 
   if (error || !payment) {
@@ -21,7 +22,6 @@ export async function POST(req) {
     return NextResponse.json({ status: "pending" });
   }
 
-  // ✅ Check if order already exists
   const { data: existing } = await supabase
     .from("orders")
     .select("id")

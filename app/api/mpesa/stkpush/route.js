@@ -1,90 +1,37 @@
+// File: app/api/mpesa/stkpush/route.js
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseClient";
-
-const consumerKey = process.env.MPESA_CONSUMER_KEY;
-const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
-const shortcode = process.env.MPESA_SHORTCODE;
-const passkey = process.env.MPESA_PASSKEY;
-const callbackURL = process.env.BASE_URL + "/api/mpesa/callback";
-
-const getTimestamp = () => new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
-
-const formatPhone = (phone) => {
-  if (phone.startsWith("07")) return "254" + phone.slice(1);
-  return phone;
-};
+import { sanitizePhone } from "@/lib/utils";
+import { initiateSTKPush } from "@/lib/mpesaClient";
 
 export async function POST(req) {
-  try {
-    const body = await req.json();
-    const { amount, phone, user_id, checkoutItems, shipping_address, email } = body;
+  const body = await req.json();
+  const { phone, amount, items, shipping, email, user_id } = body;
 
-    if (!amount || !phone || !user_id || !checkoutItems || !shipping_address || !email) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
-    }
+  const sanitizedPhone = sanitizePhone(phone);
 
-    const formattedPhone = formatPhone(phone);
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
+  const { checkoutRequestID } = await initiateSTKPush({
+    phone: sanitizedPhone,
+    amount,
+  });
 
-    const tokenRes = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
-      headers: { Authorization: `Basic ${auth}` },
-    });
-
-    const { access_token } = await tokenRes.json();
-    
-    const timestamp = getTimestamp();
-    const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString("base64");
-
-    const stkBody = {
-      BusinessShortCode: shortcode,
-      Password: password,
-      Timestamp: timestamp,
-      TransactionType: "CustomerPayBillOnline",
-      Amount: amount,
-      PartyA: formattedPhone,
-      PartyB: shortcode,
-      PhoneNumber: formattedPhone,
-      CallBackURL: callbackURL,
-      AccountReference: "order123",
-      TransactionDesc: "Payment for order",
-    };
-
-    const stkRes = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(stkBody),
-    });
-
-    const stkData = await stkRes.json();
-
-    if (stkData.ResponseCode !== "0") {
-      return NextResponse.json({ message: "STK Push failed", details: stkData }, { status: 500 });
-    }
-
-    const checkoutRequestId = stkData.CheckoutRequestID;
-
-    const { error: paymentError } = await supabase.from("payments").insert({
+  const { data, error } = await supabase.from("payments").insert([
+    {
       user_id,
-      phone_number: formattedPhone,
+      email,
+      phone: sanitizedPhone,
+      checkout_request_id: checkoutRequestID,
       amount,
       status: "pending",
-      checkout_request_id: checkoutRequestId,
-      shipping_address,
-      items: JSON.stringify(checkoutItems),
-      email,
-    });
+      items,
+      shipping,
+    },
+  ]);
 
-    if (paymentError) {
-      console.error("Supabase payment insert error:", paymentError);
-      return NextResponse.json({ error: "Failed to save pending payment" }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true, checkoutRequestId });
-  } catch (err) {
-    console.error("STK Push Error:", err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  if (error) {
+    console.error("Error saving payment:", error);
+    return NextResponse.json({ error: "Failed to save payment." }, { status: 500 });
   }
+
+  return NextResponse.json({ checkoutRequestId: checkoutRequestID });
 }

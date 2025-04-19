@@ -6,107 +6,83 @@ import { Loader2, RefreshCw, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function PaymentProcessing() {
-  const [status, setStatus] = useState<"pending" | "paid" | "failed">("pending");
+  const [status, setStatus] = useState("pending");
   const [error, setError] = useState("");
-  const [countdown, setCountdown] = useState(30); // seconds
-  const router = useRouter();
+  const [progress, setProgress] = useState(0);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const checkoutRequestId = searchParams.get("checkoutRequestId");
 
-  // Request notification permission on mount
   useEffect(() => {
-    if (Notification.permission === "default") {
+    if (!checkoutRequestId) return;
+
+    let countdown = 30;
+    const updateProgress = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 100 : prev + 100 / 30));
+      countdown--;
+      if (countdown <= 0) clearInterval(updateProgress);
+    }, 1000);
+
+    const pollPayment = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/mpesa/check-payment?checkoutRequestId=${checkoutRequestId}`);
+        const data = await res.json();
+
+        if (data.status === "paid") {
+          clearInterval(pollPayment);
+          clearInterval(updateProgress);
+
+          if ("Notification" in window && Notification.permission === "granted") {
+            new Notification("🎉 Payment Successful!", {
+              body: "Your order has been confirmed.",
+            });
+          }
+
+          router.push("/orders/success");
+        } else if (data.status === "failed") {
+          clearInterval(pollPayment);
+          clearInterval(updateProgress);
+          setStatus("failed");
+        }
+      } catch (err) {
+        setError("Something went wrong. Try again.");
+        clearInterval(pollPayment);
+        clearInterval(updateProgress);
+      }
+    }, 5000);
+
+    return () => {
+      clearInterval(pollPayment);
+      clearInterval(updateProgress);
+    };
+  }, [checkoutRequestId]);
+
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted") {
       Notification.requestPermission();
     }
   }, []);
 
-  // Poll payment status every 5s
-  useEffect(() => {
-    if (!checkoutRequestId) return;
-
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/check-payment?checkoutRequestId=${checkoutRequestId}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ checkoutRequestId }),
-        });
-        const data = await res.json();
-
-        if (data.status === "paid") {
-          clearInterval(interval);
-          setStatus("paid");
-
-          // 🔔 Push Notification
-          if (Notification.permission === "granted") {
-            new Notification("✅ Payment Successful", {
-              body: "Your order has been confirmed!",
-              icon: "/success-icon.png", // optional
-            });
-
-            const audio = new Audio("/success-sound.mp3");
-            audio.play().catch(() => {}); // silent fail
-          }
-
-          // Redirect after short delay
-          setTimeout(() => router.push("/orders/success"), 1500);
-        } else if (data.status === "failed") {
-          clearInterval(interval);
-          setStatus("failed");
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Something went wrong. Try again.");
-        clearInterval(interval);
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [checkoutRequestId]);
-
-  // Countdown timer
-  useEffect(() => {
-    if (status !== "pending") return;
-
-    const timer = setInterval(() => {
-      setCountdown((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          setStatus("failed");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [status]);
-
-  const progress = ((30 - countdown) / 30) * 100;
-
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
-      <div className="text-center space-y-6 max-w-md mx-auto">
-        {status === "pending" && (
+    <div className="min-h-screen flex items-center justify-center px-4 py-12">
+      <div className="text-center space-y-4 max-w-md mx-auto w-full">
+        {status === "pending" ? (
           <>
             <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
               <Loader2 className="w-10 h-10 text-blue-600 animate-spin mx-auto" />
             </motion.div>
             <h2 className="text-xl font-semibold">Waiting for payment confirmation...</h2>
             <p className="text-sm text-gray-500">This might take up to 30 seconds.</p>
-            <div className="relative h-3 w-full bg-gray-200 rounded-lg overflow-hidden">
+
+            <div className="relative w-full h-2 bg-gray-200 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-blue-600"
-                initial={{ width: 0 }}
+                className="h-full bg-blue-500"
                 animate={{ width: `${progress}%` }}
-                transition={{ duration: 1, ease: "linear" }}
+                transition={{ ease: "linear", duration: 1 }}
               />
             </div>
-            <p className="text-sm text-gray-400">{countdown}s remaining...</p>
           </>
-        )}
-
-        {status === "failed" && (
+        ) : status === "failed" ? (
           <>
             <h2 className="text-xl font-bold text-red-600">Payment Failed</h2>
             <p className="text-sm text-gray-600">Your payment could not be confirmed.</p>
@@ -125,7 +101,7 @@ export default function PaymentProcessing() {
               </button>
             </div>
           </>
-        )}
+        ) : null}
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
       </div>
