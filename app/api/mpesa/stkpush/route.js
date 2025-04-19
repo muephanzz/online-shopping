@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { mpesaClient } from "@/lib/mpesaClient";
-import { supabase } from "@/components/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 
 export async function POST(req) {
   try {
