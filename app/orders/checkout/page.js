@@ -42,19 +42,14 @@ export default function Checkout() {
     fetchEmail();
   }, []);
 
-  const isValidPhone = (phone) => /^2547\d{8}$/.test(phone);
+  const isValidPhone = (phone) => /^07\d{8}$/.test(phone);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     if (!isValidPhone(phone)) {
-      setError("Please enter a valid phone number (format: 2547...)");
-      return;
-    }
-
-    if (!email || !email.includes("@")) {
-      setError("Please log in to purchase.");
+      setError("Please enter a valid phone number (format: 07...)");
       return;
     }
 
@@ -67,9 +62,9 @@ export default function Checkout() {
 
     try {
       const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError || !userData?.user) throw new Error("User not authenticated");
+      if (userError || !userData?.user) throw new Error("Please log in to Purchase this Item!");
 
-      const res = await fetch("/api/mpesa", {
+      const res = await fetch("/api/mpesa/stkpush", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

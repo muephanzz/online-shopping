@@ -1,23 +1,45 @@
 import { supabase } from "@/lib/supabaseClient";
 
 export async function POST(req) {
-  try {
-    const body = await req.json();
-    const callback = body?.Body?.stkCallback;
+  const headers = req.headers;
+  const secret = headers.get("x-safaricom-secret");
 
-    const resultCode = callback?.ResultCode;
-    const checkoutRequestId = callback?.CheckoutRequestID;
-
-    if (resultCode === 0) {
-      await supabase.from("payments").update({ status: "paid" }).eq("checkout_request_id", checkoutRequestId);
-      await supabase.from("orders").update({ status: "paid" }).eq("mpesa_transaction_id", checkoutRequestId);
-    } else {
-      console.warn("STK Failed:", callback?.ResultDesc);
-    }
-
-    return new Response(JSON.stringify({ message: "Callback handled" }), { status: 200 });
-  } catch (error) {
-    console.error("Callback error:", error);
-    return new Response(JSON.stringify({ error: "Callback failed" }), { status: 500 });
+  if (secret !== process.env.SAFARICOM_SECRET) {
+    return NextResponse.json({ error: "Unauthorized request" }, { status: 401 });
   }
+  
+  const payload = await req.json();
+  const callback = payload.Body?.stkCallback;
+  const resultCode = callback?.ResultCode;
+
+  if (resultCode !== 0) {
+    return new Response("Payment not successful", { status: 200 });
+  }
+
+  const checkoutRequestID = callback.CheckoutRequestID;
+  const metadata = callback.CallbackMetadata?.Item;
+
+  const amount = metadata.find(i => i.Name === "Amount")?.Value;
+  const receipt = metadata.find(i => i.Name === "MpesaReceiptNumber")?.Value;
+  const transactionDate = metadata.find(i => i.Name === "TransactionDate")?.Value;
+  const phone = metadata.find(i => i.Name === "PhoneNumber")?.Value;
+
+  await supabase
+    .from("payments")
+    .update({
+      status: "paid",
+      amount,
+      receipt,
+      transaction_date: transactionDate,
+      phone,
+    })
+    .eq("checkout_request_id", checkoutRequestID);
+
+  await supabase
+    .from("orders")
+    .update({ status: "paid" })
+    .eq("checkout_request_id", checkoutRequestID);
+
+  return new Response("Callback processed successfully", { status: 200 });
 }
+
