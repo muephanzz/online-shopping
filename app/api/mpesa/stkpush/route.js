@@ -44,7 +44,7 @@ export async function POST(req) {
       PartyA: formattedPhone,
       PartyB: shortcode,
       PhoneNumber: formattedPhone,
-      CallBackURL: callbackURL ,
+      CallBackURL: callbackURL,
       AccountReference: `Order-${user_id}`,
       TransactionDesc: "E-commerce order",
     };
@@ -66,27 +66,20 @@ export async function POST(req) {
 
     const checkoutRequestId = stkData.CheckoutRequestID;
 
-    const { error: orderError } = await supabase.from("orders").insert({
-      user_id,
-      total: amount,
-      shipping_address,
-      phone_number: formattedPhone,
-      status: "pending",
-      items: JSON.stringify(checkoutItems),
-      mpesa_transaction_id: checkoutRequestId,
-    });
-
     const { error: paymentError } = await supabase.from("payments").insert({
       user_id,
       phone_number: formattedPhone,
       amount,
       status: "pending",
       checkout_request_id: checkoutRequestId,
+      shipping_address,
+      items: JSON.stringify(checkoutItems),
+      email,
     });
 
-    if (orderError || paymentError) {
-      console.error("Supabase insert error:", { orderError, paymentError });
-      return NextResponse.json({ error: "Failed to save pending records" }, { status: 500 });
+    if (paymentError) {
+      console.error("Supabase payment insert error:", paymentError);
+      return NextResponse.json({ error: "Failed to save pending payment" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, checkoutRequestId });
