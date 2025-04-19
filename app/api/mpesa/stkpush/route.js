@@ -1,40 +1,97 @@
-import { NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
+import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabaseClient";
+
+const consumerKey = process.env.MPESA_CONSUMER_KEY;
+const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
+const shortcode = process.env.MPESA_SHORTCODE;
+const passkey = process.env.MPESA_PASSKEY;
+const callbackURL = process.env.BASE_URL + "/api/mpesa/stkpush";
+
+const getTimestamp = () => new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
+
+const formatPhone = (phone) => {
+  if (phone.startsWith("07")) return "254" + phone.slice(1);
+  return phone;
+};
 
 export async function POST(req) {
   try {
     const body = await req.json();
     const { amount, phone, user_id, checkoutItems, shipping_address, email } = body;
 
-    const checkoutRequestId = uuidv4(); // simulate unique request ID
+    if (!amount || !phone || !user_id || !checkoutItems || !shipping_address || !email) {
+      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    }
 
-    // Simulate an STK Push (replace with actual M-Pesa API integration)
-    console.log("Sending STK Push to", phone, "for Ksh", amount);
+    const formattedPhone = formatPhone(phone);
+    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString("base64");
 
-    // Save to DB: orders and payments (simplified here)
-    await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/orders`, {
-      method: "POST",
-      headers: {
-        "apikey": process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        "Content-Type": "application/json",
-        "Prefer": "return=representation",
-      },
-      body: JSON.stringify({
-        user_id,
-        amount,
-        status: "pending",
-        shipping_address,
-        items: checkoutItems,
-        checkout_request_id: checkoutRequestId,
-        email,
-        created_at: new Date().toISOString(),
-      }),
+    const tokenRes = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+      headers: { Authorization: `Basic ${auth}` },
     });
 
-    return NextResponse.json({ checkoutRequestId });
+    const { access_token } = await tokenRes.json();
+
+    const timestamp = getTimestamp();
+    const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString("base64");
+
+    const stkBody = {
+      BusinessShortCode: shortcode,
+      Password: password,
+      Timestamp: timestamp,
+      TransactionType: "CustomerPayBillOnline",
+      Amount: amount,
+      PartyA: formattedPhone,
+      PartyB: shortcode,
+      PhoneNumber: formattedPhone,
+      CallBackURL: callbackURL ,
+      AccountReference: `Order-${user_id}`,
+      TransactionDesc: "E-commerce order",
+    };
+
+    const stkRes = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(stkBody),
+    });
+
+    const stkData = await stkRes.json();
+
+    if (stkData.ResponseCode !== "0") {
+      return NextResponse.json({ message: "STK Push failed", details: stkData }, { status: 500 });
+    }
+
+    const checkoutRequestId = stkData.CheckoutRequestID;
+
+    const { error: orderError } = await supabase.from("orders").insert({
+      user_id,
+      total: amount,
+      shipping_address,
+      phone_number: formattedPhone,
+      status: "pending",
+      items: JSON.stringify(checkoutItems),
+      mpesa_transaction_id: checkoutRequestId,
+    });
+
+    const { error: paymentError } = await supabase.from("payments").insert({
+      user_id,
+      phone_number: formattedPhone,
+      amount,
+      status: "pending",
+      checkout_request_id: checkoutRequestId,
+    });
+
+    if (orderError || paymentError) {
+      console.error("Supabase insert error:", { orderError, paymentError });
+      return NextResponse.json({ error: "Failed to save pending records" }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, checkoutRequestId });
   } catch (err) {
     console.error("STK Push Error:", err);
-    return NextResponse.json({ error: "Failed to initiate payment." }, { status: 500 });
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
