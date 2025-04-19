@@ -14,6 +14,8 @@ const formatPhone = (phone) => {
   return phone;
 };
 
+console.log("cc", callbackURL);
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -31,7 +33,9 @@ export async function POST(req) {
     });
 
     const { access_token } = await tokenRes.json();
-
+    
+    console.log("cc", callbackURL);
+    
     const timestamp = getTimestamp();
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString("base64");
 
