@@ -6,17 +6,16 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.
 
 export async function POST(req) {
   try {
-    const { phone, amount, shipping, email, user_id, items } = await req.json();
+    const { phone, amount, shipping_address, email, user_id, items } = await req.json();
 
-    if (!phone || !amount || !shipping || !email || !user_id || !items.length) {
+    if (!phone || !amount || !shipping_address || !email || !user_id || !items.length) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     await supabase.from("orders").insert({
       user_id,
-      order_id,
       items,
-      shipping,
+      shipping_address,
       status: "pending",
       amount,
       email,
@@ -24,7 +23,6 @@ export async function POST(req) {
 
     await supabase.from("payments").insert({
       user_id,
-      order_id,
       amount,
       phone,
       status: "pending",
