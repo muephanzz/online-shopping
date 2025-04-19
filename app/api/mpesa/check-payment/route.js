@@ -1,9 +1,7 @@
 // --- File: app/api/mpesa/check-payment/route.js ---
 
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+import { supabase } from "@/components/supabaseClient";
 
 export async function POST(req) {
   try {
