@@ -1,66 +1,40 @@
-import { NextResponse } from "next/server";
-import { v4 as uuidv4 } from "uuid";
-import { mpesaClient } from "@/lib/mpesaClient";
-import { supabase } from "@/lib/supabaseClient";
+import { NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function POST(req) {
   try {
-    const { phone, amount, shipping_address, email, user_id, items } = await req.json();
+    const body = await req.json();
+    const { amount, phone, user_id, checkoutItems, shipping_address, email } = body;
 
-    if (!phone || !amount || !shipping_address || !email || !user_id || !items.length) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
+    const checkoutRequestId = uuidv4(); // simulate unique request ID
 
-    const checkoutRequestId = uuidv4(); // 👈 Generate unique ID for payment tracking
+    // Simulate an STK Push (replace with actual M-Pesa API integration)
+    console.log("Sending STK Push to", phone, "for Ksh", amount);
 
-    // Save the pending order
-    const { error: orderError } = await supabase.from("orders").insert({
-      user_id,
-      items,
-      shipping_address,
-      status: "pending",
-      amount,
-      email,
-      checkoutRequestId,
+    // Save to DB: orders and payments (simplified here)
+    await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/orders`, {
+      method: "POST",
+      headers: {
+        "apikey": process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+        "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        "Content-Type": "application/json",
+        "Prefer": "return=representation",
+      },
+      body: JSON.stringify({
+        user_id,
+        amount,
+        status: "pending",
+        shipping_address,
+        items: checkoutItems,
+        checkout_request_id: checkoutRequestId,
+        email,
+        created_at: new Date().toISOString(),
+      }),
     });
 
-    if (orderError) {
-      console.error("Order insert error:", orderError);
-      return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
-    }
-
-    // Save initial payment
-    const { error: paymentError } = await supabase.from("payments").insert({
-      user_id,
-      amount,
-      phone,
-      status: "pending",
-      email,
-      checkoutRequestId,
-    });
-
-    if (paymentError) {
-      console.error("Payment insert error:", paymentError);
-      return NextResponse.json({ error: "Failed to create payment" }, { status: 500 });
-    }
-
-    // Trigger M-Pesa STK Push
-    const response = await mpesaClient.stkPush({
-      phoneNumber: phone,
-      amount,
-      accountReference: "CampusCart",
-      transactionDesc: `Payment by ${email}`,
-      callbackUrl: `${process.env.BASE_URL}/api/mpesa/callback`,
-    });
-
-    if (response.ResponseCode !== "0") {
-      console.error("M-Pesa STK Push failed:", response);
-      return NextResponse.json({ error: "STK Push failed" }, { status: 500 });
-    }
-
-    return NextResponse.json({ checkoutRequestId }); // 👈 return the correct value now
+    return NextResponse.json({ checkoutRequestId });
   } catch (err) {
     console.error("STK Push Error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to initiate payment." }, { status: 500 });
   }
 }

@@ -1,24 +1,19 @@
-// --- File: app/api/mpesa/check-payment/route.js ---
-
-import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   try {
     const { checkoutRequestId } = await req.json();
 
-    if (!checkoutRequestId) return NextResponse.json({ error: "Missing request ID" }, { status: 400 });
+    // Simulate payment check - replace with actual API call
+    const isPaid = Math.random() > 0.5; // mock paid 50% chance
 
-    const { data, error } = await supabase
-      .from("payments")
-      .select("status")
-      .eq("checkout_request_id", checkoutRequestId)
-      .single();
-
-    if (error) throw new Error("Unable to check payment status");
-
-    return NextResponse.json({ status: data?.status });
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (isPaid) {
+      return NextResponse.json({ status: "paid" });
+    } else {
+      return NextResponse.json({ status: "pending" });
+    }
+  } catch (err) {
+    console.error("Check Payment Error:", err);
+    return NextResponse.json({ error: "Payment check failed." }, { status: 500 });
   }
 }

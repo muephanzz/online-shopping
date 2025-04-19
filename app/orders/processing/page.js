@@ -2,18 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 
 export default function ProcessingPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const checkoutRequestId = searchParams.get("checkoutRequestId");
-  const [status, setStatus] = useState("pending");
+
+  const [status, setStatus] = useState("Checking payment...");
+  const [tries, setTries] = useState(0);
 
   useEffect(() => {
-    if (!checkoutRequestId) return;
+    const checkPayment = async () => {
+      if (!checkoutRequestId) return;
 
-    const interval = setInterval(async () => {
       const res = await fetch("/api/mpesa/check-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -23,22 +24,23 @@ export default function ProcessingPage() {
       const data = await res.json();
 
       if (data.status === "paid") {
-        clearInterval(interval);
         router.push("/orders/success");
-      } else if (data.status === "failed") {
-        clearInterval(interval);
-        router.push("/orders/failed");
+      } else if (tries < 5) {
+        setTimeout(() => setTries((t) => t + 1), 5000);
+      } else {
+        setStatus("Payment still pending. Please try again.");
       }
-    }, 4000);
+    };
 
-    return () => clearInterval(interval);
-  }, [checkoutRequestId, router]);
+    checkPayment();
+  }, [tries, checkoutRequestId]);
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center text-center">
-      <Loader2 className="h-10 w-10 text-blue-500 animate-spin mb-4" />
-      <p className="text-lg font-semibold">Processing your payment...</p>
-      <p className="text-sm text-gray-500">Do not close this page.</p>
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="text-center">
+        <h1 className="text-2xl font-semibold text-blue-600 mb-4">{status}</h1>
+        <p className="text-gray-600">Please wait while we verify your payment...</p>
+      </div>
     </div>
   );
 }
