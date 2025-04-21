@@ -55,7 +55,7 @@ export async function POST(req) {
     if (resultCode === 0) {
       await supabase
         .from("orders")
-        .update({ status: "confirmed" })
+        .update({ status: "paid" })
         .eq("mpesa_transaction_id", checkoutRequestId);
     }
 

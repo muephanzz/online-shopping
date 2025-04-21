@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import ClientWrapper from "@/components/ClientWrapper";
 import Loading from "./loading";
 import { AuthProvider } from "@/context/AuthContext";
+import { CartProvider } from '@/context/CartContext';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,7 +27,9 @@ export default function RootLayout({ children }) {
       <body className="antialiased">
           <Suspense fallback={<Loading />}>
             <AuthProvider>
-              <ClientWrapper>{children}</ClientWrapper>
+              <CartProvider>
+                <ClientWrapper>{children}</ClientWrapper>
+              </CartProvider>
             </AuthProvider>
           </Suspense>
       </body>

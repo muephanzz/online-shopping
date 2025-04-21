@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 
 export default function ProcessingPage() {
   const searchParams = useSearchParams();
@@ -12,13 +11,12 @@ export default function ProcessingPage() {
 
   const [status, setStatus] = useState("Checking payment...");
   const [tries, setTries] = useState(0);
-  const [icon, setIcon] = useState(<Loader2 className="animate-spin w-12 h-12 text-blue-500" />);
 
   useEffect(() => {
     const checkPayment = async () => {
       if (!checkoutRequestId) return;
 
-      const res = await fetch("/api/mpesa/check-payment", {
+      const res = await fetch("/api/mpesa/callback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ checkoutRequestId }),
@@ -27,14 +25,11 @@ export default function ProcessingPage() {
       const data = await res.json();
 
       if (data.status === "paid") {
-        setIcon(<CheckCircle className="text-green-500 w-12 h-12" />);
-        setStatus("Payment confirmed! Redirecting...");
-        setTimeout(() => router.push("/orders/success"), 2000);
-      } else if (tries < 5) {
+        router.push("/orders/success");
+      } else if (tries < 6) {
         setTimeout(() => setTries((t) => t + 1), 5000);
       } else {
-        setStatus("Payment still pending. Please try again.");
-        setIcon(<AlertCircle className="text-yellow-500 w-12 h-12" />);
+        setStatus("Payment still pending. Please try again or contact support.");
       }
     };
 
@@ -42,17 +37,15 @@ export default function ProcessingPage() {
   }, [tries, checkoutRequestId]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-blue-50"
-    >
-      <div className="text-center p-8 bg-white rounded-2xl shadow-2xl max-w-md w-full">
-        <div className="flex justify-center mb-4">{icon}</div>
-        <h1 className="text-2xl font-bold text-blue-600 mb-2">{status}</h1>
-        <p className="text-gray-500 text-sm">Please wait while we verify your payment...</p>
+    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+      <div className="text-center max-w-md">
+        <Loader2 className="animate-spin mx-auto text-blue-600 w-12 h-12 mb-4" />
+        <h1 className="text-2xl font-semibold text-blue-700 mb-2">{status}</h1>
+        <p className="text-gray-600">
+          Do not close this page. We’re verifying your payment via M-Pesa.
+        </p>
+        <p className="text-sm text-gray-400 mt-2">Attempt {tries + 1}/6</p>
       </div>
-    </motion.div>
+    </div>
   );
 }

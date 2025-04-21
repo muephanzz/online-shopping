@@ -8,6 +8,9 @@ const AdminLayout = ({ children }) => {
       <aside className="w-64 bg-gray-900 text-white p-4">
         <h2 className="text-xl font-bold mb-6">Admin Panel</h2>
         <nav className="space-y-2">
+        <Link href="/" className="block hover:text-blue-400">
+            Home
+          </Link>
           <Link href="/admin/products" className="block hover:text-blue-400">
             Manage Products
           </Link>

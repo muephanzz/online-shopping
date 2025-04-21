@@ -1,5 +1,5 @@
 "use client";
-
+import { Button } from "@/components/ui/button";
 import { Menu, Transition } from "@headlessui/react";
 import { Fragment, useState, useEffect } from "react";
 import Link from "next/link";
@@ -78,8 +78,7 @@ export default function UserMenu({ onSignIn }) {
       {user ? (
         <Menu as="div" className="relative inline-block mr-4 text-left">
           <Menu.Button className="flex items-center p-2 text-white rounded-full hover:bg-white hover:text-black transition">
-            <User2 className="h-6 w-6" />
-            <ChevronDown className="h-4 w-4 ml-1" />
+            <Button variant="ghost"><User2/><ChevronDown/></Button>
           </Menu.Button>
           <Transition
             as={Fragment}
@@ -163,9 +162,7 @@ export default function UserMenu({ onSignIn }) {
         </Menu>
       ) : (
         <Link href="/signin">
-        <button className="bg-green-600 text-white rounded-md w-16 hover:bg-white hover:text-black mr-4 transition">
-            Sign In 
-          </button>
+          <Button variant="ghost"><User2/><ChevronDown/></Button>
         </Link>
       )}
     </div>

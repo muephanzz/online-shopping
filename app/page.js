@@ -42,57 +42,62 @@ export default function Home() {
   }, [currentPage]);
 
   return (
-    <div className="sm:pt-20 pt-20 md:pt-22 bg-black lg:pt-28">
-      <main className="bg-black min-h-screen flex flex-col items-center justify-center px-0 sm:px-4 lg:px-4">
-        <section className="border-2 border-orange-300 shadow-lg bg-white mb-6">
-        <div className="col-span-2 sm:col-span-3 lg:col-span-4">
+    <div className="bg-gradient-to-br from-gray-900 via-black to-gray-800 text-white min-h-screen">
+      <main className="max-w-7xl mx-auto pt-24 px-4 sm:px-6 lg:px-8">
+        {/* Top Sales */}
+        <section className="mb-10 rounded-3xl border border-orange-200/30 backdrop-blur-md shadow-xl bg-white/5 p-4">
+          <div className="mb-4">
             <TopSalesSection />
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
             {products.slice(0, 10).map((product) => (
               <ProductCard key={product.product_id} product={product} />
             ))}
           </div>
         </section>
 
-
         {/* Product Grid */}
-        <section className="border-2 border-orange-300 shadow-lg bg-white mb-6">
+        <section className="mb-10 rounded-3xl border border-yellow-300/30 backdrop-blur-lg shadow-2xl bg-white/5 p-4">
           {loading ? (
-            <div className="flex justify-center items-center min-h-[50vh]">
-              <div className="relative w-12 h-12 mb-4">
-                <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-500 animate-spin blur-sm"></div>
-                <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-blue-400 animate-spin"></div>
-              </div>
-            </div>
-          ) : (
-          <>
-            <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl rounded-xl overflow-hidden col-span-2 sm:col-span-3 lg:col-span-4">
-              <p className="text-lg px-2 font-bold text-gray-900">
-                Most Affordable price 🔥 
-              </p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 mb-6">
-              {products.map((product) => (
-                <ProductCard key={product.product_id} product={product} />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+              {[...Array(itemsPerPage)].map((_, i) => (
+                <div key={i} className="bg-white/60 rounded-lg shadow animate-pulse p-3 space-y-3">
+                  <div className="h-44 bg-gray-300 rounded-md"></div>
+                  <div className="h-4 w-3/4 bg-gray-300 rounded"></div>
+                  <div className="h-3 w-5/6 bg-gray-300 rounded"></div>
+                  <div className="h-4 w-1/2 bg-indigo-300 rounded"></div>
+                </div>
               ))}
             </div>
-          </>
-        )}
-      </section>
+          ) : (
+            <>
+              <div className="bg-gradient-to-r from-orange-100 to-yellow-50 py-2 shadow-2xl rounded-xl overflow-hidden col-span-2 sm:col-span-3 lg:col-span-4">
+                <p className="text-lg px-2 font-bold text-gray-900">
+                  Most Affordable price 🔥
+                </p>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 mb-6">
+                {products.map((product) => (
+                  <ProductCard key={product.product_id} product={product} />
+                ))}
+              </div>
+            </>
+          )}
+        </section>
 
-      {/* Pagination */}
-      <div className="m-4">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-        />
-      </div>
+        {/* Pagination */}
+        <div className="flex justify-center my-6">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
 
         {/* User Chat */}
         <UserChat />
       </main>
+
       <Footer />
     </div>
   );

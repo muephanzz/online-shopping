@@ -5,7 +5,7 @@ const consumerKey = process.env.MPESA_CONSUMER_KEY;
 const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
 const shortcode = process.env.MPESA_SHORTCODE;
 const passkey = process.env.MPESA_PASSKEY;
-const callbackURL = process.env.BASE_URL + "/api/mpesa/stkpush";
+const callbackURL = process.env.BASE_URL + "/api/mpesa/callback";
 
 const getTimestamp = () =>
   new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
@@ -45,7 +45,7 @@ export async function POST(req) {
       PartyB: shortcode,
       PhoneNumber: formattedPhone,
       CallBackURL: callbackURL,
-      AccountReference: `Order-${user_id}`,
+      AccountReference: `Order`,
       TransactionDesc: "E-commerce Order",
     };
 

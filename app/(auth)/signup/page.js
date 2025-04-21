@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 export default function SignUpPage() {
   const [form, setForm] = useState({
@@ -96,9 +97,9 @@ export default function SignUpPage() {
 
         <p className="text-sm text-center mt-4">
           Already have an account?{" "}
-          <a href="/signin" className="text-blue-600 hover:underline">
+          <Link href="/signin" className="text-blue-600 hover:underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </div>
     </div>

@@ -150,7 +150,7 @@ export default function Checkout() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
-              placeholder="e.g. 254712345678"
+              placeholder="e.g. 0712345678"
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>

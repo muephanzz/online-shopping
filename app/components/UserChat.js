@@ -178,15 +178,12 @@ const UserChat = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Typing Indicator */}
-          {isTyping && <div className="p-2 text-sm text-gray-500 italic">Typing...</div>}
-
           {/* Input & Send Button */}
           <div className="flex space-x-2 p-3 bg-gray-100 border-t rounded-b-lg">
-            <input
+            <textarea
               value={message}
               onChange={handleTyping}
-              className="flex-1 border border-gray-300 p-2 rounded-lg text-gray-800"
+              className="flex-1 w-3/4 overflow-hidden border border-gray-300 p-2 rounded-lg text-gray-800"
               placeholder="Type a message"
             />
             {/* Image Upload */}
@@ -197,7 +194,7 @@ const UserChat = () => {
               className="hidden"
               id="image-upload"
             />
-            <label htmlFor="image-upload" className="cursor-pointer">
+            <label htmlFor="image-upload" className="cursor-pointer justify[-center">
               <ImageIcon size={24} className="text-blue-500" />
             </label>
 

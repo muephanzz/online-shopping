@@ -1,8 +1,20 @@
+"use client";
+import { useEffect, useState } from "react";
 import Link from 'next/link';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube } from 'lucide-react';
 import { FaCcVisa, FaCcMastercard, FaPaypal } from 'react-icons/fa';
 
 export default function Footer() {
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+      const checkMobile = () => {
+        setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+      };
+      checkMobile();
+    }, []);
+
+  if (isMobile) return null;
+
   return (
     <footer className="bg-gradient-to-br mt-10 from-gray-900 via-gray-800 to-gray-900 text-white p-10 shadow-inner">
       {/* About Section */}
@@ -22,17 +34,17 @@ export default function Footer() {
           <h2 className="mb-4 text-xl font-bold tracking-wide text-blue-400">Quick Links</h2>
           <ul className="space-y-2 text-sm text-gray-300">
             <li><Link href="/" className="hover:text-blue-300">🏠 Home</Link></li>
-            <li><Link href="/privacy-policy" className="hover:text-blue-300">🔒 Privacy Policy</Link></li>
-            <li><Link href="/terms" className="hover:text-blue-300">📄 Terms & Conditions</Link></li>
-            <li><Link href="/faqs" className="hover:text-blue-300">❓ FAQs</Link></li>
+            <li><Link href="/coming-soon" className="hover:text-blue-300">🔒 Privacy Policy</Link></li>
+            <li><Link href="/coming-soon" className="hover:text-blue-300">📄 Terms & Conditions</Link></li>
+            <li><Link href="/coming-soon" className="hover:text-blue-300">❓ FAQs</Link></li>
           </ul>
         </div>
 
         {/* Contact Section */}
         <div id='contacts'>
           <h2 className="mb-4 text-xl font-bold tracking-wide text-blue-400">Contact Us</h2>
-          <p className="text-sm mb-2">📧 <a href="mailto:muephanzz@gmail.com" className="hover:text-blue-300">muephanzz@gmail.com</a></p>
-          <p className="text-sm">📞 <a href="tel:+254798229783" className="hover:text-blue-300">+254 798 229 783</a></p>
+          <p className="text-sm mb-2">📧 <Link href="mailto:muephanzz@gmail.com" className="hover:text-blue-300">muephanzz@gmail.com</Link></p>
+          <p className="text-sm">📞 <Link href="tel:0798229783" className="hover:text-blue-300"> 0798 229 783</Link></p>
         </div>
 
         {/* Payment Methods */}
@@ -65,11 +77,11 @@ export default function Footer() {
         <div>
           <h2 className="mb-4 text-xl font-bold tracking-wide text-blue-400">Follow Us</h2>
           <div className="flex space-x-4">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500"><Facebook size={24} /></a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400"><Twitter size={24} /></a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500"><Instagram size={24} /></a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-blue-300"><Linkedin size={24} /></a>
-            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:text-red-500"><Youtube size={24} /></a>
+            <Link href="/coming-soon" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500"><Facebook size={24} /></Link>
+            <Link href="/coming-soon" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400"><Twitter size={24} /></Link>
+            <Link href="/coming-soon" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500"><Instagram size={24} /></Link>
+            <Link href="/coming-soon" target="_blank" rel="noopener noreferrer" className="hover:text-blue-300"><Linkedin size={24} /></Link>
+            <Link href="/coming-soon" target="_blank" rel="noopener noreferrer" className="hover:text-red-500"><Youtube size={24} /></Link>
           </div>
         </div>
       </div>

@@ -4,11 +4,12 @@ import { Menu, X, Home, Tag } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
+import { Button } from "./ui/button";
 
 export default function MobileMenu() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const searchParams = useSearchParams(); // Get URL search parameters
-  const categoryId = searchParams.get("category_id"); // Extract category_id
+  const searchParams = useSearchParams();
+  const categoryId = searchParams.get("category_id"); 
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -29,12 +30,12 @@ export default function MobileMenu() {
   return (
     <div className="md:hidden">
       {/* Menu Button */}
-      <button
+      <Button
         onClick={() => setMenuOpen(!menuOpen)}
-        className="top-4 ml-2 text-white p-2 rounded-full hover:bg-white hover:text-black transition-all duration-300"
+        variant="ghost"
       >
         {menuOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      </Button>
 
       {/* Fullscreen Overlay */}
       {menuOpen && (

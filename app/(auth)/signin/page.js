@@ -38,13 +38,13 @@ export default function SignInPage() {
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100 px-4">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-xl">
         <h2 className="text-xl font-semibold text-center mb-6 text-blue-600">Sign In</h2>
-
+      {/*       
         <button
           onClick={handleGoogle}
           className="w-full flex items-center justify-center bg-gray-100 py-2 rounded-lg mb-4 text-sm hover:bg-gray-200"
         >
           <FcGoogle className="mr-2" size={20} /> Continue with Google
-        </button>
+        </button> */} 
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
