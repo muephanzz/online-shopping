@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import ClientWrapper from "@/components/ClientWrapper";
 import Loading from "./loading";
 import { AuthProvider } from "@/context/AuthContext";
-import Head from "next/head";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,14 +23,6 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable}`}>
-      <Head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-        />
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description} />
-      </Head>
       <body className="antialiased">
         <Suspense fallback={<Loading />}>
           <AuthProvider>
