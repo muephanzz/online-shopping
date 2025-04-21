@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { motion } from "framer-motion";
-import { MessageSquare, Mic, ImageIcon } from "lucide-react";
+import { MessageSquare, ImageIcon } from "lucide-react";
 import moment from "moment";
-import { AudioRecorder } from "./AudioRecorder"; // Custom audio recorder component
 
 const UserChat = () => {
   const [messages, setMessages] = useState([]);
@@ -13,11 +12,20 @@ const UserChat = () => {
   const [user, setUser] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [newMessage, setNewMessage] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
   const [image, setImage] = useState(null); // For image upload
   const messagesEndRef = useRef(null);
   const chatRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+      const checkMobile = () => {
+        setIsMobile(/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+      };
+      checkMobile();
+    }, []);
 
+  if (isMobile) return null;
+  
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -120,7 +128,7 @@ const UserChat = () => {
       <motion.div
         drag
         dragConstraints={{ left: -6, right: 6, top: -6, bottom: 6 }}
-        className="fixed bottom-20 right-6 bg-gradient-to-r from-blue-500 via-teal-400 to-indigo-500 text-white p-3 rounded-full cursor-pointer shadow-xl transform hover:scale-105 transition-all"
+        className="fixed z-900 bottom-12 right-6 bg-gradient-to-r from-blue-500 via-teal-400 to-indigo-500 text-white p-3 rounded-full cursor-pointer shadow-xl transform hover:scale-105 transition-all"
         onClick={() => {
           setIsOpen(!isOpen);
           setNewMessage(false);
@@ -141,7 +149,7 @@ const UserChat = () => {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.8 }}
-          className="fixed bottom-20 right-0 w-80 max-w-xs bg-white border rounded-lg shadow-lg border-gray-300"
+          className="fixed bottom-12 right-0 w-80 max-w-xs bg-white border rounded-lg shadow-lg border-gray-300"
         >
           <div className="p-3 bg-gradient-to-r from-blue-500 via-teal-400 to-indigo-500 text-white flex justify-between items-center rounded-t-lg">
             <span className="font-bold text-lg">Chat with Support</span>
@@ -197,9 +205,6 @@ const UserChat = () => {
             <label htmlFor="image-upload" className="cursor-pointer justify[-center">
               <ImageIcon size={24} className="text-blue-500" />
             </label>
-
-            {/* Voice Message */}
-            <AudioRecorder />
 
             <button
               onClick={sendMessage}

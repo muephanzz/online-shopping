@@ -6,16 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import toast from "react-hot-toast";
-import {
-  User2,
-  LogOut,
-  ShoppingBasket,
-  ChevronDown,
-  Package,
-  User,
-  CheckCircle,
-  History,
-} from "lucide-react";
+import { User2, LogOut, ShoppingBasket, ChevronDown, Package, User, CheckCircle, } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 export default function UserMenu({ onSignIn }) {
@@ -78,7 +69,7 @@ export default function UserMenu({ onSignIn }) {
       {user ? (
         <Menu as="div" className="relative inline-block mr-4 text-left">
           <Menu.Button className="flex items-center p-2 text-white rounded-full hover:bg-white hover:text-black transition">
-            <Button variant="ghost"><User2/><ChevronDown/></Button>
+            <button className="flex"><User2/><ChevronDown/></button>
           </Menu.Button>
           <Transition
             as={Fragment}
@@ -118,16 +109,6 @@ export default function UserMenu({ onSignIn }) {
               <Menu.Item>
                 {({ active }) => (
                   <Link
-                    href="/orders/history"
-                    className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}
-                  >
-                    <History className="inline-block mr-2" /> Order History
-                  </Link>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <Link
                     href="/orders/tracking"
                     className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}
                   >
@@ -161,9 +142,34 @@ export default function UserMenu({ onSignIn }) {
           </Transition>
         </Menu>
       ) : (
-        <Link href="/signin">
-          <Button variant="ghost"><User2/><ChevronDown/></Button>
-        </Link>
+        <Menu as="div" className="relative inline-block mr-4 text-left">
+          <Menu.Button className="flex items-center p-2 text-white rounded-full hover:bg-white hover:text-black transition">
+            <button className="flex"><User2/><ChevronDown/></button>
+          </Menu.Button>
+          <Transition
+            as={Fragment}
+            enter="transition ease-out duration-100"
+            enterFrom="transform opacity-0 scale-95"
+            enterTo="transform opacity-100 scale-100"
+            leave="transition ease-in duration-75"
+            leaveFrom="transform opacity-100 scale-100"
+            leaveTo="transform opacity-0 scale-95"
+          >
+            <Menu.Items className="absolute right-0 mt-3 w-56 bg-white border rounded-md shadow-lg">
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href="/signin"
+                    className={`block px-4 py-2 ${active ? "bg-gray-100" : ""}`}
+                  >
+                    <User className="inline-block mr-2" /> Sign in
+                  </Link>
+                )}
+              </Menu.Item>
+
+            </Menu.Items>
+          </Transition>
+      </Menu>
       )}
     </div>
   );

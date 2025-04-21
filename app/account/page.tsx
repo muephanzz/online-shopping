@@ -10,26 +10,38 @@ export default function AccountPage() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (user?.user_metadata?.role === "admin") {
-      setIsAdmin(true);
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+
+    const { data, error: userError } = await supabase.auth.getUser();
+    const currentUser = data?.user;
+
+    if (userError || !currentUser) {
+      console.error("Error fetching user or user not logged in:", userError);
+      return;
     }
-  }, [user]);
 
-  useEffect(() => {
-    const fetchUserName = async () => {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("first_name, last_name")
-        .eq("user_id", user.id)
-        .maybeSingle();
+    setUser(currentUser);
 
-      if (!error && data)
-        setUserName(`${data.first_name || ""} ${data.last_name || ""}`.trim());
-    };
+    const { data: isAdminData, error: adminError } = await supabase.rpc("check_is_admin", {
+      uid: currentUser.id,
+    });
 
-    fetchUserName();
-  }, [user]);
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("first_name")
+      .eq("user_id", currentUser.id)
+      .maybeSingle();
+
+    if (adminError) console.error("Error checking admin status:", adminError);
+    setIsAdmin(isAdminData || false);
+
+    if (profileError) console.error("Error fetching profile data:", profileError);
+    setUserName(profileData?.first_name || "User");
+
+  };
 
   if (!user) {
     return (

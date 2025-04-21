@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  Home,
-  Heart,
-  Menu,
-  ShoppingCart,
-  User,
-} from "lucide-react";
+import { Home, Heart, Menu, ShoppingCart, User, ChartBarIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
@@ -60,10 +54,10 @@ export default function BottomNav() {
           </button>
         </Link>
 
-        <Link href="/wishlist">
-          <button className={buttonStyle(pathname === "/wishlist")}>
-            <Heart size={24} />
-            <span className="mt-1">Wishlist</span>
+        <Link href="/chat">
+          <button className={buttonStyle(pathname === "/chats")}>
+            <ChartBarIcon size={24} />
+            <span className="mt-1">Messages</span>
           </button>
         </Link>
 

@@ -14,7 +14,11 @@ function LayoutWrapper({ children }) {
   const { user, setUser } = useAuth();
   const pathname = usePathname();
   const cleanPath = pathname.split("?")[0].replace(/\/$/, "");
-  const hideNav = ["/signin", "/signup", "/checkout", "/reset-password", "/admin/dashboard", "/admin/products", "/admin/orders", "/admin/chat", "/admin/access-denied"].includes(cleanPath);
+  const hideNav = 
+  ["/signin", "/signup", "/reset-password", 
+  "/admin/dashboard", "/admin/products", "/admin/orders", 
+  "/admin/chat", "/access-denied", "/coming-soon"]
+  .includes(cleanPath);
   
   return (
     <>

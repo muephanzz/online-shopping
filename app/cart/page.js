@@ -13,7 +13,6 @@ export default function Cart() {
   const [cartItems, setCartItems] = useState([]);
   const [selectedItems, setSelectedItems] = useState({});
   const [loading, setLoading] = useState(true);
-  const [wishlist, setWishlist] = useState([]);
   const [userId, setUserId] = useState(null);
   const router = useRouter();
 
@@ -54,38 +53,8 @@ export default function Cart() {
       setLoading(false);
     };
 
-    const fetchWishlist = async (userId) => {
-      const { data, error } = await supabase
-        .from("wishlist")
-        .select("product_id")
-        .eq("user_id", userId);
-
-      if (error) console.error("Error fetching wishlist:", error.message);
-      setWishlist(data?.map((item) => item.product_id) || []);
-    };
-
     fetchUserData();
   }, []);
-
-  const addToWishlist = async (item) => {
-    if (wishlist.includes(item.product_id)) {
-      toast.info("Already in wishlist!");
-      return;
-    }
-
-    const { error } = await supabase.from("wishlist").insert({
-      user_id: userId,
-      product_id: item.product_id,
-    });
-
-    if (error) {
-      console.error("Error adding to wishlist:", error.message);
-      toast.error("Failed to add to wishlist.");
-    } else {
-      setWishlist([...wishlist, item.product_id]);
-      toast.success("Added to wishlist!");
-    }
-  };
 
   const handleRemoveItem = async (cart_id) => {
     const confirmation = window.confirm("Are you sure you want to remove this product?");
@@ -207,12 +176,6 @@ export default function Cart() {
               </div>
 
               <div className="flex items-center justify-center gap-2">
-                <button
-                  onClick={() => addToWishlist(item)}
-                  className="p-2 bg-pink-500 hover:bg-pink-600 text-white rounded-full"
-                >
-                  <Heart size={18} />
-                </button>
                 <button
                   onClick={() => handleRemoveItem(item.cart_id)}
                   className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full"

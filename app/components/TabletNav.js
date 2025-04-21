@@ -30,12 +30,12 @@ export default function MobileMenu() {
   return (
     <div className="md:hidden">
       {/* Menu Button */}
-      <Button
+      <button
         onClick={() => setMenuOpen(!menuOpen)}
-        variant="ghost"
+        className="text-white ml-4 "
       >
         {menuOpen ? <X size={24} /> : <Menu size={24} />}
-      </Button>
+      </button>
 
       {/* Fullscreen Overlay */}
       {menuOpen && (

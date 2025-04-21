@@ -1,13 +1,8 @@
-// components/ProductCard.jsx
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 export default function ProductCard({ product, loading }) {
-  const [hovered, setHovered] = useState(false);
 
   if (loading) {
     return (
@@ -24,8 +19,6 @@ export default function ProductCard({ product, loading }) {
     <Link
       href={`/products/${product.product_id}`}
       className="group block"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
     >
       <motion.div
         className="border border-gray-200 bg-white rounded-lg shadow-sm hover:shadow-xl p-3 sm:p-4 transition-all duration-300 overflow-hidden relative"
@@ -59,17 +52,6 @@ export default function ProductCard({ product, loading }) {
         <p className="mt-2 font-bold text-indigo-700 text-sm sm:text-base">
           Ksh {Number(product.price).toLocaleString()}
         </p>
-
-        {hovered && (
-          <motion.button
-            className="absolute top-4 right-4 bg-black text-white px-3 py-1 text-xs rounded shadow hover:bg-indigo-600 transition"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-          >
-            Quick View
-          </motion.button>
-        )}
       </motion.div>
     </Link>
   );
