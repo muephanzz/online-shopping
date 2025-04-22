@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import ClientWrapper from "@/components/ClientWrapper";
 import Loading from "./loading";
 import { AuthProvider } from "@/context/AuthContext";
-import UserChat from "./components/UserChat";
+
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
