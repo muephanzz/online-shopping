@@ -38,7 +38,8 @@ export async function POST(req) {
       return NextResponse.json({ message: "Missing CheckoutRequestID" }, { status: 400 });
     }
 
-    const { error: paymentError } = await supabase
+    // Update the payment table
+    await supabase
       .from("payments")
       .update({
         status: resultCode === 0 ? "paid" : "pending",
@@ -48,15 +49,65 @@ export async function POST(req) {
       })
       .eq("checkout_request_id", checkoutRequestId);
 
-    if (paymentError) {
-      console.error("Payment update error:", paymentError.message);
-    }
+    let userEmail = "";
+    let userId = "";
 
     if (resultCode === 0) {
-      await supabase
+      // Success: update orders to paid
+      const { data: order } = await supabase
         .from("orders")
         .update({ status: "paid" })
-        .eq("mpesa_transaction_id", checkoutRequestId);
+        .eq("mpesa_transaction_id", checkoutRequestId)
+        .select("user_id");
+
+      userId = order?.[0]?.user_id || "";
+
+      if (userId) {
+        const { data: userData } = await supabase
+          .from("users")
+          .select("email")
+          .eq("id", userId)
+          .single();
+
+        userEmail = userData?.email || "";
+
+        // Send payment success email
+        await fetch(`${process.env.BASE_URL}/api/email/orderpaid`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: userEmail, checkoutRequestId }),
+        });
+      }
+    } else {
+      // Failed or pending: optionally notify user
+      const { data: paymentData } = await supabase
+        .from("payments")
+        .select("user_id")
+        .eq("checkout_request_id", checkoutRequestId)
+        .single();
+
+      userId = paymentData?.user_id;
+
+      if (userId) {
+        const { data: userData } = await supabase
+          .from("users")
+          .select("email")
+          .eq("id", userId)
+          .single();
+
+        userEmail = userData?.email || "";
+
+        // Send failure or pending notification email
+        await fetch(`${process.env.BASE_URL}/api/email/orderpending`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: userEmail,
+            reason: resultDesc,
+            checkoutRequestId,
+          }),
+        });
+      }
     }
 
     return NextResponse.json({ message: "Callback received successfully" });
