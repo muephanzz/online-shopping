@@ -55,7 +55,7 @@ export default function BottomNav() {
         </Link>
 
         <Link href="/chat">
-          <button className={buttonStyle(pathname === "/chats")}>
+          <button className={buttonStyle(pathname === "/user/chat")}>
             <ChartBarIcon size={24} />
             <span className="mt-1">Messages</span>
           </button>

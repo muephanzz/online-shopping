@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 import ProductCard from "@/components/ProductCard";
 import Pagination from "@/components/Pagination";
 import Footer from "@/components/Footer";
-import UserChat from "@/components/UserChat";
+import ChatView from "@/components/chat/ChatView";
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -57,7 +57,7 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-4 mb-6">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
                 {products.map((product) => (
                   <ProductCard key={product.product_id} product={product} />
                 ))}
@@ -76,7 +76,7 @@ export default function Home() {
         </div>
 
       </main>
-      <UserChat />
+      <ChatView />
       <Footer />
     </div>
   );

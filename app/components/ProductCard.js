@@ -32,7 +32,7 @@ export default function ProductCard({ product, loading }) {
             width={500}
             height={500}
             loading="lazy"
-            className="w-full h-44 object-cover rounded-md transition-transform duration-300"
+            className="w-full h-44 object-fill rounded-md transition-transform duration-300"
           />
           {product.state && (
             <span className="absolute top-2 left-2 bg-indigo-600 text-white text-xs font-medium px-2 py-0.5 rounded-md shadow z-10">
