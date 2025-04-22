@@ -80,7 +80,7 @@ export default function Checkout() {
       const data = await res.json();
 
       if (res.ok && data.checkoutRequestId) {
-        router.push(`/processing?checkoutRequestId=${data.checkoutRequestId}`);
+        router.push(`/orders/processing?checkoutRequestId=${data.checkoutRequestId}`);
       } else {
         setError(data.error || "Payment initiation failed.");
         setLoading(false);
